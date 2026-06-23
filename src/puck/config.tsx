@@ -1204,7 +1204,21 @@ export type PuckConfig = {
         value: string;
       }[];
     };
-    Footer: {};
+    Footer: {
+      description?: string;
+      twitterUrl?: string;
+      instagramUrl?: string;
+      col1Title?: string;
+      col1Links?: { label: string; href: string }[];
+      col2Title?: string;
+      col2Links?: { label: string; href: string }[];
+      col3Title?: string;
+      col3Links?: { label: string; href: string }[];
+      col4Title?: string;
+      col4Links?: { label: string; href: string }[];
+      copyrightText?: string;
+      statusText?: string;
+    };
   };
 };
 
@@ -3627,19 +3641,19 @@ export const config: Config<PuckConfig> = {
         const cols = [
           {
             h: "المنتج",
-            links: ["الميزات", "الأسعار", "كيف يعمل", "التكاملات", "القوالب الجاهزة"],
+            links: ["الميزات", "كيف يعمل", "القوالب الجاهزة"],
           },
           {
             h: "لمن",
-            links: ["للمعلمين", "للمدارس", "للجامعات", "للجهات التعليمية", "للطلاب"],
+            links: ["للمعلمين", "للمدارس", "للجامعات", "للجهات التعليمية"],
           },
           {
             h: "موارد",
-            links: ["مركز المساعدة", "المدوّنة", "الأكاديمية", "دراسات حالة", "تواصل معنا"],
+            links: ["مركز المساعدة", "المدوّنة", "عن اختباري", "تواصل معنا"],
           },
           {
             h: "الشركة",
-            links: ["عن اختباري", "الوظائف", "سياسة الخصوصية", "الشروط والأحكام", "الأمان"],
+            links: ["سياسة الخصوصية", "الشروط والأحكام"],
           },
         ];
 
@@ -3677,29 +3691,54 @@ export const config: Config<PuckConfig> = {
                     بالمنهج السعودي.
                   </p>
                   <div style={{ display: "flex", gap: 8, marginTop: 22, direction: "rtl" }}>
-                    {[
-                      <Icon.Globe key="g" />,
-                      <Icon.Share key="s" />,
-                      <Icon.Users key="u" />,
-                    ].map((I, i) => (
-                      <a
-                        key={i}
-                        href="#"
-                        style={{
-                          width: 38,
-                          height: 38,
-                          borderRadius: 10,
-                          background: "var(--bg-elev-2)",
-                          border: "1px solid var(--border)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "var(--text-muted)",
-                        }}
-                      >
-                        {React.cloneElement(I, { width: 16, height: 16 })}
-                      </a>
-                    ))}
+                    <a
+                      href="https://x.com/examyai"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        width: 38,
+                        height: 38,
+                        borderRadius: 10,
+                        background: "var(--bg-elev-2)",
+                        border: "1px solid var(--border)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "var(--text-muted)",
+                        transition: "all 0.15s ease",
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = "var(--brand)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
+                    >
+                      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                      </svg>
+                    </a>
+                    <a
+                      href="https://www.instagram.com/examy.ai/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        width: 38,
+                        height: 38,
+                        borderRadius: 10,
+                        background: "var(--bg-elev-2)",
+                        border: "1px solid var(--border)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "var(--text-muted)",
+                        transition: "all 0.15s ease",
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = "var(--brand)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                        <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
+                      </svg>
+                    </a>
                   </div>
                 </div>
 
@@ -3729,7 +3768,7 @@ export const config: Config<PuckConfig> = {
                         <li key={l}>
                           <a
                             href="#"
-                            style={{ fontSize: 14, color: "var(--text-muted)" }}
+                            style={{ fontSize: 14, color: "var(--text-muted)", transition: "all 0.15s ease" }}
                             onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text)")}
                             onMouseLeave={(e) =>
                               (e.currentTarget.style.color = "var(--text-muted)")
@@ -3758,9 +3797,11 @@ export const config: Config<PuckConfig> = {
                 }}
               >
                 <div>
-                  © 2026 اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦
+                  © ٢٠٢٦ اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦
                 </div>
-                <div style={{ display: "flex", gap: 18 }}>
+                <div style={{ display: "flex", gap: 18, alignItems: "center" }}>
+                  <a href="#" style={{ fontSize: 13, color: "var(--text-subtle)" }}>English</a>
+                  <a href="#" style={{ fontSize: 13, color: "var(--text-subtle)" }}>العربية</a>
                   <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                     <span
                       style={{
@@ -3770,10 +3811,8 @@ export const config: Config<PuckConfig> = {
                         background: "var(--brand)",
                       }}
                     />
-                    جميع الأنظمة تعمل
+                    توليد ذكي وموثوق
                   </span>
-                  <a href="#">العربية</a>
-                  <a href="#">English</a>
                 </div>
               </div>
             </div>
