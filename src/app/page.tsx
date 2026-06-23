@@ -41,6 +41,35 @@ const fallbackData = {
     {
       type: "HowItWorks",
       props: {
+        eyebrowText: "كيف يعمل",
+        title: "أربع خطوات. اختبارٌ كامل.",
+        subtitle: "من فكرة في رأس المعلم إلى اختبار جاهز للطلاب — مساعدُك في كل خطوة.",
+        steps: [
+          {
+            n: "01",
+            t: "صِف الاختبار",
+            d: "اكتب وصفاً بالعربية، أو اختر من القوالب. حدّد المادة والصف والعدد.",
+            iconName: "Edit"
+          },
+          {
+            n: "02",
+            t: "يولّد الذكاء الاصطناعي",
+            d: "يُنشئ النظام الأسئلة من بنك مرتبط بالمنهج السعودي ونواتج التعلم.",
+            iconName: "Brain"
+          },
+          {
+            n: "03",
+            t: "راجع وعدّل",
+            d: "حرّر أي سؤال، بدّل المستوى البلومي، أو أضف نماذج (A/B) بضغطة.",
+            iconName: "Layers"
+          },
+          {
+            n: "04",
+            t: "شارك وحلّل",
+            d: "أرسل للطلاب، صحّح آلياً، واحصل على تحليلات الأداء فوراً.",
+            iconName: "Chart"
+          }
+        ],
         id: "how-it-works"
       }
     },
@@ -150,6 +179,47 @@ export default function Home() {
               delete updatedProps.primaryCtaLink;
               delete updatedProps.secondaryCtaText;
               delete updatedProps.secondaryCtaLink;
+              return { ...item, props: updatedProps };
+            }
+            if (item.type === "HowItWorks") {
+              const updatedProps = { ...item.props };
+              if (!updatedProps.eyebrowText) {
+                updatedProps.eyebrowText = "كيف يعمل";
+              }
+              if (!updatedProps.title) {
+                updatedProps.title = "أربع خطوات. اختبارٌ كامل.";
+              }
+              if (!updatedProps.subtitle) {
+                updatedProps.subtitle = "من فكرة في رأس المعلم إلى اختبار جاهز للطلاب — مساعدُك في كل خطوة.";
+              }
+              if (!updatedProps.steps || updatedProps.steps.length === 0) {
+                updatedProps.steps = [
+                  {
+                    n: "01",
+                    t: "صِف الاختبار",
+                    d: "اكتب وصفاً بالعربية، أو اختر من القوالب. حدّد المادة والصف والعدد.",
+                    iconName: "Edit",
+                  },
+                  {
+                    n: "02",
+                    t: "يولّد الذكاء الاصطناعي",
+                    d: "يُنشئ النظام الأسئلة من بنك مرتبط بالمنهج السعودي ونواتج التعلم.",
+                    iconName: "Brain",
+                  },
+                  {
+                    n: "03",
+                    t: "راجع وعدّل",
+                    d: "حرّر أي سؤال، بدّل المستوى البلومي، أو أضف نماذج (A/B) بضغطة.",
+                    iconName: "Layers",
+                  },
+                  {
+                    n: "04",
+                    t: "شارك وحلّل",
+                    d: "أرسل للطلاب، صحّح آلياً، واحصل على تحليلات الأداء فوراً.",
+                    iconName: "Chart",
+                  },
+                ];
+              }
               return { ...item, props: updatedProps };
             }
             return item;

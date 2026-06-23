@@ -1157,7 +1157,17 @@ export type PuckConfig = {
       subtitle: string;
       ctas?: { label: string; href: string; variant: "primary" | "secondary" }[];
     };
-    HowItWorks: {};
+    HowItWorks: {
+      eyebrowText?: string;
+      title?: string;
+      subtitle?: string;
+      steps?: {
+        n: string;
+        t: string;
+        d: string;
+        iconName: "Edit" | "Brain" | "Layers" | "Chart" | "Book" | "Clock" | "Settings" | "Shield" | "Saudi" | "AI" | "Zap" | "Users" | "Target";
+      }[];
+    };
     FeatureTabs: {};
     Showcase: {};
     Stats: {};
@@ -2250,39 +2260,136 @@ export const config: Config<PuckConfig> = {
       },
     },
     HowItWorks: {
-      render: () => {
-        const [active, setActive] = useState(0);
-        useEffect(() => {
-          const id = setInterval(() => setActive((a) => (a + 1) % 4), 3500);
-          return () => clearInterval(id);
-        }, []);
-
-        const steps = [
+      fields: {
+        eyebrowText: { type: "text", label: "نص الشارة العلوية (Eyebrow)" },
+        title: { type: "text", label: "العنوان الرئيسي" },
+        subtitle: { type: "text", label: "العنوان الفرعي" },
+        steps: {
+          type: "array",
+          label: "خطوات العمل (Steps)",
+          getItemSummary: (item) => `${item.n || ""} - ${item.t || "خطوة جديدة"}`,
+          arrayFields: {
+            n: { type: "text", label: "رقم/رمز الخطوة (مثال: 01)" },
+            t: { type: "text", label: "عنوان الخطوة" },
+            d: { type: "textarea", label: "شرح الخطوة" },
+            iconName: {
+              type: "select",
+              label: "أيقونة الخطوة",
+              options: [
+                { label: "تعديل / قلم", value: "Edit" },
+                { label: "دماغ / ذكاء", value: "Brain" },
+                { label: "طبقات / نماذج", value: "Layers" },
+                { label: "مخطط بياني / إحصاء", value: "Chart" },
+                { label: "كتاب / دراسة", value: "Book" },
+                { label: "ساعة / وقت", value: "Clock" },
+                { label: "ترس / ضبط", value: "Settings" },
+                { label: "درع / أمان", value: "Shield" },
+                { label: "هدف / نواتج", value: "Target" },
+                { label: "برق / سرعة", value: "Zap" },
+                { label: "ذكاء اصطناعي", value: "AI" },
+                { label: "مستخدمين / طلاب", value: "Users" },
+                { label: "درع المملكة", value: "Saudi" }
+              ]
+            }
+          },
+          defaultItemProps: {
+            n: "01",
+            t: "خطوة جديدة",
+            d: "اكتب تفاصيل هذه الخطوة هنا.",
+            iconName: "Edit"
+          }
+        }
+      },
+      defaultProps: {
+        eyebrowText: "كيف يعمل",
+        title: "أربع خطوات. اختبارٌ كامل.",
+        subtitle: "من فكرة في رأس المعلم إلى اختبار جاهز للطلاب — مساعدُك في كل خطوة.",
+        steps: [
           {
             n: "01",
             t: "صِف الاختبار",
             d: "اكتب وصفاً بالعربية، أو اختر من القوالب. حدّد المادة والصف والعدد.",
-            icon: <Icon.Edit />,
+            iconName: "Edit",
           },
           {
             n: "02",
             t: "يولّد الذكاء الاصطناعي",
             d: "يُنشئ النظام الأسئلة من بنك مرتبط بالمنهج السعودي ونواتج التعلم.",
-            icon: <Icon.Brain />,
+            iconName: "Brain",
           },
           {
             n: "03",
             t: "راجع وعدّل",
             d: "حرّر أي سؤال، بدّل المستوى البلومي، أو أضف نماذج (A/B) بضغطة.",
-            icon: <Icon.Layers />,
+            iconName: "Layers",
           },
           {
             n: "04",
             t: "شارك وحلّل",
             d: "أرسل للطلاب، صحّح آلياً، واحصل على تحليلات الأداء فوراً.",
-            icon: <Icon.Chart />,
+            iconName: "Chart",
+          },
+        ]
+      },
+      render: ({ eyebrowText, title, subtitle, steps }) => {
+        const [active, setActive] = useState(0);
+
+        const defaultSteps = [
+          {
+            n: "01",
+            t: "صِف الاختبار",
+            d: "اكتب وصفاً بالعربية، أو اختر من القوالب. حدّد المادة والصف والعدد.",
+            iconName: "Edit" as const,
+          },
+          {
+            n: "02",
+            t: "يولّد الذكاء الاصطناعي",
+            d: "يُنشئ النظام الأسئلة من بنك مرتبط بالمنهج السعودي ونواتج التعلم.",
+            iconName: "Brain" as const,
+          },
+          {
+            n: "03",
+            t: "راجع وعدّل",
+            d: "حرّر أي سؤال، بدّل المستوى البلومي، أو أضف نماذج (A/B) بضغطة.",
+            iconName: "Layers" as const,
+          },
+          {
+            n: "04",
+            t: "شارك وحلّل",
+            d: "أرسل للطلاب، صحّح آلياً، واحصل على تحليلات الأداء فوراً.",
+            iconName: "Chart" as const,
           },
         ];
+
+        const activeSteps = steps && steps.length > 0 ? steps : defaultSteps;
+
+        useEffect(() => {
+          if (activeSteps.length === 0) return;
+          const id = setInterval(() => {
+            setActive((a) => (a + 1) % activeSteps.length);
+          }, 3500);
+          return () => clearInterval(id);
+        }, [activeSteps.length]);
+
+        const iconMap = {
+          Edit: <Icon.Edit />,
+          Brain: <Icon.Brain />,
+          Layers: <Icon.Layers />,
+          Chart: <Icon.Chart />,
+          Book: <Icon.Book />,
+          Clock: <Icon.Clock />,
+          Settings: <Icon.Settings />,
+          Shield: <Icon.Shield />,
+          Saudi: <Icon.Saudi />,
+          AI: <Icon.AI />,
+          Zap: <Icon.Zap />,
+          Users: <Icon.Users />,
+          Target: <Icon.Target />,
+        };
+
+        const eyebrow = eyebrowText || "كيف يعمل";
+        const mainTitle = title || "أربع خطوات. اختبارٌ كامل.";
+        const descText = subtitle || "من فكرة في رأس المعلم إلى اختبار جاهز للطلاب — مساعدُك في كل خطوة.";
 
         return (
           <section id="how" className="section" style={{ position: "relative" }}>
@@ -2290,119 +2397,124 @@ export const config: Config<PuckConfig> = {
               <div className="section-head">
                 <div className="eyebrow">
                   <span className="dot" />
-                  كيف يعمل
+                  {eyebrow}
                 </div>
-                <h2 style={{ marginTop: 16 }}>أربع خطوات. اختبارٌ كامل.</h2>
-                <p>من فكرة في رأس المعلم إلى اختبار جاهز للطلاب — مساعدُك في كل خطوة.</p>
+                <h2 style={{ marginTop: 16 }}>{mainTitle}</h2>
+                <p>{descText}</p>
               </div>
 
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(4, 1fr)",
-                  gap: 16,
-                }}
-                className="how-grid"
-              >
-                {steps.map((s, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActive(i)}
-                    className="card text-right"
-                    style={{
-                      padding: 28,
-                      position: "relative",
-                      background: active === i ? "var(--bg-elev-2)" : "var(--bg-elev-1)",
-                      borderColor:
-                        active === i
-                          ? "color-mix(in oklch, var(--brand) 40%, transparent)"
-                          : "var(--border)",
-                      cursor: "pointer",
-                      transition: "all 0.3s ease",
-                      transform: active === i ? "translateY(-4px)" : "translateY(0)",
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        marginBottom: 20,
-                      }}
-                    >
-                      <div
+              {activeSteps.length > 0 && (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: `repeat(${activeSteps.length}, 1fr)`,
+                    gap: 16,
+                  }}
+                  className="how-grid"
+                >
+                  {activeSteps.map((s, i) => {
+                    const stepIcon = iconMap[s.iconName] || <Icon.Edit />;
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => setActive(i)}
+                        className="card text-right"
                         style={{
-                          width: 44,
-                          height: 44,
-                          borderRadius: 12,
-                          background: active === i ? "var(--brand)" : "var(--bg-elev-2)",
-                          color: active === i ? "var(--brand-on)" : "var(--brand)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          transition: "all 0.3s",
+                          padding: 28,
+                          position: "relative",
+                          background: active === i ? "var(--bg-elev-2)" : "var(--bg-elev-1)",
+                          borderColor:
+                            active === i
+                              ? "color-mix(in oklch, var(--brand) 40%, transparent)"
+                              : "var(--border)",
+                          cursor: "pointer",
+                          transition: "all 0.3s ease",
+                          transform: active === i ? "translateY(-4px)" : "translateY(0)",
                         }}
                       >
-                        {React.cloneElement(s.icon, { width: 22, height: 22 })}
-                      </div>
-                      <div
-                        style={{
-                          fontSize: 13,
-                          fontFamily: "monospace",
-                          fontWeight: 600,
-                          color: active === i ? "var(--brand)" : "var(--text-subtle)",
-                          letterSpacing: "0.05em",
-                        }}
-                      >
-                        {s.n}
-                      </div>
-                    </div>
-                    <h3
-                      style={{
-                        fontSize: 19,
-                        fontWeight: 700,
-                        marginBottom: 8,
-                        color: "var(--text)",
-                      }}
-                    >
-                      {s.t}
-                    </h3>
-                    <p
-                      style={{
-                        fontSize: 14,
-                        color: "var(--text-muted)",
-                        lineHeight: 1.6,
-                        textAlign: "right",
-                      }}
-                    >
-                      {s.d}
-                    </p>
-                    {/* progress bar */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: 0,
-                        insetInlineStart: 0,
-                        insetInlineEnd: 0,
-                        height: 2,
-                        background: "var(--border)",
-                        borderBottomLeftRadius: 22,
-                        borderBottomRightRadius: 22,
-                        overflow: "hidden",
-                      }}
-                    >
-                      <div
-                        style={{
-                          height: "100%",
-                          width: active === i ? "100%" : "0%",
-                          background: "var(--brand)",
-                          transition: active === i ? "width 3.5s linear" : "none",
-                        }}
-                      />
-                    </div>
-                  </button>
-                ))}
-              </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            marginBottom: 20,
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: 44,
+                              height: 44,
+                              borderRadius: 12,
+                              background: active === i ? "var(--brand)" : "var(--bg-elev-2)",
+                              color: active === i ? "var(--brand-on)" : "var(--brand)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              transition: "all 0.3s",
+                            }}
+                          >
+                            {React.cloneElement(stepIcon, { width: 22, height: 22 })}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: 13,
+                              fontFamily: "monospace",
+                              fontWeight: 600,
+                              color: active === i ? "var(--brand)" : "var(--text-subtle)",
+                              letterSpacing: "0.05em",
+                            }}
+                          >
+                            {s.n}
+                          </div>
+                        </div>
+                        <h3
+                          style={{
+                            fontSize: 19,
+                            fontWeight: 700,
+                            marginBottom: 8,
+                            color: "var(--text)",
+                          }}
+                        >
+                          {s.t}
+                        </h3>
+                        <p
+                          style={{
+                            fontSize: 14,
+                            color: "var(--text-muted)",
+                            lineHeight: 1.6,
+                            textAlign: "right",
+                          }}
+                        >
+                          {s.d}
+                        </p>
+                        {/* progress bar */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            bottom: 0,
+                            insetInlineStart: 0,
+                            insetInlineEnd: 0,
+                            height: 2,
+                            background: "var(--border)",
+                            borderBottomLeftRadius: 22,
+                            borderBottomRightRadius: 22,
+                            overflow: "hidden",
+                          }}
+                        >
+                          <div
+                            style={{
+                              height: "100%",
+                              width: active === i ? "100%" : "0%",
+                              background: "var(--brand)",
+                              transition: active === i ? "width 3.5s linear" : "none",
+                            }}
+                          />
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
               <style>{`
                 @media (max-width: 980px) { .how-grid { grid-template-columns: repeat(2, 1fr) !important; } }
                 @media (max-width: 560px) { .how-grid { grid-template-columns: 1fr !important; } }
