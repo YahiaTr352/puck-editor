@@ -84,12 +84,7 @@ const initialData = {
         id: "stats-banner"
       }
     },
-    {
-      type: "Pricing",
-      props: {
-        id: "pricing-block"
-      }
-    },
+
     {
       type: "FinalCTA",
       props: {
@@ -292,7 +287,7 @@ export default function AdminEditor() {
               return { ...item, props: updatedProps };
             }
             return item;
-          }).filter((item: any) => item && item.type !== "FAQ" && item.type !== "Showcase" && item.type !== "Testimonials");
+          }).filter((item: any) => item && item.type !== "FAQ" && item.type !== "Showcase" && item.type !== "Testimonials" && item.type !== "Pricing");
           setData({ ...parsed, content: migratedContent });
         } else {
           setData(initialData);
