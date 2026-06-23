@@ -480,7 +480,7 @@ export default function AdminEditor() {
 
   const handleSave = async (newData: any) => {
     localStorage.setItem("puck-page-data", JSON.stringify(newData));
-    alert("تم حفظ تصميم الصفحة محلياً بنجاح! يمكنك الآن ربطها بـ Laravel APIs لحفظها بشكل دائم.");
+    alert("تم حفظ التعديلات بنجاح");
   };
 
   if (!data) {

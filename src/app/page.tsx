@@ -481,17 +481,7 @@ export default function Home() {
   }, []);
 
   if (!data) {
-    return (
-      <div style={{
-        display: "flex",
-        height: "100vh",
-        alignItems: "center",
-        justifyContent: "center",
-        color: "#64748b"
-      }}>
-        جاري تحميل الصفحة...
-      </div>
-    );
+    return null;
   }
 
   return (
@@ -499,38 +489,7 @@ export default function Home() {
       {/* الخلفية التفاعلية المضيئة المرفقة بالتصميم الأصلي */}
       <AmbientBackground bgStyle="fluid" intensity={75} blur={60} speed={100} grain={true} mesh={false} />
 
-      {/* شريط توجيهي علوي يربط بين الصفحة والمحرر البصري */}
-      <div style={{
-        backgroundColor: "rgba(12, 24, 21, 0.95)",
-        color: "#ffffff",
-        padding: "12px 24px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        fontSize: "0.95rem",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-        borderBottom: "1px solid rgba(255,255,255,0.05)",
-        direction: "rtl",
-        position: "relative",
-        zIndex: 100
-      }}>
-        <span>💡 هذه هي الصفحة العامة للزوار. تم تصميمها بالكامل بواسطة Puck Editor!</span>
-        <a href="/admin" style={{
-          backgroundColor: "#00E08A",
-          color: "#06120E",
-          padding: "8px 16px",
-          borderRadius: "8px",
-          textDecoration: "none",
-          fontWeight: "bold",
-          fontSize: "0.85rem",
-          transition: "background 0.2s"
-        }}
-        onMouseOver={(e) => e.currentTarget.style.opacity = "0.9"}
-        onMouseOut={(e) => e.currentTarget.style.opacity = "1"}
-        >
-          دخول لوحة تحكم المحرر البصري 🛠️
-        </a>
-      </div>
+
 
       {/* عرض مكونات Puck البصرية بكامل عرض الشاشة ودون حواجز مقيدة */}
       <div style={{ direction: "rtl", width: "100%" }}>
