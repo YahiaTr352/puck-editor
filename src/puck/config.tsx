@@ -1219,6 +1219,19 @@ export type PuckConfig = {
       copyrightText?: string;
       statusText?: string;
     };
+    FAQ: {
+      title?: string;
+      subtitle?: string;
+      categories?: {
+        label: string;
+        iconName: "general" | "creation" | "customization" | "grading" | "pricing";
+        items?: {
+          q: string;
+          a: string;
+          list?: { value: string }[];
+        }[];
+      }[];
+    };
   };
 };
 
@@ -3965,6 +3978,280 @@ export const config: Config<PuckConfig> = {
               }
             `}</style>
           </footer>
+        );
+      },
+    },
+    FAQ: {
+      fields: {
+        title: { type: "text", label: "عنوان قسم الأسئلة" },
+        subtitle: { type: "textarea", label: "الوصف الفرعي" },
+        categories: {
+          type: "array",
+          label: "التصنيفات والأسئلة",
+          getItemSummary: (item) => item.label || "تصنيف جديد",
+          arrayFields: {
+            label: { type: "text", label: "اسم التصنيف" },
+            iconName: {
+              type: "select",
+              label: "الأيقونة",
+              options: [
+                { label: "عام (عن اختباري)", value: "general" },
+                { label: "إنشاء الاختبارات", value: "creation" },
+                { label: "التخصيص والإخراج", value: "customization" },
+                { label: "التصحيح والتحليلات", value: "grading" },
+                { label: "الأسعار والبدء", value: "pricing" }
+              ]
+            },
+            items: {
+              type: "array",
+              label: "قائمة الأسئلة",
+              getItemSummary: (qItem) => qItem.q || "سؤال جديد",
+              arrayFields: {
+                q: { type: "text", label: "السؤال" },
+                a: { type: "textarea", label: "الإجابة" },
+                list: {
+                  type: "array",
+                  label: "قائمة نقاط إضافية (اختياري)",
+                  getItemSummary: (li) => li.value || "نقطة جديدة",
+                  arrayFields: {
+                    value: { type: "text", label: "النص" }
+                  },
+                  defaultItemProps: {
+                    value: "نقطة جديدة"
+                  }
+                }
+              },
+              defaultItemProps: {
+                q: "سؤال جديد؟",
+                a: "إجابة هذا السؤال..."
+              }
+            }
+          },
+          defaultItemProps: {
+            label: "تصنيف جديد",
+            iconName: "general",
+            items: [
+              { q: "سؤال جديد؟", a: "إجابة هذا السؤال..." }
+            ]
+          }
+        }
+      },
+      defaultProps: {
+        title: "كل ما تريد معرفته عن اختباري",
+        subtitle: "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات، التصحيح، التخصيص، والأسعار. لم تجد إجابتك؟ فريقنا جاهز لمساعدتك.",
+        categories: [
+          {
+            label: "عن اختباري",
+            iconName: "general",
+            items: [
+              { q: "ما هي منصة اختباري؟", a: "اختباري منصة ذكاء اصطناعي تساعد المعلمين والمعلمات على إنشاء الاختبارات وأوراق العمل خلال أقل من دقيقة، وفق المنهج السعودي، مع إمكانية تخصيص الاختبار وإخراجه بصيغة PDF جاهزة للطباعة." },
+              { q: "هل أحتاج إلى خبرة تقنية لاستخدام المنصة؟", a: "لا. صُممت المنصة لتكون سهلة الاستخدام، ويمكن لأي معلم إنشاء اختبار خلال خطوات بسيطة دون أي خلفية تقنية." },
+              { q: "هل يمكن استخدام المنصة من الجوال؟", a: "نعم. تعمل المنصة على الجوال والأجهزة اللوحية وأجهزة الكمبيوتر بكفاءة." },
+              { q: "هل الذكاء الاصطناعي يغني عن دور المعلم؟", a: "لا. اختباري أداة تساعد المعلم وتختصر الوقت، بينما يبقى المعلم صاحب القرار النهائي في اختيار وتعديل واعتماد الأسئلة." }
+            ]
+          },
+          {
+            label: "إنشاء الاختبارات",
+            iconName: "creation",
+            items: [
+              { q: "هل الأسئلة متوافقة مع المنهج السعودي؟", a: "نعم. يتم إنشاء الأسئلة بناءً على المنهج السعودي والدروس التي يحددها المعلم، مع مراعاة نواتج التعلم ومستويات الصعوبة المختلفة." },
+              { q: "كم يستغرق إنشاء اختبار؟", a: "غالبًا أقل من دقيقة واحدة، حسب عدد الأسئلة والإعدادات المختارة." },
+              { q: "هل يمكنني اختيار عدد الأسئلة؟", a: "نعم. يمكنك تحديد عدد الأسئلة المناسب لاحتياجك قبل إنشاء الاختبار." },
+              { q: "ما أنواع الأسئلة التي تدعمها المنصة؟", a: "تدعم المنصة أنواعًا متعددة من الأسئلة تقابل مختلف أنماط التقويم:", list: [{ value: "الاختيار من متعدد" }, { value: "الصح والخطأ" }, { value: "أكمل الفراغ" }, { value: "المزاوجة (صل)" }, { value: "علِّل" }, { value: "الاستنتاج" }, { value: "الأسئلة المقالية" }, { value: "وغيرها من الأنماط التعليمية" }] },
+              { q: "هل يمكن تعديل الأسئلة بعد إنشائها؟", a: "نعم. يمكنك تعديل الأسئلة أو حذفها أو إضافة أسئلة جديدة بسهولة قبل تصدير الاختبار." },
+              { q: "هل توفر المنصة نموذج إجابة؟", a: "نعم. يتم إنشاء نموذج إجابة تلقائي مع كل اختبار." },
+              { q: "هل يمكن إنشاء أكثر من نموذج للاختبار؟", a: "نعم. يمكنك إنشاء نماذج متعددة (A/B) لتقليل فرص الغش داخل الفصل." },
+              { q: "هل الأسئلة مكررة أو منسوخة؟", a: "لا. يتم توليد الأسئلة ديناميكيًا وفق المعايير التعليمية والدروس المختارة، مع إمكانية إعادة التوليد للحصول على نماذج جديدة." },
+              { q: "هل تدعم المنصة جميع المواد الدراسية؟", a: "نعم. تدعم معظم المواد الدراسية لجميع المراحل التعليمية وفق المناهج السعودية." },
+              { q: "هل يمكن إنشاء أوراق عمل وليس اختبارات فقط؟", a: "نعم. يمكنك إنشاء أنواعًا متعددة من المحتوى التعليمي:", list: [{ value: "أوراق عمل" }, { value: "واجبات" }, { value: "تدريبات صفية" }, { value: "اختبارات قصيرة" }, { value: "اختبارات نهائية" }] }
+            ]
+          },
+          {
+            label: "التخصيص والإخراج",
+            iconName: "customization",
+            items: [
+              { q: "هل يمكن إضافة شعار المدرسة وبياناتها؟", a: "نعم. يمكنك تخصيص ترويسة الاختبار لتشمل بيانات مدرستك بالكامل:", list: [{ value: "شعار المدرسة" }, { value: "اسم المدرسة" }, { value: "اسم المعلم" }, { value: "اسم المدير" }, { value: "الفصل الدراسي" }, { value: "المادة الدراسية" }] },
+              { q: "هل يمكن طباعة الاختبار مباشرة؟", a: "نعم. يتم تصدير الاختبار بصيغة PDF جاهزة للطباعة مباشرة." },
+              { q: "هل تحفظ المنصة الاختبارات السابقة؟", a: "نعم. يتم حفظ اختباراتك داخل حسابك للرجوع إليها أو تعديلها لاحقًا." },
+              { q: "هل يمكن مشاركة الاختبار إلكترونيًا؟", a: "نعم. يمكن مشاركة الاختبار إلكترونيًا مع الطلاب عبر رابط أو رمز QR بحسب نوع الاختبار." }
+            ]
+          },
+          {
+            label: "التصحيح والتحليلات",
+            iconName: "grading",
+            items: [
+              { q: "هل توفر المنصة تصحيحًا آليًا للاختبارات؟", a: "نعم. تدعم المنصة الاختبارات الإلكترونية مع التصحيح الآلي وإظهار النتائج مباشرة." },
+              { q: "هل تقدم المنصة تحليلات لنتائج الطلاب؟", a: "في الباقات المتقدمة توفر المنصة تحليلات تعليمية متكاملة:", list: [{ value: "تحليل أداء الطلاب" }, { value: "قياس نواتج التعلم" }, { value: "تحديد نقاط القوة والضعف" }, { value: "اقتراح خطط علاجية" }] },
+              { q: "هل يمكن الاعتماد على اختباري في الاختبارات الرسمية؟", a: "نعم. يستخدم آلاف المعلمين المنصة لإنشاء اختباراتهم وأوراق عملهم اليومية والفصلية، مع إمكانية مراجعة وتعديل جميع الأسئلة قبل اعتمادها." },
+              { q: "كم ساعة يمكن أن توفر عليّ المنصة؟", a: "يستطيع المعلم توفير عشرات الساعات خلال الفصل الدراسي عبر أتمتة إنشاء الاختبارات ونماذج الإجابة والتقارير التعليمية." }
+            ]
+          },
+          {
+            label: "الأسعار والبدء",
+            iconName: "pricing",
+            items: [
+              { q: "هل توجد نسخة مجانية؟", a: "نعم. توفر المنصة باقة مجانية تتيح تجربة إنشاء أوراق العمل والاختبارات بحدود معينة." },
+              { q: "كيف أبدأ باستخدام اختباري؟", a: "أنشئ حسابك مجانًا وابدأ في إنشاء أول اختبار خلال دقائق عبر الموقع: examy.ai" }
+            ]
+          }
+        ]
+      },
+      render: ({ title, subtitle, categories = [] }) => {
+        const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+        const toggle = (q: string) => {
+          setExpanded((prev) => ({ ...prev, [q]: !prev[q] }));
+        };
+
+        const renderIcon = (iconName: string) => {
+          const props = { width: 18, height: 18, style: { color: "var(--brand)" } };
+          switch (iconName) {
+            case "general":
+              return <Icon.Book {...props} />;
+            case "creation":
+              return <Icon.Bolt {...props} />;
+            case "customization":
+              return <Icon.Settings {...props} />;
+            case "grading":
+              return <Icon.Chart {...props} />;
+            case "pricing":
+              return <Icon.Target {...props} />;
+            default:
+              return <Icon.Book {...props} />;
+          }
+        };
+
+        const displayTitle = title !== undefined ? title : "كل ما تريد معرفته عن اختباري";
+        const displaySubtitle = subtitle !== undefined ? subtitle : "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات، التصحيح، التخصيص، والأسعار. لم تجد إجابتك؟ فريقنا جاهز لمساعدتك.";
+
+        return (
+          <section className="section" style={{ direction: "rtl", textAlign: "right", position: "relative" }}>
+            <div className="container" style={{ maxWidth: 880 }}>
+              <div style={{ textAlign: "center", marginBottom: 48 }}>
+                <h2 style={{ fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 800 }}>{displayTitle}</h2>
+                {displaySubtitle && (
+                  <p style={{ color: "var(--text-muted)", marginTop: 12, fontSize: 15, lineHeight: 1.6 }}>
+                    {displaySubtitle}
+                  </p>
+                )}
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+                {categories.map((cat, i) => (
+                  <div key={i} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 10,
+                        borderBottom: "1px solid var(--border)",
+                        paddingBottom: 8,
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: 32,
+                          height: 32,
+                          borderRadius: 8,
+                          background: "var(--brand-soft)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {renderIcon(cat.iconName)}
+                      </span>
+                      <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>{cat.label}</h3>
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                      {(cat.items || []).map((item, idx) => {
+                        const isOpen = !!expanded[item.q];
+                        return (
+                          <div
+                            key={idx}
+                            style={{
+                              background: "var(--bg-elev-1)",
+                              border: "1px solid " + (isOpen ? "rgba(0, 224, 138, 0.35)" : "var(--border)"),
+                              borderRadius: 12,
+                              overflow: "hidden",
+                              transition: "all 0.2s ease",
+                            }}
+                          >
+                            <button
+                              onClick={() => toggle(item.q)}
+                              style={{
+                                width: "100%",
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                padding: "16px 20px",
+                                background: "none",
+                                border: "none",
+                                cursor: "pointer",
+                                color: "inherit",
+                                fontFamily: "inherit",
+                                textAlign: "right",
+                              }}
+                            >
+                              <span style={{ fontSize: 15, fontWeight: 600, flex: 1, paddingLeft: 16 }}>{item.q}</span>
+                              <span
+                                style={{
+                                  width: 24,
+                                  height: 24,
+                                  borderRadius: "50%",
+                                  background: "var(--brand-soft)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  color: "var(--brand)",
+                                  transform: isOpen ? "rotate(45deg)" : "none",
+                                  transition: "transform 0.2s ease",
+                                }}
+                              >
+                                +
+                              </span>
+                            </button>
+
+                            {isOpen && (
+                              <div
+                                style={{
+                                  padding: "0 20px 20px",
+                                  borderTop: "1px solid var(--border)",
+                                  paddingTop: 16,
+                                  color: "var(--text-muted)",
+                                  fontSize: 14.5,
+                                  lineHeight: 1.6,
+                                }}
+                              >
+                                <p style={{ margin: 0 }}>{item.a}</p>
+                                {item.list && item.list.length > 0 && (
+                                  <ul
+                                    style={{
+                                      paddingRight: 20,
+                                      marginTop: 10,
+                                      listStyleType: "circle",
+                                      display: "flex",
+                                      flexDirection: "column",
+                                      gap: 6,
+                                    }}
+                                  >
+                                    {item.list.map((li, k) => (
+                                      <li key={k}>{li.value}</li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
         );
       },
     },

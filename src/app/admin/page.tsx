@@ -1,507 +1,312 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Puck } from "@puckeditor/core";
-import "@puckeditor/core/dist/index.css";
-import { config } from "../../puck/config";
+import React, { useState } from "react";
+import Link from "next/link";
+import { AmbientBackground } from "../../components/AmbientBackground";
 
-// بيانات المكونات الأصلية المتكاملة لمنصة Examy
-const initialData = {
-  content: [
-    {
-      type: "Nav",
-      props: {
-        ctaText: "ابدأ مجاناً",
-        ctaLink: "#cta",
-        links: [
-          { label: "المنتج", href: "#features" },
-          { label: "كيف يعمل", href: "#how" },
-          { label: "الأسعار", href: "#pricing" },
-          { label: "الأسئلة الشائعة", href: "#faq" }
-        ],
-        id: "nav-header"
-      }
-    },
-    {
-      type: "Hero",
-      props: {
-        variant: "aurora",
-        badgeText: "منصة سعودية · مدعومة بالذكاء الاصطناعي",
-        title: "اختبارُك جاهزٌ خلال دقيقة",
-        gradientText: "حسب المنهج السعودي",
-        subtitle: "منصة ذكاء اصطناعي تُولّد الاختبارات وتُديرها وتُحلّل نتائجها — مرتبطة بنواتج التعلم ومستويات بلوم، تختصر ساعاتٍ من الإعداد إلى دقائق.",
-        ctas: [
-          { label: "ابدأ مجاناً الآن", href: "#cta", variant: "primary" },
-          { label: "شاهد كيف يعمل", href: "#how", variant: "secondary" }
-        ],
-        id: "hero-section"
-      }
-    },
-    {
-      type: "HowItWorks",
-      props: {
-        eyebrowText: "كيف يعمل",
-        title: "أربع خطوات. اختبارٌ كامل.",
-        subtitle: "من فكرة في رأس المعلم إلى اختبار جاهز للطلاب — مساعدُك في كل خطوة.",
-        steps: [
-          {
-            n: "01",
-            t: "صِف الاختبار",
-            d: "اكتب وصفاً بالعربية، أو اختر من القوالب. حدّد المادة والصف والعدد.",
-            iconName: "Edit"
-          },
-          {
-            n: "02",
-            t: "يولّد الذكاء الاصطناعي",
-            d: "يُنشئ النظام الأسئلة من بنك مرتبط بالمنهج السعودي ونواتج التعلم.",
-            iconName: "Brain"
-          },
-          {
-            n: "03",
-            t: "راجع وعدّل",
-            d: "حرّر أي سؤال، بدّل المستوى البلومي، أو أضف نماذج (A/B) بضغطة.",
-            iconName: "Layers"
-          },
-          {
-            n: "04",
-            t: "شارك وحلّل",
-            d: "أرسل للطلاب، صحّح آلياً، واحصل على تحليلات الأداء فوراً.",
-            iconName: "Chart"
-          }
-        ],
-        id: "how-it-works"
-      }
-    },
-    {
-      type: "FeatureTabs",
-      props: {
-        id: "feature-tabs"
-      }
-    },
-    {
-      type: "Stats",
-      props: {
-        id: "stats-banner",
-        eyebrowText: "أرقام تتحدّث",
-        title: "آلاف المعلمين يستخدمون اختباري يومياً",
-        items: [
-          { label: "دقّة في التوليد", sub: "نتائج مراجعة من خبراء تربويين" },
-          { label: "اختبار شهرياً", sub: "يُنشَأ على اختباري" },
-          { label: "معلم ومعلمة", sub: "يستخدمون المنصة يومياً" },
-          { label: "مدرسة وجامعة", sub: "في المملكة العربية السعودية" }
-        ]
-      }
-    },
+export default function AdminDashboard() {
+  const [activeTab, setActiveTab] = useState("pages");
 
+  const pages = [
     {
-      type: "FinalCTA",
-      props: {
-        id: "final-cta",
-        title: "جاهز لتختصر وقتك و",
-        titleAccent: "تطوّر طريقتك",
-        titleSuffix: " في الاختبارات؟",
-        subtitle: "ابدأ مجاناً اليوم. لا حاجة لبطاقة ائتمان — ٥ اختبارات شهرياً للأبد.",
-        ctas: [
-          { label: "ابدأ مجاناً الآن", href: "#", variant: "primary" },
-          { label: "تحدّث مع المبيعات", href: "#", variant: "ghost" }
-        ],
-        features: [
-          { value: "مجاني للأبد" },
-          { value: "دعم بالعربية" },
-          { value: "مستضاف في السعودية" }
-        ]
-      }
+      title: "الصفحة الرئيسية",
+      route: "/",
+      editRoute: "/admin/home",
+      status: "منشورة",
+      lastModified: "اليوم",
+      author: "المسؤول الرئيسي",
+      icon: "🏠"
     },
     {
-      type: "Footer",
-      props: {
-        id: "footer-block",
-        description: "منصة سعودية مدعومة بالذكاء اصطناعي لإنشاء وإدارة الاختبارات، مرتبطة بالمنهج السعودي.",
-        twitterUrl: "https://x.com/examyai",
-        instagramUrl: "https://www.instagram.com/examy.ai/",
-        col1Title: "المنتج",
-        col1Links: [
-          { label: "الميزات", href: "#" },
-          { label: "كيف يعمل", href: "#" },
-          { label: "القوالب الجاهزة", href: "#" }
-        ],
-        col2Title: "لمن",
-        col2Links: [
-          { label: "للمعلمين", href: "#" },
-          { label: "للمدارس", href: "#" },
-          { label: "للجامعات", href: "#" },
-          { label: "للجهات التعليمية", href: "#" }
-        ],
-        col3Title: "موارد",
-        col3Links: [
-          { label: "مركز المساعدة", href: "#" },
-          { label: "المدوّنة", href: "#" },
-          { label: "عن اختباري", href: "#" },
-          { label: "تواصل معنا", href: "#" }
-        ],
-        col4Title: "الشركة",
-        col4Links: [
-          { label: "سياسة الخصوصية", href: "#" },
-          { label: "الشروط والأحكام", href: "#" }
-        ],
-        copyrightText: "© ٢٠٢٦ اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦",
-        statusText: "توليد ذكي وموثوق"
-      }
+      title: "صفحة الأسئلة الشائعة",
+      route: "/faq",
+      editRoute: "/admin/faq",
+      status: "منشورة",
+      lastModified: "منذ ساعة",
+      author: "المسؤول الرئيسي",
+      icon: "💬"
     }
-  ],
-  root: {
-    props: {
-      title: "الصفحة الرئيسية - Examy"
-    }
-  }
-};
-
-export default function AdminEditor() {
-  const [data, setData] = useState<any>(null);
-
-  useEffect(() => {
-    const savedData = localStorage.getItem("puck-page-data");
-    if (savedData) {
-      try {
-        const parsed = JSON.parse(savedData);
-        // التحقق من أن الهيكل متوافق وإلا تحميل الافتراضي
-        if (parsed.content && Array.isArray(parsed.content)) {
-          const migratedContent = parsed.content.map((item: any) => {
-            if (item.type === "Nav") {
-              const updatedProps = { ...item.props };
-              if (!updatedProps.links) {
-                updatedProps.links = [
-                  { label: "المنتج", href: "#features" },
-                  { label: "كيف يعمل", href: "#how" },
-                  { label: "الأسعار", href: "#pricing" },
-                  { label: "الأسئلة الشائعة", href: "#faq" }
-                ];
-              }
-              if (!updatedProps.actions) {
-                updatedProps.actions = [
-                  { label: "تسجيل دخول", href: "#login", variant: "link" },
-                  { label: updatedProps.ctaText || "ابدأ مجاناً", href: updatedProps.ctaLink || "#cta", variant: "primary" }
-                ];
-              }
-              return { ...item, props: updatedProps };
-            }
-            if (item.type === "Hero") {
-              const updatedProps = { ...item.props };
-              if (!updatedProps.ctas) {
-                updatedProps.ctas = [
-                  {
-                    label: updatedProps.primaryCtaText || "ابدأ مجاناً الآن",
-                    href: updatedProps.primaryCtaLink || "#cta",
-                    variant: "primary"
-                  },
-                  {
-                    label: updatedProps.secondaryCtaText || "شاهد كيف يعمل",
-                    href: updatedProps.secondaryCtaLink || "#how",
-                    variant: "secondary"
-                  }
-                ];
-              }
-              delete updatedProps.primaryCtaText;
-              delete updatedProps.primaryCtaLink;
-              delete updatedProps.secondaryCtaText;
-              delete updatedProps.secondaryCtaLink;
-              return { ...item, props: updatedProps };
-            }
-            if (item.type === "HowItWorks") {
-              const updatedProps = { ...item.props };
-              if (!updatedProps.eyebrowText) {
-                updatedProps.eyebrowText = "كيف يعمل";
-              }
-              if (!updatedProps.title) {
-                updatedProps.title = "أربع خطوات. اختبارٌ كامل.";
-              }
-              if (!updatedProps.subtitle) {
-                updatedProps.subtitle = "من فكرة في رأس المعلم إلى اختبار جاهز للطلاب — مساعدُك في كل خطوة.";
-              }
-              if (!updatedProps.steps || updatedProps.steps.length === 0) {
-                updatedProps.steps = [
-                  {
-                    n: "01",
-                    t: "صِف الاختبار",
-                    d: "اكتب وصفاً بالعربية، أو اختر من القوالب. حدّد المادة والصف والعدد.",
-                    iconName: "Edit",
-                  },
-                  {
-                    n: "02",
-                    t: "يولّد الذكاء الاصطناعي",
-                    d: "يُنشئ النظام الأسئلة من بنك مرتبط بالمنهج السعودي ونواتج التعلم.",
-                    iconName: "Brain",
-                  },
-                  {
-                    n: "03",
-                    t: "راجع وعدّل",
-                    d: "حرّر أي سؤال، بدّل المستوى البلومي، أو أضف نماذج (A/B) بضغطة.",
-                    iconName: "Layers",
-                  },
-                  {
-                    n: "04",
-                    t: "شارك وحلّل",
-                    d: "أرسل للطلاب، صحّح آلياً، واحصل على تحليلات الأداء فوراً.",
-                    iconName: "Chart",
-                  },
-                ];
-              }
-              return { ...item, props: updatedProps };
-            }
-            if (item.type === "FeatureTabs") {
-              const updatedProps = { ...item.props };
-              if (!updatedProps.eyebrowText) {
-                updatedProps.eyebrowText = "كل ما تحتاجه";
-              }
-              if (!updatedProps.title) {
-                updatedProps.title = "كل احتياجات الاختبار في مكانٍ واحد";
-              }
-              if (!updatedProps.subtitle) {
-                updatedProps.subtitle = "تصفّح المزايا واحدةً واحدة — كل تبويبٍ يكشف لك كيف يعمل داخل المنصة.";
-              }
-              if (!updatedProps.tabs || updatedProps.tabs.length === 0) {
-                updatedProps.tabs = [
-                  {
-                    short: "المنهج السعودي",
-                    t: "مرتبط بالمنهج السعودي",
-                    d: "كل اختبار مبنيٌّ على بنك أسئلة ضخم ونواتج تعلم رسمية معتمدة، مرتبطٍ مباشرةً بالمنهج السعودي ومراحله الدراسية.",
-                    iconName: "Saudi",
-                    visualName: "Curriculum",
-                    bullets: [
-                      { value: "بنك أسئلة معتمد لكل مادة" },
-                      { value: "نواتج تعلم رسمية ١٤٤٧هـ" },
-                      { value: "تغطية لكل المراحل والصفوف" }
-                    ]
-                  },
-                  {
-                    short: "تحليلات",
-                    t: "تحليلات عميقة",
-                    d: "تقارير أداء دقيقة على مستوى الطالب والفصل والمادة، تكشف نقاط القوة والضعف وتساعدك على اتخاذ قرارٍ مبنيٍّ على البيانات.",
-                    iconName: "Chart",
-                    visualName: "Analytics",
-                    bullets: [
-                      { value: "أداء على مستوى الطالب والفصل" },
-                      { value: "تحليل لكل مهارة ودرس" },
-                      { value: "تصدير التقارير ومشاركتها" }
-                    ]
-                  },
-                  {
-                    short: "مستويات بلوم",
-                    t: "مستويات بلوم",
-                    d: "تنويع تلقائي ذكي للأسئلة عبر مستويات بلوم الستة — من التذكّر حتى الإبداع — لاختبارٍ متوازنٍ يقيس الفهم الحقيقي.",
-                    iconName: "Layers",
-                    visualName: "Bloom",
-                    bullets: [
-                      { value: "توزيع متوازن للأسئلة" },
-                      { value: "تحكّم في نسبة كل مستوى" },
-                      { value: "قياس مهارات التفكير العليا" }
-                    ]
-                  },
-                  {
-                    short: "التصحيح الآلي",
-                    t: "تصحيح آلي + OMR",
-                    d: "صحّح الاختبارات الإلكترونية لحظياً، والورقية عبر الماسح الضوئي بتقنية OMR — دقّةٌ عالية ووقتٌ موفور.",
-                    iconName: "Shield",
-                    visualName: "OMR",
-                    bullets: [
-                      { value: "تصحيح أونلاين فوري" },
-                      { value: "مسح ضوئي OMR للورقي" },
-                      { value: "نتائج ودرجات تلقائية" }
-                    ]
-                  },
-                  {
-                    short: "قوالب جاهزة",
-                    t: "قوالب جاهزة",
-                    d: "مكتبة قوالب احترافية لكل المراحل والمواد، قابلة للتخصيص الكامل لتبدأ من نقطةٍ متقدمة في ثوانٍ.",
-                    iconName: "Bookmark",
-                    visualName: "Templates",
-                    bullets: [
-                      { value: "قوالب لكل مرحلة ومادة" },
-                      { value: "تخصيص كامل للشكل والمحتوى" },
-                      { value: "احفظ قوالبك الخاصة" }
-                    ]
-                  },
-                  {
-                    short: "مشاركة فورية",
-                    t: "مشاركة فوريّة",
-                    d: "أرسل الاختبار لطلابك في لحظة — عبر رابط مباشر، رمز QR، أو من داخل المنصة — دون أي تعقيد.",
-                    iconName: "Users",
-                    visualName: "Share",
-                    bullets: [
-                      { value: "رابط مباشر قابل للنسخ" },
-                      { value: "رمز QR للمشاركة السريعة" },
-                      { value: "إرسال داخل المنصة للطلاب" }
-                    ]
-                  }
-                ];
-              }
-              return { ...item, props: updatedProps };
-            }
-            if (item.type === "Stats") {
-              const updatedProps = { ...item.props };
-              if (!updatedProps.eyebrowText) {
-                updatedProps.eyebrowText = "أرقام تتحدّث";
-              }
-              if (!updatedProps.title) {
-                updatedProps.title = "آلاف المعلمين يستخدمون اختباري يومياً";
-              }
-              if (!updatedProps.items) {
-                updatedProps.items = [
-                  {
-                    label: updatedProps.stat1Label || "دقّة في التوليد",
-                    sub: updatedProps.stat1Sub || "نتائج مراجعة من خبراء تربويين",
-                  },
-                  {
-                    label: updatedProps.stat2Label || "اختبار شهرياً",
-                    sub: updatedProps.stat2Sub || "يُنشَأ على اختباري",
-                  },
-                  {
-                    label: updatedProps.stat3Label || "معلم ومعلمة",
-                    sub: updatedProps.stat3Sub || "يستخدمون المنصة يومياً",
-                  },
-                  {
-                    label: updatedProps.stat4Label || "مدرسة وجامعة",
-                    sub: updatedProps.stat4Sub || "في المملكة العربية السعودية",
-                  },
-                ];
-              }
-              delete updatedProps.stat1Label;
-              delete updatedProps.stat1Sub;
-              delete updatedProps.stat2Label;
-              delete updatedProps.stat2Sub;
-              delete updatedProps.stat3Label;
-              delete updatedProps.stat3Sub;
-              delete updatedProps.stat4Label;
-              delete updatedProps.stat4Sub;
-              return { ...item, props: updatedProps };
-            }
-            if (item.type === "FinalCTA") {
-              const updatedProps = { ...item.props };
-              if (!updatedProps.title) {
-                updatedProps.title = "جاهز لتختصر وقتك و";
-              }
-              if (!updatedProps.titleAccent) {
-                updatedProps.titleAccent = "تطوّر طريقتك";
-              }
-              if (!updatedProps.titleSuffix) {
-                updatedProps.titleSuffix = " في الاختبارات؟";
-              }
-              if (!updatedProps.subtitle) {
-                updatedProps.subtitle = "ابدأ مجاناً اليوم. لا حاجة لبطاقة ائتمان — ٥ اختبارات شهرياً للأبد.";
-              }
-              if (!updatedProps.ctas || updatedProps.ctas.length === 0) {
-                updatedProps.ctas = [
-                  { label: "ابدأ مجاناً الآن", href: "#", variant: "primary" },
-                  { label: "تحدّث مع المبيعات", href: "#", variant: "ghost" }
-                ];
-              }
-              if (!updatedProps.features || updatedProps.features.length === 0) {
-                updatedProps.features = [
-                  { value: "مجاني للأبد" },
-                  { value: "دعم بالعربية" },
-                  { value: "مستضاف في السعودية" }
-                ];
-              }
-              return { ...item, props: updatedProps };
-            }
-            if (item.type === "Footer") {
-              const updatedProps = { ...item.props };
-              if (!updatedProps.description) {
-                updatedProps.description = "منصة سعودية مدعومة بالذكاء اصطناعي لإنشاء وإدارة الاختبارات، مرتبطة بالمنهج السعودي.";
-              }
-              if (!updatedProps.twitterUrl) {
-                updatedProps.twitterUrl = "https://x.com/examyai";
-              }
-              if (!updatedProps.instagramUrl) {
-                updatedProps.instagramUrl = "https://www.instagram.com/examy.ai/";
-              }
-              if (!updatedProps.col1Title) {
-                updatedProps.col1Title = "المنتج";
-              }
-              if (!updatedProps.col1Links || updatedProps.col1Links.length === 0) {
-                updatedProps.col1Links = [
-                  { label: "الميزات", href: "#" },
-                  { label: "كيف يعمل", href: "#" },
-                  { label: "القوالب الجاهزة", href: "#" }
-                ];
-              }
-              if (!updatedProps.col2Title) {
-                updatedProps.col2Title = "لمن";
-              }
-              if (!updatedProps.col2Links || updatedProps.col2Links.length === 0) {
-                updatedProps.col2Links = [
-                  { label: "للمعلمين", href: "#" },
-                  { label: "للمدارس", href: "#" },
-                  { label: "للجامعات", href: "#" },
-                  { label: "للجهات التعليمية", href: "#" }
-                ];
-              }
-              if (!updatedProps.col3Title) {
-                updatedProps.col3Title = "موارد";
-              }
-              if (!updatedProps.col3Links || updatedProps.col3Links.length === 0) {
-                updatedProps.col3Links = [
-                  { label: "مركز المساعدة", href: "#" },
-                  { label: "المدوّنة", href: "#" },
-                  { label: "عن اختباري", href: "#" },
-                  { label: "تواصل معنا", href: "#" }
-                ];
-              }
-              if (!updatedProps.col4Title) {
-                updatedProps.col4Title = "الشركة";
-              }
-              if (!updatedProps.col4Links || updatedProps.col4Links.length === 0) {
-                updatedProps.col4Links = [
-                  { label: "سياسة الخصوصية", href: "#" },
-                  { label: "الشروط والأحكام", href: "#" }
-                ];
-              }
-              if (!updatedProps.copyrightText) {
-                updatedProps.copyrightText = "© ٢٠٢٦ اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦";
-              }
-              if (!updatedProps.statusText) {
-                updatedProps.statusText = "توليد ذكي وموثوق";
-              }
-              return { ...item, props: updatedProps };
-            }
-            return item;
-          }).filter((item: any) => item && item.type !== "FAQ" && item.type !== "Showcase" && item.type !== "Testimonials");
-          setData({ ...parsed, content: migratedContent });
-        } else {
-          setData(initialData);
-        }
-      } catch (e) {
-        setData(initialData);
-      }
-    } else {
-      setData(initialData);
-    }
-  }, []);
-
-  const handleSave = async (newData: any) => {
-    localStorage.setItem("puck-page-data", JSON.stringify(newData));
-    alert("تم حفظ التعديلات بنجاح");
-  };
-
-  if (!data) {
-    return (
-      <div style={{
-        display: "flex",
-        height: "100vh",
-        alignItems: "center",
-        justifyContent: "center",
-        fontFamily: "sans-serif",
-        fontSize: "1.2rem",
-        color: "#64748b"
-      }}>
-        جاري تحميل المحرر البصري لـ Examy...
-      </div>
-    );
-  }
+  ];
 
   return (
-    <div style={{ height: "100vh", direction: "ltr" }}>
-      < Puck config={config} data={data} onPublish={handleSave} />
+    <div style={{
+      minHeight: "100vh",
+      display: "flex",
+      flexDirection: "row-reverse", // RTL Sidebar layout
+      background: "#07100E",
+      color: "#E8F1EE",
+      fontFamily: "'Cairo', system-ui, sans-serif",
+      direction: "rtl",
+      position: "relative",
+      overflowX: "hidden"
+    }}>
+      {/* Background spotlights */}
+      <AmbientBackground bgStyle="fluid" intensity={40} blur={90} speed={60} grain={true} mesh={false} />
+
+      {/* Sidebar (WordPress style) */}
+      <aside style={{
+        width: "260px",
+        background: "#0C1815",
+        borderLeft: "1px solid rgba(255, 255, 255, 0.06)",
+        display: "flex",
+        flexDirection: "column",
+        zIndex: 20,
+        position: "relative"
+      }}>
+        {/* Sidebar Header */}
+        <div style={{
+          padding: "24px 20px",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px"
+        }}>
+          <span style={{ fontSize: "1.5rem" }}>🛠️</span>
+          <h2 style={{ fontSize: "1.2rem", fontWeight: 800, margin: 0, color: "#ffffff" }}>لوحة تحكم Examy</h2>
+        </div>
+
+        {/* Navigation Menu */}
+        <nav style={{ padding: "20px 12px", display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
+          <button 
+            onClick={() => setActiveTab("dashboard")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              padding: "12px 16px",
+              borderRadius: "8px",
+              border: "none",
+              background: activeTab === "dashboard" ? "rgba(0, 220, 138, 0.15)" : "transparent",
+              color: activeTab === "dashboard" ? "#00E08A" : "rgba(232, 241, 238, 0.7)",
+              fontFamily: "inherit",
+              fontSize: "0.95rem",
+              textAlign: "right",
+              cursor: "pointer",
+              fontWeight: activeTab === "dashboard" ? "700" : "500",
+              transition: "all 0.2s"
+            }}
+          >
+            <span style={{ minWidth: "24px" }}>📊</span>
+            <span>الرئيسية</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab("pages")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              padding: "12px 16px",
+              borderRadius: "8px",
+              border: "none",
+              background: activeTab === "pages" ? "rgba(0, 220, 138, 0.15)" : "transparent",
+              color: activeTab === "pages" ? "#00E08A" : "rgba(232, 241, 238, 0.7)",
+              fontFamily: "inherit",
+              fontSize: "0.95rem",
+              textAlign: "right",
+              cursor: "pointer",
+              fontWeight: activeTab === "pages" ? "700" : "500",
+              transition: "all 0.2s"
+            }}
+          >
+            <span style={{ minWidth: "24px" }}>📄</span>
+            <span>الصفحات</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab("settings")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              padding: "12px 16px",
+              borderRadius: "8px",
+              border: "none",
+              background: activeTab === "settings" ? "rgba(0, 220, 138, 0.15)" : "transparent",
+              color: activeTab === "settings" ? "#00E08A" : "rgba(232, 241, 238, 0.7)",
+              fontFamily: "inherit",
+              fontSize: "0.95rem",
+              textAlign: "right",
+              cursor: "pointer",
+              fontWeight: activeTab === "settings" ? "700" : "500",
+              transition: "all 0.2s"
+            }}
+          >
+            <span style={{ minWidth: "24px" }}>⚙️</span>
+            <span>الإعدادات</span>
+          </button>
+        </nav>
+
+        {/* Sidebar Footer */}
+        <div style={{
+          padding: "20px",
+          borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+          fontSize: "0.85rem",
+          color: "rgba(232, 241, 238, 0.5)"
+        }}>
+          النسخة 1.0.0
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <main style={{
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        zIndex: 10,
+        position: "relative"
+      }}>
+        {/* Top Header Bar */}
+        <header style={{
+          height: "70px",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+          background: "rgba(12, 24, 21, 0.4)",
+          backdropFilter: "blur(8px)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 40px"
+        }}>
+          <div>
+            <h1 style={{ fontSize: "1.3rem", fontWeight: 800, margin: 0 }}>لوحة إدارة المحتوى</h1>
+          </div>
+          <div>
+            <Link href="/" style={{
+              background: "rgba(0, 224, 138, 0.1)",
+              border: "1px solid rgba(0, 224, 138, 0.2)",
+              color: "#00E08A",
+              padding: "8px 16px",
+              borderRadius: "8px",
+              fontSize: "0.85rem",
+              textDecoration: "none",
+              fontWeight: 700,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              transition: "all 0.2s"
+            }}
+            >
+              <span>زيارة الموقع المباشر</span>
+              <span>🌐</span>
+            </Link>
+          </div>
+        </header>
+
+        {/* Content Container */}
+        <div style={{ padding: "40px" }}>
+          {activeTab === "pages" && (
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "28px" }}>
+                <div>
+                  <h2 style={{ fontSize: "1.8rem", fontWeight: 800, margin: 0 }}>كل الصفحات</h2>
+                  <p style={{ color: "rgba(232, 241, 238, 0.6)", fontSize: "0.9rem", marginTop: "4px" }}>
+                    إدارة وتعديل الصفحات العامة والمحتوى باستخدام المحرر البصري.
+                  </p>
+                </div>
+              </div>
+
+              {/* Table of Pages */}
+              <div style={{
+                background: "#0C1815",
+                border: "1px solid rgba(255, 255, 255, 0.06)",
+                borderRadius: "16px",
+                overflow: "hidden",
+                boxShadow: "0 4px 20px rgba(0,0,0,0.15)"
+              }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "right" }}>
+                  <thead>
+                    <tr style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.08)", background: "rgba(255,255,255,0.02)" }}>
+                      <th style={{ padding: "18px 24px", fontSize: "0.9rem", color: "rgba(232, 241, 238, 0.6)", fontWeight: 700 }}>اسم الصفحة</th>
+                      <th style={{ padding: "18px 24px", fontSize: "0.9rem", color: "rgba(232, 241, 238, 0.6)", fontWeight: 700 }}>المسار</th>
+                      <th style={{ padding: "18px 24px", fontSize: "0.9rem", color: "rgba(232, 241, 238, 0.6)", fontWeight: 700 }}>الحالة</th>
+                      <th style={{ padding: "18px 24px", fontSize: "0.9rem", color: "rgba(232, 241, 238, 0.6)", fontWeight: 700 }}>التعديل الأخير</th>
+                      <th style={{ padding: "18px 24px", fontSize: "0.9rem", color: "rgba(232, 241, 238, 0.6)", fontWeight: 700 }}>التحرير</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pages.map((p, i) => (
+                      <tr 
+                        key={i} 
+                        style={{ 
+                          borderBottom: i === pages.length - 1 ? "none" : "1px solid rgba(255, 255, 255, 0.06)",
+                          transition: "background 0.2s"
+                        }}
+                      >
+                        <td style={{ padding: "20px 24px", display: "flex", alignItems: "center", gap: "12px" }}>
+                          <span style={{ fontSize: "1.3rem" }}>{p.icon}</span>
+                          <span style={{ fontWeight: 700, fontSize: "1rem" }}>{p.title}</span>
+                        </td>
+                        <td style={{ padding: "20px 24px", fontSize: "0.9rem", color: "rgba(232, 241, 238, 0.7)", fontFamily: "monospace" }}>{p.route}</td>
+                        <td style={{ padding: "20px 24px" }}>
+                          <span style={{
+                            background: "rgba(0, 224, 138, 0.12)",
+                            color: "#00E08A",
+                            padding: "4px 10px",
+                            borderRadius: "6px",
+                            fontSize: "0.8rem",
+                            fontWeight: 700
+                          }}>
+                            {p.status}
+                          </span>
+                        </td>
+                        <td style={{ padding: "20px 24px", fontSize: "0.9rem", color: "rgba(232, 241, 238, 0.6)" }}>{p.lastModified}</td>
+                        <td style={{ padding: "20px 24px" }}>
+                          <div style={{ display: "flex", gap: "10px" }}>
+                            <Link href={p.editRoute} style={{
+                              background: "#00E08A",
+                              color: "#06120E",
+                              padding: "6px 14px",
+                              borderRadius: "8px",
+                              fontSize: "0.85rem",
+                              fontWeight: 700,
+                              textDecoration: "none",
+                              transition: "opacity 0.2s"
+                            }}
+                            >
+                              تعديل بصري 🛠️
+                            </Link>
+                            <Link href={p.route} style={{
+                              background: "rgba(255, 255, 255, 0.08)",
+                              color: "#ffffff",
+                              padding: "6px 14px",
+                              borderRadius: "8px",
+                              fontSize: "0.85rem",
+                              fontWeight: 700,
+                              textDecoration: "none",
+                              border: "1px solid rgba(255, 255, 255, 0.1)",
+                              transition: "background 0.2s"
+                            }}
+                            >
+                              عرض 👁️
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "dashboard" && (
+            <div style={{ padding: "30px", textAlign: "center", background: "#0C1815", borderRadius: "16px", border: "1px solid rgba(255, 255, 255, 0.06)" }}>
+              <h3 style={{ fontSize: "1.4rem", fontWeight: 700, marginBottom: "8px" }}>مرحباً بك في لوحة تحكم Examy</h3>
+              <p style={{ color: "rgba(232, 241, 238, 0.6)" }}>استخدم القائمة الجانبية للتنقل وإدارة الصفحات المختلفة للمنصة.</p>
+            </div>
+          )}
+
+          {activeTab === "settings" && (
+            <div style={{ padding: "30px", textAlign: "center", background: "#0C1815", borderRadius: "16px", border: "1px solid rgba(255, 255, 255, 0.06)" }}>
+              <h3 style={{ fontSize: "1.4rem", fontWeight: 700, marginBottom: "8px" }}>إعدادات لوحة التحكم</h3>
+              <p style={{ color: "rgba(232, 241, 238, 0.6)" }}>جميع الإعدادات الافتراضية نشطة ومتصلة بالمنصة بنجاح.</p>
+            </div>
+          )}
+        </div>
+      </main>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+      `}</style>
     </div>
   );
 }
