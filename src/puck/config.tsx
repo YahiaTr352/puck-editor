@@ -1190,7 +1190,20 @@ export type PuckConfig = {
       }[];
     };
     Pricing: {};
-    FinalCTA: {};
+    FinalCTA: {
+      title?: string;
+      titleAccent?: string;
+      titleSuffix?: string;
+      subtitle?: string;
+      ctas?: {
+        label: string;
+        href: string;
+        variant: "primary" | "ghost";
+      }[];
+      features?: {
+        value: string;
+      }[];
+    };
     Footer: {};
   };
 };
@@ -3450,83 +3463,164 @@ export const config: Config<PuckConfig> = {
       },
     },
     FinalCTA: {
-      render: () => (
-        <section
-          id="cta"
-          className="section"
-          style={{ position: "relative", overflow: "hidden" }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              pointerEvents: "none",
-              background:
-                "radial-gradient(ellipse 60% 80% at 50% 100%, color-mix(in oklch, var(--brand) 22%, transparent), transparent 65%)",
-            }}
-          />
-          <div
-            className="container"
-            style={{ position: "relative", textAlign: "center", maxWidth: 760 }}
+      fields: {
+        title: { type: "text", label: "العنوان الرئيسي" },
+        titleAccent: { type: "text", label: "العنوان الرئيسي الملون (بالأخضر)" },
+        titleSuffix: { type: "text", label: "تتمة العنوان الرئيسي" },
+        subtitle: { type: "textarea", label: "العنوان الفرعي" },
+        ctas: {
+          type: "array",
+          label: "أزرار الإجراءات (CTAs)",
+          getItemSummary: (item) => item.label || "زر جديد",
+          arrayFields: {
+            label: { type: "text", label: "نص الزر" },
+            href: { type: "text", label: "الرابط (URL)" },
+            variant: {
+              type: "select",
+              label: "نوع الزر",
+              options: [
+                { label: "زر رئيسي (ملون)", value: "primary" },
+                { label: "زر ثانوي (شفاف)", value: "ghost" }
+              ]
+            }
+          },
+          defaultItemProps: {
+            label: "زر جديد",
+            href: "#",
+            variant: "primary"
+          }
+        },
+        features: {
+          type: "array",
+          label: "مميزات إضافية (أيقونات صح خضراء)",
+          getItemSummary: (item) => item.value || "ميزة جديدة",
+          arrayFields: {
+            value: { type: "text", label: "نص الميزة" }
+          },
+          defaultItemProps: {
+            value: "ميزة جديدة"
+          }
+        }
+      },
+      defaultProps: {
+        title: "جاهز لتختصر وقتك و",
+        titleAccent: "تطوّر طريقتك",
+        titleSuffix: " في الاختبارات؟",
+        subtitle: "ابدأ مجاناً اليوم. لا حاجة لبطاقة ائتمان — ٥ اختبارات شهرياً للأبد.",
+        ctas: [
+          { label: "ابدأ مجاناً الآن", href: "#", variant: "primary" },
+          { label: "تحدّث مع المبيعات", href: "#", variant: "ghost" }
+        ],
+        features: [
+          { value: "مجاني للأبد" },
+          { value: "دعم بالعربية" },
+          { value: "مستضاف في السعودية" }
+        ]
+      },
+      render: ({
+        title,
+        titleAccent,
+        titleSuffix,
+        subtitle,
+        ctas = [],
+        features = [],
+      }) => {
+        const displayTitle = title !== undefined ? title : "جاهز لتختصر وقتك و";
+        const displayAccent = titleAccent !== undefined ? titleAccent : "تطوّر طريقتك";
+        const displaySuffix = titleSuffix !== undefined ? titleSuffix : " في الاختبارات؟";
+        const displaySubtitle = subtitle !== undefined ? subtitle : "ابدأ مجاناً اليوم. لا حاجة لبطاقة ائتمان — ٥ اختبارات شهرياً للأبد.";
+
+        const defaultCtas = [
+          { label: "ابدأ مجاناً الآن", href: "#", variant: "primary" },
+          { label: "تحدّث مع المبيعات", href: "#", variant: "ghost" }
+        ] as const;
+
+        const displayCtas = ctas.length > 0 ? ctas : defaultCtas;
+
+        const defaultFeatures = [
+          { value: "مجاني للأبد" },
+          { value: "دعم بالعربية" },
+          { value: "مستضاف في السعودية" }
+        ];
+
+        const displayFeatures = features.length > 0 ? features : defaultFeatures;
+
+        return (
+          <section
+            id="cta"
+            className="section"
+            style={{ position: "relative", overflow: "hidden" }}
           >
-            <h2
-              style={{
-                fontSize: "clamp(36px, 5vw, 60px)",
-                fontWeight: 900,
-                letterSpacing: "-0.02em",
-              }}
-            >
-              جاهز لتختصر وقتك
-              <br />
-              و<span style={{ color: "var(--brand)" }}>تطوّر طريقتك</span> في الاختبارات؟
-            </h2>
-            <p style={{ fontSize: 18, color: "var(--text-muted)", marginTop: 20 }}>
-              ابدأ مجاناً اليوم. لا حاجة لبطاقة ائتمان — ٥ اختبارات شهرياً للأبد.
-            </p>
             <div
               style={{
-                display: "flex",
-                gap: 12,
-                marginTop: 32,
-                justifyContent: "center",
-                flexWrap: "wrap",
+                position: "absolute",
+                inset: 0,
+                pointerEvents: "none",
+                background:
+                  "radial-gradient(ellipse 60% 80% at 50% 100%, color-mix(in oklch, var(--brand) 22%, transparent), transparent 65%)",
               }}
-            >
-              <a href="#" className="btn btn-primary btn-lg">
-                ابدأ مجاناً الآن
-                <Icon.ArrowLeft width="18" height="18" />
-              </a>
-              <a href="#" className="btn btn-ghost btn-lg">
-                تحدّث مع المبيعات
-              </a>
-            </div>
+            />
             <div
-              style={{
-                marginTop: 24,
-                display: "flex",
-                justifyContent: "center",
-                gap: 24,
-                flexWrap: "wrap",
-                fontSize: 13,
-                color: "var(--text-subtle)",
-              }}
+              className="container"
+              style={{ position: "relative", textAlign: "center", maxWidth: 760 }}
             >
-              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <Icon.Check width="14" height="14" style={{ color: "var(--brand)" }} />{" "}
-                مجاني للأبد
-              </span>
-              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <Icon.Check width="14" height="14" style={{ color: "var(--brand)" }} /> دعم
-                بالعربية
-              </span>
-              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <Icon.Check width="14" height="14" style={{ color: "var(--brand)" }} />{" "}
-                مستضاف في السعودية
-              </span>
+              <h2
+                style={{
+                  fontSize: "clamp(36px, 5vw, 60px)",
+                  fontWeight: 900,
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                {displayTitle}
+                <br />
+                <span style={{ color: "var(--brand)" }}>{displayAccent}</span>
+                {displaySuffix}
+              </h2>
+              <p style={{ fontSize: 18, color: "var(--text-muted)", marginTop: 20 }}>
+                {displaySubtitle}
+              </p>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 12,
+                  marginTop: 32,
+                  justifyContent: "center",
+                  flexWrap: "wrap",
+                }}
+              >
+                {displayCtas.map((cta, i) => {
+                  const isPrimary = cta.variant === "primary";
+                  const btnClass = isPrimary ? "btn btn-primary btn-lg" : "btn btn-ghost btn-lg";
+                  return (
+                    <a key={i} href={cta.href} className={btnClass}>
+                      {cta.label}
+                      {isPrimary && <Icon.ArrowLeft width="18" height="18" />}
+                    </a>
+                  );
+                })}
+              </div>
+              <div
+                style={{
+                  marginTop: 24,
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: 24,
+                  flexWrap: "wrap",
+                  fontSize: 13,
+                  color: "var(--text-subtle)",
+                }}
+              >
+                {displayFeatures.map((feat, i) => (
+                  <span key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <Icon.Check width="14" height="14" style={{ color: "var(--brand)" }} />
+                    {feat.value}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
-      ),
+          </section>
+        );
+      },
     },
     Footer: {
       render: () => {

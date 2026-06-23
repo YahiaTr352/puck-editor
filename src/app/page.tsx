@@ -97,7 +97,20 @@ const fallbackData = {
     {
       type: "FinalCTA",
       props: {
-        id: "final-cta"
+        id: "final-cta",
+        title: "جاهز لتختصر وقتك و",
+        titleAccent: "تطوّر طريقتك",
+        titleSuffix: " في الاختبارات؟",
+        subtitle: "ابدأ مجاناً اليوم. لا حاجة لبطاقة ائتمان — ٥ اختبارات شهرياً للأبد.",
+        ctas: [
+          { label: "ابدأ مجاناً الآن", href: "#", variant: "primary" },
+          { label: "تحدّث مع المبيعات", href: "#", variant: "ghost" }
+        ],
+        features: [
+          { value: "مجاني للأبد" },
+          { value: "دعم بالعربية" },
+          { value: "مستضاف في السعودية" }
+        ]
       }
     },
     {
@@ -124,7 +137,7 @@ export default function Home() {
       try {
         const parsed = JSON.parse(savedData);
         // التحقق من صحة الهيكل وتواجد مكون الهيرو
-        if (parsed.content && parsed.content.some((item: any) => item.type === "Hero")) {
+        if (parsed.content && Array.isArray(parsed.content)) {
           const migratedContent = parsed.content.map((item: any) => {
             if (item.type === "Nav") {
               const updatedProps = { ...item.props };
@@ -332,6 +345,35 @@ export default function Home() {
               delete updatedProps.stat3Sub;
               delete updatedProps.stat4Label;
               delete updatedProps.stat4Sub;
+              return { ...item, props: updatedProps };
+            }
+            if (item.type === "FinalCTA") {
+              const updatedProps = { ...item.props };
+              if (!updatedProps.title) {
+                updatedProps.title = "جاهز لتختصر وقتك و";
+              }
+              if (!updatedProps.titleAccent) {
+                updatedProps.titleAccent = "تطوّر طريقتك";
+              }
+              if (!updatedProps.titleSuffix) {
+                updatedProps.titleSuffix = " في الاختبارات؟";
+              }
+              if (!updatedProps.subtitle) {
+                updatedProps.subtitle = "ابدأ مجاناً اليوم. لا حاجة لبطاقة ائتمان — ٥ اختبارات شهرياً للأبد.";
+              }
+              if (!updatedProps.ctas || updatedProps.ctas.length === 0) {
+                updatedProps.ctas = [
+                  { label: "ابدأ مجاناً الآن", href: "#", variant: "primary" },
+                  { label: "تحدّث مع المبيعات", href: "#", variant: "ghost" }
+                ];
+              }
+              if (!updatedProps.features || updatedProps.features.length === 0) {
+                updatedProps.features = [
+                  { value: "مجاني للأبد" },
+                  { value: "دعم بالعربية" },
+                  { value: "مستضاف في السعودية" }
+                ];
+              }
               return { ...item, props: updatedProps };
             }
             return item;
