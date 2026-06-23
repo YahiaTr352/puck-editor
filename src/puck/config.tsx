@@ -3641,7 +3641,7 @@ export const config: Config<PuckConfig> = {
         description: { type: "textarea", label: "الوصف التعريفي للشركة" },
         twitterUrl: { type: "text", label: "رابط تويتر (X)" },
         instagramUrl: { type: "text", label: "رابط إنستقرام" },
-        col1Title: { type: "text", label: "عنوان القسم الأول (مثال: المنتج)" },
+        col1Title: { type: "text", label: "عنوان القسم الأول" },
         col1Links: {
           type: "array",
           label: "روابط القسم الأول",
@@ -3655,7 +3655,7 @@ export const config: Config<PuckConfig> = {
             href: "#"
           }
         },
-        col2Title: { type: "text", label: "عنوان القسم الثاني (مثال: لمن)" },
+        col2Title: { type: "text", label: "عنوان القسم الثاني" },
         col2Links: {
           type: "array",
           label: "روابط القسم الثاني",
@@ -3669,7 +3669,7 @@ export const config: Config<PuckConfig> = {
             href: "#"
           }
         },
-        col3Title: { type: "text", label: "عنوان القسم الثالث (مثال: موارد)" },
+        col3Title: { type: "text", label: "عنوان القسم الثالث" },
         col3Links: {
           type: "array",
           label: "روابط القسم الثالث",
@@ -3683,7 +3683,7 @@ export const config: Config<PuckConfig> = {
             href: "#"
           }
         },
-        col4Title: { type: "text", label: "عنوان القسم الرابع (مثال: الشركة)" },
+        col4Title: { type: "text", label: "عنوان القسم الرابع" },
         col4Links: {
           type: "array",
           label: "روابط القسم الرابع",
