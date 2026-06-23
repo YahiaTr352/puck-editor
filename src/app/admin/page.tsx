@@ -79,27 +79,9 @@ const initialData = {
       }
     },
     {
-      type: "Showcase",
-      props: {
-        id: "showcase-interactive"
-      }
-    },
-    {
       type: "Stats",
       props: {
         id: "stats-banner"
-      }
-    },
-    {
-      type: "Testimonials",
-      props: {
-        id: "testimonials-block"
-      }
-    },
-    {
-      type: "FAQ",
-      props: {
-        id: "faq-block"
       }
     },
     {
@@ -310,7 +292,7 @@ export default function AdminEditor() {
               return { ...item, props: updatedProps };
             }
             return item;
-          });
+          }).filter((item: any) => item && item.type !== "FAQ" && item.type !== "Showcase" && item.type !== "Testimonials");
           setData({ ...parsed, content: migratedContent });
         } else {
           setData(initialData);
