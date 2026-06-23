@@ -465,7 +465,7 @@ export default function AdminEditor() {
               return { ...item, props: updatedProps };
             }
             return item;
-          }).filter((item: any) => item && item.type !== "FAQ" && item.type !== "Showcase" && item.type !== "Testimonials" && item.type !== "Pricing");
+          }).filter((item: any) => item && item.type !== "FAQ" && item.type !== "Showcase" && item.type !== "Testimonials");
           setData({ ...parsed, content: migratedContent });
         } else {
           setData(initialData);
