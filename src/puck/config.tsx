@@ -2878,9 +2878,9 @@ export const config: Config<PuckConfig> = {
         title: { type: "text", label: "العنوان الرئيسي لقسم الإحصائيات" },
         items: {
           type: "array",
-          label: "عبارات الإحصائيات (الأرقام غير قابلة للتعديل)",
+          label: "عبارات الإحصائيات",
           getItemSummary: (item, index) => {
-            const names = ["الإحصائية الأولى (98%)", "الإحصائية الثانية (120,000+)", "الإحصائية الثالثة (12,000+)", "الإحصائية الرابعة (340+)"];
+            const names = ["الإحصائية الأولى", "الإحصائية الثانية", "الإحصائية الثالثة", "الإحصائية الرابعة"];
             return (index !== undefined && names[index]) ? names[index] : item.label || "إحصائية جديدة";
           },
           arrayFields: {
