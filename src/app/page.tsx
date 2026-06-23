@@ -82,7 +82,15 @@ const fallbackData = {
     {
       type: "Stats",
       props: {
-        id: "stats-banner"
+        id: "stats-banner",
+        eyebrowText: "أرقام تتحدّث",
+        title: "آلاف المعلمين يستخدمون اختباري يومياً",
+        items: [
+          { label: "دقّة في التوليد", sub: "نتائج مراجعة من خبراء تربويين" },
+          { label: "اختبار شهرياً", sub: "يُنشَأ على اختباري" },
+          { label: "معلم ومعلمة", sub: "يستخدمون المنصة يومياً" },
+          { label: "مدرسة وجامعة", sub: "في المملكة العربية السعودية" }
+        ]
       }
     },
 
@@ -286,6 +294,44 @@ export default function Home() {
                   }
                 ];
               }
+              return { ...item, props: updatedProps };
+            }
+            if (item.type === "Stats") {
+              const updatedProps = { ...item.props };
+              if (!updatedProps.eyebrowText) {
+                updatedProps.eyebrowText = "أرقام تتحدّث";
+              }
+              if (!updatedProps.title) {
+                updatedProps.title = "آلاف المعلمين يستخدمون اختباري يومياً";
+              }
+              if (!updatedProps.items) {
+                updatedProps.items = [
+                  {
+                    label: updatedProps.stat1Label || "دقّة في التوليد",
+                    sub: updatedProps.stat1Sub || "نتائج مراجعة من خبراء تربويين",
+                  },
+                  {
+                    label: updatedProps.stat2Label || "اختبار شهرياً",
+                    sub: updatedProps.stat2Sub || "يُنشَأ على اختباري",
+                  },
+                  {
+                    label: updatedProps.stat3Label || "معلم ومعلمة",
+                    sub: updatedProps.stat3Sub || "يستخدمون المنصة يومياً",
+                  },
+                  {
+                    label: updatedProps.stat4Label || "مدرسة وجامعة",
+                    sub: updatedProps.stat4Sub || "في المملكة العربية السعودية",
+                  },
+                ];
+              }
+              delete updatedProps.stat1Label;
+              delete updatedProps.stat1Sub;
+              delete updatedProps.stat2Label;
+              delete updatedProps.stat2Sub;
+              delete updatedProps.stat3Label;
+              delete updatedProps.stat3Sub;
+              delete updatedProps.stat4Label;
+              delete updatedProps.stat4Sub;
               return { ...item, props: updatedProps };
             }
             return item;

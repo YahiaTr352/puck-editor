@@ -1181,7 +1181,14 @@ export type PuckConfig = {
         bullets: { value: string }[] | string[];
       }[];
     };
-    Stats: {};
+    Stats: {
+      eyebrowText?: string;
+      title?: string;
+      items?: {
+        label?: string;
+        sub?: string;
+      }[];
+    };
     Pricing: {};
     FinalCTA: {};
     Footer: {};
@@ -2866,13 +2873,67 @@ export const config: Config<PuckConfig> = {
     },
 
     Stats: {
-      render: () => {
-        const stats = [
-          { v: 98, suffix: "%", label: "دقّة في التوليد", sub: "نتائج مراجعة من خبراء تربويين" },
-          { v: 120000, suffix: "+", label: "اختبار شهرياً", sub: "يُنشَأ على اختباري" },
-          { v: 12000, suffix: "+", label: "معلم ومعلمة", sub: "يستخدمون المنصة يومياً" },
-          { v: 340, suffix: "+", label: "مدرسة وجامعة", sub: "في المملكة العربية السعودية" },
+      fields: {
+        eyebrowText: { type: "text", label: "الشارة العلوية للقسم (مثال: أرقام تتحدث)" },
+        title: { type: "text", label: "العنوان الرئيسي لقسم الإحصائيات" },
+        items: {
+          type: "array",
+          label: "عبارات الإحصائيات (الأرقام غير قابلة للتعديل)",
+          getItemSummary: (item, index) => {
+            const names = ["الإحصائية الأولى (98%)", "الإحصائية الثانية (120,000+)", "الإحصائية الثالثة (12,000+)", "الإحصائية الرابعة (340+)"];
+            return (index !== undefined && names[index]) ? names[index] : item.label || "إحصائية جديدة";
+          },
+          arrayFields: {
+            label: { type: "text", label: "العنوان الرئيسي" },
+            sub: { type: "text", label: "الوصف الفرعي" },
+          },
+          defaultItemProps: {
+            label: "عنوان الإحصائية",
+            sub: "الوصف الفرعي للإحصائية"
+          }
+        }
+      },
+      defaultProps: {
+        eyebrowText: "أرقام تتحدّث",
+        title: "آلاف المعلمين يستخدمون اختباري يومياً",
+        items: [
+          { label: "دقّة في التوليد", sub: "نتائج مراجعة من خبراء تربويين" },
+          { label: "اختبار شهرياً", sub: "يُنشَأ على اختباري" },
+          { label: "معلم ومعلمة", sub: "يستخدمون المنصة يومياً" },
+          { label: "مدرسة وجامعة", sub: "في المملكة العربية السعودية" },
+        ]
+      },
+      render: ({
+        eyebrowText,
+        title,
+        items = [],
+      }) => {
+        const defaultItems = [
+          { label: "دقّة في التوليد", sub: "نتائج مراجعة من خبراء تربويين" },
+          { label: "اختبار شهرياً", sub: "يُنشَأ على اختباري" },
+          { label: "معلم ومعلمة", sub: "يستخدمون المنصة يومياً" },
+          { label: "مدرسة وجامعة", sub: "في المملكة العربية السعودية" },
         ];
+
+        const statsData = [
+          { v: 98, suffix: "%" },
+          { v: 120000, suffix: "+" },
+          { v: 12000, suffix: "+" },
+          { v: 340, suffix: "+" },
+        ];
+
+        const stats = statsData.map((data, i) => {
+          const item = items[i] || defaultItems[i];
+          return {
+            v: data.v,
+            suffix: data.suffix,
+            label: item.label || defaultItems[i].label,
+            sub: item.sub || defaultItems[i].sub,
+          };
+        });
+
+        const eyebrow = eyebrowText || "أرقام تتحدّث";
+        const mainTitle = title || "آلاف المعلمين يستخدمون اختباري يومياً";
 
         return (
           <section className="section">
@@ -2880,9 +2941,9 @@ export const config: Config<PuckConfig> = {
               <div className="section-head">
                 <div className="eyebrow">
                   <span className="dot" />
-                  أرقام تتحدّث
+                  {eyebrow}
                 </div>
-                <h2 style={{ marginTop: 16 }}>آلاف المعلمين يستخدمون اختباري يومياً</h2>
+                <h2 style={{ marginTop: 16 }}>{mainTitle}</h2>
               </div>
               <div
                 style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}
