@@ -2879,6 +2879,8 @@ export const config: Config<PuckConfig> = {
         items: {
           type: "array",
           label: "عبارات الإحصائيات",
+          max: 4,
+          min: 4,
           getItemSummary: (item, index) => {
             const names = ["الإحصائية الأولى", "الإحصائية الثانية", "الإحصائية الثالثة", "الإحصائية الرابعة"];
             return (index !== undefined && names[index]) ? names[index] : item.label || "إحصائية جديدة";
