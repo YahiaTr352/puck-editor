@@ -1797,7 +1797,7 @@ export const config: Config<PuckConfig> = {
           <h1
             className="reveal hero-title"
             style={{
-              fontSize: "clamp(30px, 6.6vw, 84px)",
+              fontSize: "clamp(30px, 6.6vw, 73px)",
               fontWeight: 900,
               letterSpacing: "-0.02em",
               lineHeight: 1.08,
