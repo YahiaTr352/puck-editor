@@ -1168,7 +1168,19 @@ export type PuckConfig = {
         iconName: "Edit" | "Brain" | "Layers" | "Chart" | "Book" | "Clock" | "Settings" | "Shield" | "Saudi" | "AI" | "Zap" | "Users" | "Target";
       }[];
     };
-    FeatureTabs: {};
+    FeatureTabs: {
+      eyebrowText?: string;
+      title?: string;
+      subtitle?: string;
+      tabs?: {
+        short: string;
+        t: string;
+        d: string;
+        iconName: "Saudi" | "Chart" | "Layers" | "Shield" | "Bookmark" | "Users" | "Edit" | "Brain" | "Book" | "Clock" | "Settings" | "AI" | "Zap" | "Target";
+        visualName: "Curriculum" | "Analytics" | "Bloom" | "OMR" | "Templates" | "Share";
+        bullets: { value: string }[] | string[];
+      }[];
+    };
     Showcase: {};
     Stats: {};
     Testimonials: {};
@@ -2525,10 +2537,267 @@ export const config: Config<PuckConfig> = {
       },
     },
     FeatureTabs: {
-      render: () => {
+      fields: {
+        eyebrowText: { type: "text", label: "نص الشارة العلوية (Eyebrow)" },
+        title: { type: "text", label: "العنوان الرئيسي" },
+        subtitle: { type: "text", label: "العنوان الفرعي" },
+        tabs: {
+          type: "array",
+          label: "التبويبات (Tabs)",
+          getItemSummary: (item) => item.short || "تبويب جديد",
+          arrayFields: {
+            short: { type: "text", label: "عنوان التبويب المختصر (على شريط التبويبات)" },
+            t: { type: "text", label: "عنوان اللوحة الداخلي" },
+            d: { type: "textarea", label: "الوصف التفصيلي" },
+            iconName: {
+              type: "select",
+              label: "أيقونة التبويب",
+              options: [
+                { label: "درع المملكة", value: "Saudi" },
+                { label: "رسم بياني / تحليل", value: "Chart" },
+                { label: "طبقات / مستويات", value: "Layers" },
+                { label: "درع / أمان", value: "Shield" },
+                { label: "علامة مرجعية / حفظ", value: "Bookmark" },
+                { label: "مستخدمين / تواصل", value: "Users" },
+                { label: "قلم تعديل", value: "Edit" },
+                { label: "دماغ / ذكاء", value: "Brain" },
+                { label: "كتاب / دراسة", value: "Book" },
+                { label: "ساعة / وقت", value: "Clock" },
+                { label: "ترس / ضبط", value: "Settings" },
+                { label: "برق / سرعة", value: "Zap" },
+                { label: "هدف / نواتج", value: "Target" }
+              ]
+            },
+            visualName: {
+              type: "select",
+              label: "الشكل المرئي التفاعلي (المحاكاة البصرية)",
+              options: [
+                { label: "المنهج والأسئلة (Curriculum)", value: "Curriculum" },
+                { label: "التحليلات والرسوم (Analytics)", value: "Analytics" },
+                { label: "هرم بلوم (Bloom)", value: "Bloom" },
+                { label: "التصحيح OMR (OMR)", value: "OMR" },
+                { label: "القوالب الجاهزة (Templates)", value: "Templates" },
+                { label: "المشاركة والتصدير (Share)", value: "Share" }
+              ]
+            },
+            bullets: {
+              type: "array",
+              label: "النقاط المميزة (Bullets)",
+              getItemSummary: (item) => item.value || "نقطة جديدة",
+              arrayFields: {
+                value: { type: "text", label: "النص" }
+              },
+              defaultItemProps: {
+                value: "نقطة مميزة جديدة"
+              }
+            }
+          },
+          defaultItemProps: {
+            short: "تبويب جديد",
+            t: "ميزة جديدة مذهلة",
+            d: "اكتب وصفاً تفصيلياً عن هذه الميزة هنا ليظهر للمستخدمين.",
+            iconName: "Saudi",
+            visualName: "Curriculum",
+            bullets: [
+              { value: "الخاصية الأولى المميزة" },
+              { value: "الخاصية الثانية المميزة" }
+            ]
+          }
+        }
+      },
+      defaultProps: {
+        eyebrowText: "كل ما تحتاجه",
+        title: "كل احتياجات الاختبار في مكانٍ واحد",
+        subtitle: "تصفّح المزايا واحدةً واحدة — كل تبويبٍ يكشف لك كيف يعمل داخل المنصة.",
+        tabs: [
+          {
+            short: "المنهج السعودي",
+            t: "مرتبط بالمنهج السعودي",
+            d: "كل اختبار مبنيٌّ على بنك أسئلة ضخم ونواتج تعلم رسمية معتمدة، مرتبطٍ مباشرةً بالمنهج السعودي ومراحله الدراسية.",
+            iconName: "Saudi",
+            visualName: "Curriculum",
+            bullets: [
+              { value: "بنك أسئلة معتمد لكل مادة" },
+              { value: "نواتج تعلم رسمية ١٤٤٧هـ" },
+              { value: "تغطية لكل المراحل والصفوف" }
+            ]
+          },
+          {
+            short: "تحليلات",
+            t: "تحليلات عميقة",
+            d: "تقارير أداء دقيقة على مستوى الطالب والفصل والمادة، تكشف نقاط القوة والضعف وتساعدك على اتخاذ قرارٍ مبنيٍّ على البيانات.",
+            iconName: "Chart",
+            visualName: "Analytics",
+            bullets: [
+              { value: "أداء على مستوى الطالب والفصل" },
+              { value: "تحليل لكل مهارة ودرس" },
+              { value: "تصدير التقارير ومشاركتها" }
+            ]
+          },
+          {
+            short: "مستويات بلوم",
+            t: "مستويات بلوم",
+            d: "تنويع تلقائي ذكي للأسئلة عبر مستويات بلوم الستة — من التذكّر حتى الإبداع — لاختبارٍ متوازنٍ يقيس الفهم الحقيقي.",
+            iconName: "Layers",
+            visualName: "Bloom",
+            bullets: [
+              { value: "توزيع متوازن للأسئلة" },
+              { value: "تحكّم في نسبة كل مستوى" },
+              { value: "قياس مهارات التفكير العليا" }
+            ]
+          },
+          {
+            short: "التصحيح الآلي",
+            t: "تصحيح آلي + OMR",
+            d: "صحّح الاختبارات الإلكترونية لحظياً، والورقية عبر الماسح الضوئي بتقنية OMR — دقّةٌ عالية ووقتٌ موفور.",
+            iconName: "Shield",
+            visualName: "OMR",
+            bullets: [
+              { value: "تصحيح أونلاين فوري" },
+              { value: "مسح ضوئي OMR للورقي" },
+              { value: "نتائج ودرجات تلقائية" }
+            ]
+          },
+          {
+            short: "قوالب جاهزة",
+            t: "قوالب جاهزة",
+            d: "مكتبة قوالب احترافية لكل المراحل والمواد، قابلة للتخصيص الكامل لتبدأ من نقطةٍ متقدمة في ثوانٍ.",
+            iconName: "Bookmark",
+            visualName: "Templates",
+            bullets: [
+              { value: "قوالب لكل مرحلة ومادة" },
+              { value: "تخصيص كامل للشكل والمحتوى" },
+              { value: "احفظ قوالبك الخاصة" }
+            ]
+          },
+          {
+            short: "مشاركة فورية",
+            t: "مشاركة فوريّة",
+            d: "أرسل الاختبار لطلابك في لحظة — عبر رابط مباشر، رمز QR، أو من داخل المنصة — دون أي تعقيد.",
+            iconName: "Users",
+            visualName: "Share",
+            bullets: [
+              { value: "رابط مباشر قابل للنسخ" },
+              { value: "رمز QR للمشاركة السريعة" },
+              { value: "إرسال داخل المنصة للطلاب" }
+            ]
+          }
+        ]
+      },
+      render: ({ eyebrowText, title, subtitle, tabs }) => {
         const [active, setActive] = useState(0);
-        const f = FEAT_TABS[active];
-        const Visual = f.Visual;
+
+        const defaultTabs = [
+          {
+            short: "المنهج السعودي",
+            t: "مرتبط بالمنهج السعودي",
+            d: "كل اختبار مبنيٌّ على بنك أسئلة ضخم ونواتج تعلم رسمية معتمدة، مرتبطٍ مباشرةً بالمنهج السعودي ومراحله الدراسية.",
+            iconName: "Saudi" as const,
+            visualName: "Curriculum" as const,
+            bullets: [
+              { value: "بنك أسئلة معتمد لكل مادة" },
+              { value: "نواتج تعلم رسمية ١٤٤٧هـ" },
+              { value: "تغطية لكل المراحل والصفوف" }
+            ]
+          },
+          {
+            short: "تحليلات",
+            t: "تحليلات عميقة",
+            d: "تقارير أداء دقيقة على مستوى الطالب والفصل والمادة، تكشف نقاط القوة والضعف وتساعدك على اتخاذ قرارٍ مبنيٍّ على البيانات.",
+            iconName: "Chart" as const,
+            visualName: "Analytics" as const,
+            bullets: [
+              { value: "أداء على مستوى الطالب والفصل" },
+              { value: "تحليل لكل مهارة ودرس" },
+              { value: "تصدير التقارير ومشاركتها" }
+            ]
+          },
+          {
+            short: "مستويات بلوم",
+            t: "مستويات بلوم",
+            d: "تنويع تلقائي ذكي للأسئلة عبر مستويات بلوم الستة — من التذكّر حتى الإبداع — لاختبارٍ متوازنٍ يقيس الفهم الحقيقي.",
+            iconName: "Layers" as const,
+            visualName: "Bloom" as const,
+            bullets: [
+              { value: "توزيع متوازن للأسئلة" },
+              { value: "تحكّم في نسبة كل مستوى" },
+              { value: "قياس مهارات التفكير العليا" }
+            ]
+          },
+          {
+            short: "التصحيح الآلي",
+            t: "تصحيح آلي + OMR",
+            d: "صحّح الاختبارات الإلكترونية لحظياً، والورقية عبر الماسح الضوئي بتقنية OMR — دقّةٌ عالية ووقتٌ موفور.",
+            iconName: "Shield" as const,
+            visualName: "OMR" as const,
+            bullets: [
+              { value: "تصحيح أونلاين فوري" },
+              { value: "مسح ضوئي OMR للورقي" },
+              { value: "نتائج ودرجات تلقائية" }
+            ]
+          },
+          {
+            short: "قوالب جاهزة",
+            t: "قوالب جاهزة",
+            d: "مكتبة قوالب احترافية لكل المراحل والمواد، قابلة للتخصيص الكامل لتبدأ من نقطةٍ متقدمة في ثوانٍ.",
+            iconName: "Bookmark" as const,
+            visualName: "Templates" as const,
+            bullets: [
+              { value: "قوالب لكل مرحلة ومادة" },
+              { value: "تخصيص كامل للشكل والمحتوى" },
+              { value: "احفظ قوالبك الخاصة" }
+            ]
+          },
+          {
+            short: "مشاركة فورية",
+            t: "مشاركة فوريّة",
+            d: "أرسل الاختبار لطلابك في لحظة — عبر رابط مباشر، رمز QR، أو من داخل المنصة — دون أي تعقيد.",
+            iconName: "Users" as const,
+            visualName: "Share" as const,
+            bullets: [
+              { value: "رابط مباشر قابل للنسخ" },
+              { value: "رمز QR للمشاركة السريعة" },
+              { value: "إرسال داخل المنصة للطلاب" }
+            ]
+          }
+        ];
+
+        const activeTabsList = tabs && tabs.length > 0 ? tabs : defaultTabs;
+        const currentActive = active < activeTabsList.length ? active : 0;
+        const f = activeTabsList[currentActive] || activeTabsList[0];
+
+        const iconMap = {
+          Saudi: Icon.Saudi,
+          Chart: Icon.Chart,
+          Layers: Icon.Layers,
+          Shield: Icon.Shield,
+          Bookmark: Icon.Bookmark,
+          Users: Icon.Users,
+          Edit: Icon.Edit,
+          Brain: Icon.Brain,
+          Book: Icon.Book,
+          Clock: Icon.Clock,
+          Settings: Icon.Settings,
+          AI: Icon.AI,
+          Zap: Icon.Zap,
+          Target: Icon.Target,
+        };
+
+        const visualMap = {
+          Curriculum: VisualCurriculum,
+          Analytics: VisualAnalytics,
+          Bloom: VisualBloom,
+          OMR: VisualOMR,
+          Templates: VisualTemplates,
+          Share: VisualShare,
+        };
+
+        const Visual = visualMap[f.visualName] || VisualCurriculum;
+        const TabIcon = iconMap[f.iconName] || Icon.Saudi;
+
+        const eyebrow = eyebrowText || "كل ما تحتاجه";
+        const mainTitle = title || "كل احتياجات الاختبار في مكانٍ واحد";
+        const descText = subtitle || "تصفّح المزايا واحدةً واحدة — كل تبويبٍ يكشف لك كيف يعمل داخل المنصة.";
 
         return (
           <section id="features" className="section" style={{ background: "var(--bg-elev-1)" }}>
@@ -2536,17 +2805,17 @@ export const config: Config<PuckConfig> = {
               <div className="section-head">
                 <div className="eyebrow">
                   <span className="dot" />
-                  كل ما تحتاجه
+                  {eyebrow}
                 </div>
-                <h2 style={{ marginTop: 16 }}>كل احتياجات الاختبار في مكانٍ واحد</h2>
-                <p>تصفّح المزايا واحدةً واحدة — كل تبويبٍ يكشف لك كيف يعمل داخل المنصة.</p>
+                <h2 style={{ marginTop: 16 }}>{mainTitle}</h2>
+                <p>{descText}</p>
               </div>
 
               {/* Tab strip */}
               <div className="ft-strip" role="tablist">
-                {FEAT_TABS.map((tab, i) => {
-                  const I = tab.icon;
-                  const on = i === active;
+                {activeTabsList.map((tab, i) => {
+                  const I = iconMap[tab.iconName] || Icon.Saudi;
+                  const on = i === currentActive;
                   return (
                     <button
                       key={i}
@@ -2565,28 +2834,34 @@ export const config: Config<PuckConfig> = {
               </div>
 
               {/* Panel */}
-              <div className="ft-panel card" key={active}>
-                <div className="ft-panel-text" style={{ textAlign: "right" }}>
-                  <div className="ft-panel-icon">
-                    <f.icon width="24" height="24" />
+              {f && (
+                <div className="ft-panel card" key={currentActive}>
+                  <div className="ft-panel-text" style={{ textAlign: "right" }}>
+                    <div className="ft-panel-icon">
+                      <TabIcon width="24" height="24" />
+                    </div>
+                    <h3 className="ft-panel-title">{f.t}</h3>
+                    <p className="ft-panel-desc">{f.d}</p>
+                    <ul className="ft-bullets">
+                      {f.bullets &&
+                        f.bullets.map((b, i) => {
+                          const text = typeof b === "string" ? b : b.value;
+                          return (
+                            <li key={i} style={{ justifyContent: "flex-start" }}>
+                              <span className="ft-bullet-dot">
+                                <Icon.Check width="12" height="12" />
+                              </span>
+                              {text}
+                            </li>
+                          );
+                        })}
+                    </ul>
                   </div>
-                  <h3 className="ft-panel-title">{f.t}</h3>
-                  <p className="ft-panel-desc">{f.d}</p>
-                  <ul className="ft-bullets">
-                    {f.bullets.map((b, i) => (
-                      <li key={i} style={{ justifyContent: "flex-start" }}>
-                        <span className="ft-bullet-dot">
-                          <Icon.Check width="12" height="12" />
-                        </span>
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="ft-panel-visual">
+                    <Visual />
+                  </div>
                 </div>
-                <div className="ft-panel-visual">
-                  <Visual />
-                </div>
-              </div>
+              )}
             </div>
           </section>
         );

@@ -222,6 +222,95 @@ export default function Home() {
               }
               return { ...item, props: updatedProps };
             }
+            if (item.type === "FeatureTabs") {
+              const updatedProps = { ...item.props };
+              if (!updatedProps.eyebrowText) {
+                updatedProps.eyebrowText = "كل ما تحتاجه";
+              }
+              if (!updatedProps.title) {
+                updatedProps.title = "كل احتياجات الاختبار في مكانٍ واحد";
+              }
+              if (!updatedProps.subtitle) {
+                updatedProps.subtitle = "تصفّح المزايا واحدةً واحدة — كل تبويبٍ يكشف لك كيف يعمل داخل المنصة.";
+              }
+              if (!updatedProps.tabs || updatedProps.tabs.length === 0) {
+                updatedProps.tabs = [
+                  {
+                    short: "المنهج السعودي",
+                    t: "مرتبط بالمنهج السعودي",
+                    d: "كل اختبار مبنيٌّ على بنك أسئلة ضخم ونواتج تعلم رسمية معتمدة، مرتبطٍ مباشرةً بالمنهج السعودي ومراحله الدراسية.",
+                    iconName: "Saudi",
+                    visualName: "Curriculum",
+                    bullets: [
+                      { value: "بنك أسئلة معتمد لكل مادة" },
+                      { value: "نواتج تعلم رسمية ١٤٤٧هـ" },
+                      { value: "تغطية لكل المراحل والصفوف" }
+                    ]
+                  },
+                  {
+                    short: "تحليلات",
+                    t: "تحليلات عميقة",
+                    d: "تقارير أداء دقيقة على مستوى الطالب والفصل والمادة، تكشف نقاط القوة والضعف وتساعدك على اتخاذ قرارٍ مبنيٍّ على البيانات.",
+                    iconName: "Chart",
+                    visualName: "Analytics",
+                    bullets: [
+                      { value: "أداء على مستوى الطالب والفصل" },
+                      { value: "تحليل لكل مهارة ودرس" },
+                      { value: "تصدير التقارير ومشاركتها" }
+                    ]
+                  },
+                  {
+                    short: "مستويات بلوم",
+                    t: "مستويات بلوم",
+                    d: "تنويع تلقائي ذكي للأسئلة عبر مستويات بلوم الستة — من التذكّر حتى الإبداع — لاختبارٍ متوازنٍ يقيس الفهم الحقيقي.",
+                    iconName: "Layers",
+                    visualName: "Bloom",
+                    bullets: [
+                      { value: "توزيع متوازن للأسئلة" },
+                      { value: "تحكّم في نسبة كل مستوى" },
+                      { value: "قياس مهارات التفكير العليا" }
+                    ]
+                  },
+                  {
+                    short: "التصحيح الآلي",
+                    t: "تصحيح آلي + OMR",
+                    d: "صحّح الاختبارات الإلكترونية لحظياً، والورقية عبر الماسح الضوئي بتقنية OMR — دقّةٌ عالية ووقتٌ موفور.",
+                    iconName: "Shield",
+                    visualName: "OMR",
+                    bullets: [
+                      { value: "تصحيح أونلاين فوري" },
+                      { value: "مسح ضوئي OMR للورقي" },
+                      { value: "نتائج ودرجات تلقائية" }
+                    ]
+                  },
+                  {
+                    short: "قوالب جاهزة",
+                    t: "قوالب جاهزة",
+                    d: "مكتبة قوالب احترافية لكل المراحل والمواد، قابلة للتخصيص الكامل لتبدأ من نقطةٍ متقدمة في ثوانٍ.",
+                    iconName: "Bookmark",
+                    visualName: "Templates",
+                    bullets: [
+                      { value: "قوالب لكل مرحلة ومادة" },
+                      { value: "تخصيص كامل للشكل والمحتوى" },
+                      { value: "احفظ قوالبك الخاصة" }
+                    ]
+                  },
+                  {
+                    short: "مشاركة فورية",
+                    t: "مشاركة فوريّة",
+                    d: "أرسل الاختبار لطلابك في لحظة — عبر رابط مباشر، رمز QR، أو من داخل المنصة — دون أي تعقيد.",
+                    iconName: "Users",
+                    visualName: "Share",
+                    bullets: [
+                      { value: "رابط مباشر قابل للنسخ" },
+                      { value: "رمز QR للمشاركة السريعة" },
+                      { value: "إرسال داخل المنصة للطلاب" }
+                    ]
+                  }
+                ];
+              }
+              return { ...item, props: updatedProps };
+            }
             return item;
           });
           setData({ ...parsed, content: migratedContent });
