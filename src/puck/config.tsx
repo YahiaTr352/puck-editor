@@ -3637,24 +3637,161 @@ export const config: Config<PuckConfig> = {
       },
     },
     Footer: {
-      render: () => {
+      fields: {
+        description: { type: "textarea", label: "الوصف التعريفي للشركة" },
+        twitterUrl: { type: "text", label: "رابط تويتر (X)" },
+        instagramUrl: { type: "text", label: "رابط إنستقرام" },
+        col1Title: { type: "text", label: "عنوان القسم الأول (مثال: المنتج)" },
+        col1Links: {
+          type: "array",
+          label: "روابط القسم الأول",
+          getItemSummary: (item) => item.label || "رابط جديد",
+          arrayFields: {
+            label: { type: "text", label: "اسم الرابط" },
+            href: { type: "text", label: "الرابط (URL)" }
+          },
+          defaultItemProps: {
+            label: "رابط جديد",
+            href: "#"
+          }
+        },
+        col2Title: { type: "text", label: "عنوان القسم الثاني (مثال: لمن)" },
+        col2Links: {
+          type: "array",
+          label: "روابط القسم الثاني",
+          getItemSummary: (item) => item.label || "رابط جديد",
+          arrayFields: {
+            label: { type: "text", label: "اسم الرابط" },
+            href: { type: "text", label: "الرابط (URL)" }
+          },
+          defaultItemProps: {
+            label: "رابط جديد",
+            href: "#"
+          }
+        },
+        col3Title: { type: "text", label: "عنوان القسم الثالث (مثال: موارد)" },
+        col3Links: {
+          type: "array",
+          label: "روابط القسم الثالث",
+          getItemSummary: (item) => item.label || "رابط جديد",
+          arrayFields: {
+            label: { type: "text", label: "اسم الرابط" },
+            href: { type: "text", label: "الرابط (URL)" }
+          },
+          defaultItemProps: {
+            label: "رابط جديد",
+            href: "#"
+          }
+        },
+        col4Title: { type: "text", label: "عنوان القسم الرابع (مثال: الشركة)" },
+        col4Links: {
+          type: "array",
+          label: "روابط القسم الرابع",
+          getItemSummary: (item) => item.label || "رابط جديد",
+          arrayFields: {
+            label: { type: "text", label: "اسم الرابط" },
+            href: { type: "text", label: "الرابط (URL)" }
+          },
+          defaultItemProps: {
+            label: "رابط جديد",
+            href: "#"
+          }
+        },
+        copyrightText: { type: "text", label: "نص الحقوق السفلي" },
+        statusText: { type: "text", label: "حالة النظام / النص السفلي الأيسر" }
+      },
+      defaultProps: {
+        description: "منصة سعودية مدعومة بالذكاء الاصطناعي لإنشاء وإدارة الاختبارات، مرتبطة بالمنهج السعودي.",
+        twitterUrl: "https://x.com/examyai",
+        instagramUrl: "https://www.instagram.com/examy.ai/",
+        col1Title: "المنتج",
+        col1Links: [
+          { label: "الميزات", href: "#" },
+          { label: "كيف يعمل", href: "#" },
+          { label: "القوالب الجاهزة", href: "#" }
+        ],
+        col2Title: "لمن",
+        col2Links: [
+          { label: "للمعلمين", href: "#" },
+          { label: "للمدارس", href: "#" },
+          { label: "للجامعات", href: "#" },
+          { label: "للجهات التعليمية", href: "#" }
+        ],
+        col3Title: "موارد",
+        col3Links: [
+          { label: "مركز المساعدة", href: "#" },
+          { label: "المدوّنة", href: "#" },
+          { label: "عن اختباري", href: "#" },
+          { label: "تواصل معنا", href: "#" }
+        ],
+        col4Title: "الشركة",
+        col4Links: [
+          { label: "سياسة الخصوصية", href: "#" },
+          { label: "الشروط والأحكام", href: "#" }
+        ],
+        copyrightText: "© ٢٠٢٦ اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦",
+        statusText: "توليد ذكي وموثوق"
+      },
+      render: ({
+        description,
+        twitterUrl,
+        instagramUrl,
+        col1Title,
+        col1Links = [],
+        col2Title,
+        col2Links = [],
+        col3Title,
+        col3Links = [],
+        col4Title,
+        col4Links = [],
+        copyrightText,
+        statusText,
+      }) => {
+        const displayDesc = description !== undefined ? description : "منصة سعودية مدعومة بالذكاء الاصطناعي لإنشاء وإدارة الاختبارات، مرتبطة بالمنهج السعودي.";
+        const displayTwitter = twitterUrl !== undefined ? twitterUrl : "https://x.com/examyai";
+        const displayInstagram = instagramUrl !== undefined ? instagramUrl : "https://www.instagram.com/examy.ai/";
+
+        const displayCol1Title = col1Title !== undefined ? col1Title : "المنتج";
+        const defaultCol1Links = [
+          { label: "الميزات", href: "#" },
+          { label: "كيف يعمل", href: "#" },
+          { label: "القوالب الجاهزة", href: "#" }
+        ];
+        const displayCol1Links = col1Links.length > 0 ? col1Links : defaultCol1Links;
+
+        const displayCol2Title = col2Title !== undefined ? col2Title : "لمن";
+        const defaultCol2Links = [
+          { label: "للمعلمين", href: "#" },
+          { label: "للمدارس", href: "#" },
+          { label: "للجامعات", href: "#" },
+          { label: "للجهات التعليمية", href: "#" }
+        ];
+        const displayCol2Links = col2Links.length > 0 ? col2Links : defaultCol2Links;
+
+        const displayCol3Title = col3Title !== undefined ? col3Title : "موارد";
+        const defaultCol3Links = [
+          { label: "مركز المساعدة", href: "#" },
+          { label: "المدوّنة", href: "#" },
+          { label: "عن اختباري", href: "#" },
+          { label: "تواصل معنا", href: "#" }
+        ];
+        const displayCol3Links = col3Links.length > 0 ? col3Links : defaultCol3Links;
+
+        const displayCol4Title = col4Title !== undefined ? col4Title : "الشركة";
+        const defaultCol4Links = [
+          { label: "سياسة الخصوصية", href: "#" },
+          { label: "الشروط والأحكام", href: "#" }
+        ];
+        const displayCol4Links = col4Links.length > 0 ? col4Links : defaultCol4Links;
+
+        const displayCopyright = copyrightText !== undefined ? copyrightText : "© ٢٠٢٦ اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦";
+        const displayStatus = statusText !== undefined ? statusText : "توليد ذكي وموثوق";
+
         const cols = [
-          {
-            h: "المنتج",
-            links: ["الميزات", "كيف يعمل", "القوالب الجاهزة"],
-          },
-          {
-            h: "لمن",
-            links: ["للمعلمين", "للمدارس", "للجامعات", "للجهات التعليمية"],
-          },
-          {
-            h: "موارد",
-            links: ["مركز المساعدة", "المدوّنة", "عن اختباري", "تواصل معنا"],
-          },
-          {
-            h: "الشركة",
-            links: ["سياسة الخصوصية", "الشروط والأحكام"],
-          },
+          { h: displayCol1Title, links: displayCol1Links },
+          { h: displayCol2Title, links: displayCol2Links },
+          { h: displayCol3Title, links: displayCol3Links },
+          { h: displayCol4Title, links: displayCol4Links },
         ];
 
         return (
@@ -3687,58 +3824,61 @@ export const config: Config<PuckConfig> = {
                       maxWidth: 320,
                     }}
                   >
-                    منصة سعودية مدعومة بالذكاء الاصطناعي لإنشاء وإدارة الاختبارات، مرتبطة
-                    بالمنهج السعودي.
+                    {displayDesc}
                   </p>
                   <div style={{ display: "flex", gap: 8, marginTop: 22, direction: "rtl" }}>
-                    <a
-                      href="https://x.com/examyai"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        width: 38,
-                        height: 38,
-                        borderRadius: 10,
-                        background: "var(--bg-elev-2)",
-                        border: "1px solid var(--border)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "var(--text-muted)",
-                        transition: "all 0.15s ease",
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.color = "var(--brand)")}
-                      onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
-                    >
-                      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                      </svg>
-                    </a>
-                    <a
-                      href="https://www.instagram.com/examy.ai/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        width: 38,
-                        height: 38,
-                        borderRadius: 10,
-                        background: "var(--bg-elev-2)",
-                        border: "1px solid var(--border)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "var(--text-muted)",
-                        transition: "all 0.15s ease",
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.color = "var(--brand)")}
-                      onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
-                    >
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                        <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
-                      </svg>
-                    </a>
+                    {displayTwitter && (
+                      <a
+                        href={displayTwitter}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          width: 38,
+                          height: 38,
+                          borderRadius: 10,
+                          background: "var(--bg-elev-2)",
+                          border: "1px solid var(--border)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "var(--text-muted)",
+                          transition: "all 0.15s ease",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = "var(--brand)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
+                      >
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                      </a>
+                    )}
+                    {displayInstagram && (
+                      <a
+                        href={displayInstagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          width: 38,
+                          height: 38,
+                          borderRadius: 10,
+                          background: "var(--bg-elev-2)",
+                          border: "1px solid var(--border)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "var(--text-muted)",
+                          transition: "all 0.15s ease",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = "var(--brand)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                          <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
+                        </svg>
+                      </a>
+                    )}
                   </div>
                 </div>
 
@@ -3764,17 +3904,17 @@ export const config: Config<PuckConfig> = {
                         gap: 10,
                       }}
                     >
-                      {c.links.map((l) => (
-                        <li key={l}>
+                      {c.links.map((linkItem, idx) => (
+                        <li key={idx}>
                           <a
-                            href="#"
+                            href={linkItem.href || "#"}
                             style={{ fontSize: 14, color: "var(--text-muted)", transition: "all 0.15s ease" }}
                             onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text)")}
                             onMouseLeave={(e) =>
                               (e.currentTarget.style.color = "var(--text-muted)")
                             }
                           >
-                            {l}
+                            {linkItem.label}
                           </a>
                         </li>
                       ))}
@@ -3797,7 +3937,7 @@ export const config: Config<PuckConfig> = {
                 }}
               >
                 <div>
-                  © ٢٠٢٦ اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦
+                  {displayCopyright}
                 </div>
                 <div style={{ display: "flex", gap: 18, alignItems: "center" }}>
                   <a href="#" style={{ fontSize: 13, color: "var(--text-subtle)" }}>English</a>
@@ -3811,7 +3951,7 @@ export const config: Config<PuckConfig> = {
                         background: "var(--brand)",
                       }}
                     />
-                    توليد ذكي وموثوق
+                    {displayStatus}
                   </span>
                 </div>
               </div>

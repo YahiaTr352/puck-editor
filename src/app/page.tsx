@@ -116,7 +116,37 @@ const fallbackData = {
     {
       type: "Footer",
       props: {
-        id: "footer-block"
+        id: "footer-block",
+        description: "منصة سعودية مدعومة بالذكاء اصطناعي لإنشاء وإدارة الاختبارات، مرتبطة بالمنهج السعودي.",
+        twitterUrl: "https://x.com/examyai",
+        instagramUrl: "https://www.instagram.com/examy.ai/",
+        col1Title: "المنتج",
+        col1Links: [
+          { label: "الميزات", href: "#" },
+          { label: "كيف يعمل", href: "#" },
+          { label: "القوالب الجاهزة", href: "#" }
+        ],
+        col2Title: "لمن",
+        col2Links: [
+          { label: "للمعلمين", href: "#" },
+          { label: "للمدارس", href: "#" },
+          { label: "للجامعات", href: "#" },
+          { label: "للجهات التعليمية", href: "#" }
+        ],
+        col3Title: "موارد",
+        col3Links: [
+          { label: "مركز المساعدة", href: "#" },
+          { label: "المدوّنة", href: "#" },
+          { label: "عن اختباري", href: "#" },
+          { label: "تواصل معنا", href: "#" }
+        ],
+        col4Title: "الشركة",
+        col4Links: [
+          { label: "سياسة الخصوصية", href: "#" },
+          { label: "الشروط والأحكام", href: "#" }
+        ],
+        copyrightText: "© ٢٠٢٦ اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦",
+        statusText: "توليد ذكي وموثوق"
       }
     }
   ],
@@ -373,6 +403,66 @@ export default function Home() {
                   { value: "دعم بالعربية" },
                   { value: "مستضاف في السعودية" }
                 ];
+              }
+              return { ...item, props: updatedProps };
+            }
+            if (item.type === "Footer") {
+              const updatedProps = { ...item.props };
+              if (!updatedProps.description) {
+                updatedProps.description = "منصة سعودية مدعومة بالذكاء اصطناعي لإنشاء وإدارة الاختبارات، مرتبطة بالمنهج السعودي.";
+              }
+              if (!updatedProps.twitterUrl) {
+                updatedProps.twitterUrl = "https://x.com/examyai";
+              }
+              if (!updatedProps.instagramUrl) {
+                updatedProps.instagramUrl = "https://www.instagram.com/examy.ai/";
+              }
+              if (!updatedProps.col1Title) {
+                updatedProps.col1Title = "المنتج";
+              }
+              if (!updatedProps.col1Links || updatedProps.col1Links.length === 0) {
+                updatedProps.col1Links = [
+                  { label: "الميزات", href: "#" },
+                  { label: "كيف يعمل", href: "#" },
+                  { label: "القوالب الجاهزة", href: "#" }
+                ];
+              }
+              if (!updatedProps.col2Title) {
+                updatedProps.col2Title = "لمن";
+              }
+              if (!updatedProps.col2Links || updatedProps.col2Links.length === 0) {
+                updatedProps.col2Links = [
+                  { label: "للمعلمين", href: "#" },
+                  { label: "للمدارس", href: "#" },
+                  { label: "للجامعات", href: "#" },
+                  { label: "للجهات التعليمية", href: "#" }
+                ];
+              }
+              if (!updatedProps.col3Title) {
+                updatedProps.col3Title = "موارد";
+              }
+              if (!updatedProps.col3Links || updatedProps.col3Links.length === 0) {
+                updatedProps.col3Links = [
+                  { label: "مركز المساعدة", href: "#" },
+                  { label: "المدوّنة", href: "#" },
+                  { label: "عن اختباري", href: "#" },
+                  { label: "تواصل معنا", href: "#" }
+                ];
+              }
+              if (!updatedProps.col4Title) {
+                updatedProps.col4Title = "الشركة";
+              }
+              if (!updatedProps.col4Links || updatedProps.col4Links.length === 0) {
+                updatedProps.col4Links = [
+                  { label: "سياسة الخصوصية", href: "#" },
+                  { label: "الشروط والأحكام", href: "#" }
+                ];
+              }
+              if (!updatedProps.copyrightText) {
+                updatedProps.copyrightText = "© ٢٠٢٦ اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦";
+              }
+              if (!updatedProps.statusText) {
+                updatedProps.statusText = "توليد ذكي وموثوق";
               }
               return { ...item, props: updatedProps };
             }
