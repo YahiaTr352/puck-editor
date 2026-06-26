@@ -1,0 +1,233 @@
+--- Line 109 ---
+104: height: 36px;
+105: object-fit: contain;
+106: filter: invert(53%) sepia(87%) saturate(2222%) hue-rotate(119deg) brightness(98%) contrast(102%);
+107: }
+108: 
+109: .nav-links {
+110: display: flex;
+111: align-items: center;
+112: gap: 4px;
+113: }
+114: 
+115: .nav-link {
+116: padding: 8px 14px;
+117: border-radius: 8px;
+118: font-size: 14px;
+
+
+--- Line 115 ---
+110: display: flex;
+111: align-items: center;
+112: gap: 4px;
+113: }
+114: 
+115: .nav-link {
+116: padding: 8px 14px;
+117: border-radius: 8px;
+118: font-size: 14px;
+119: color: var(--text-muted);
+120: transition: color 0.2s;
+121: }
+122: 
+123: .nav-link:hover {
+124: color: var(--text-color);
+
+
+--- Line 123 ---
+118: font-size: 14px;
+119: color: var(--text-muted);
+120: transition: color 0.2s;
+121: }
+122: 
+123: .nav-link:hover {
+124: color: var(--text-color);
+125: }
+126: 
+127: .nav-link.active {
+128: font-weight: 700;
+129: color: var(--brand-color);
+130: }
+131: 
+132: .header-left {
+
+
+--- Line 127 ---
+122: 
+123: .nav-link:hover {
+124: color: var(--text-color);
+125: }
+126: 
+127: .nav-link.active {
+128: font-weight: 700;
+129: color: var(--brand-color);
+130: }
+131: 
+132: .header-left {
+133: display: flex;
+134: align-items: center;
+135: gap: 10px;
+136: }
+
+
+--- Line 642 ---
+637: background-color: var(--brand-color);
+638: }
+639: 
+640: /* Responsive */
+641: @media (max-width: 980px) {
+642: .nav-links {
+643: display: none;
+644: }
+645: .grid {
+646: grid-template-columns: repeat(2, 1fr);
+647: }
+648: .featured-card {
+649: flex-direction: column;
+650: }
+651: .featured-image-wrapper, .featured-text-wrapper {
+
+
+--- Line 683 ---
+678: }
+679: </style>
+680: </head>
+681: <body data-theme="dark">
+682: 
+683: <header class="header" id="header">
+684: <div class="header-content">
+685: <div class="header-left">
+686: <a href="/" class="start-btn">
+687: ابدأ مجاناً
+688: <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+689: <path d="M19 12H5M12 19l-7-7 7-7"/>
+690: </svg>
+691: <a href="/" class="login-btn">تسجيل دخول</a>
+692: <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme">
+
+
+--- Line 700 ---
+695: <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+696: </svg>
+697: </button>
+698: </div>
+699: 
+700: <nav class="nav-links">
+701: <a href="/faq" class="nav-link">الأسئلة الشائعة</a>
+702: <a href="/blog" class="nav-link active">المدوّنة</a>
+703: <a href="/" class="nav-link">نماذج واقعية</a>
+704: <a href="/" class="nav-link">كيف يعمل</a>
+705: <a href="/" class="nav-link">المنتج</a>
+706: </nav>
+707: 
+708: <a href="/" class="header-logo">
+709: <img src="./assets/images/logo-glow.png" alt="Examy Logo">
+
+
+--- Line 701 ---
+696: </svg>
+697: </button>
+698: </div>
+699: 
+700: <nav class="nav-links">
+701: <a href="/faq" class="nav-link">الأسئلة الشائعة</a>
+702: <a href="/blog" class="nav-link active">المدوّنة</a>
+703: <a href="/" class="nav-link">نماذج واقعية</a>
+704: <a href="/" class="nav-link">كيف يعمل</a>
+705: <a href="/" class="nav-link">المنتج</a>
+706: </nav>
+707: 
+708: <a href="/" class="header-logo">
+709: <img src="./assets/images/logo-glow.png" alt="Examy Logo">
+710: </a>
+
+
+--- Line 702 ---
+697: </button>
+698: </div>
+699: 
+700: <nav class="nav-links">
+701: <a href="/faq" class="nav-link">الأسئلة الشائعة</a>
+702: <a href="/blog" class="nav-link active">المدوّنة</a>
+703: <a href="/" class="nav-link">نماذج واقعية</a>
+704: <a href="/" class="nav-link">كيف يعمل</a>
+705: <a href="/" class="nav-link">المنتج</a>
+706: </nav>
+707: 
+708: <a href="/" class="header-logo">
+709: <img src="./assets/images/logo-glow.png" alt="Examy Logo">
+710: </a>
+711: </div>
+
+
+--- Line 703 ---
+698: </div>
+699: 
+700: <nav class="nav-links">
+701: <a href="/faq" class="nav-link">الأسئلة الشائعة</a>
+702: <a href="/blog" class="nav-link active">المدوّنة</a>
+703: <a href="/" class="nav-link">نماذج واقعية</a>
+704: <a href="/" class="nav-link">كيف يعمل</a>
+705: <a href="/" class="nav-link">المنتج</a>
+706: </nav>
+707: 
+708: <a href="/" class="header-logo">
+709: <img src="./assets/images/logo-glow.png" alt="Examy Logo">
+710: </a>
+711: </div>
+712: </header>
+
+
+--- Line 704 ---
+699: 
+700: <nav class="nav-links">
+701: <a href="/faq" class="nav-link">الأسئلة الشائعة</a>
+702: <a href="/blog" class="nav-link active">المدوّنة</a>
+703: <a href="/" class="nav-link">نماذج واقعية</a>
+704: <a href="/" class="nav-link">كيف يعمل</a>
+705: <a href="/" class="nav-link">المنتج</a>
+706: </nav>
+707: 
+708: <a href="/" class="header-logo">
+709: <img src="./assets/images/logo-glow.png" alt="Examy Logo">
+710: </a>
+711: </div>
+712: </header>
+713: 
+
+
+--- Line 705 ---
+700: <nav class="nav-links">
+701: <a href="/faq" class="nav-link">الأسئلة الشائعة</a>
+702: <a href="/blog" class="nav-link active">المدوّنة</a>
+703: <a href="/" class="nav-link">نماذج واقعية</a>
+704: <a href="/" class="nav-link">كيف يعمل</a>
+705: <a href="/" class="nav-link">المنتج</a>
+706: </nav>
+707: 
+708: <a href="/" class="header-logo">
+709: <img src="./assets/images/logo-glow.png" alt="Examy Logo">
+710: </a>
+711: </div>
+712: </header>
+713: 
+714: <main>
+
+
+--- Line 712 ---
+707: 
+708: <a href="/" class="header-logo">
+709: <img src="./assets/images/logo-glow.png" alt="Examy Logo">
+710: </a>
+711: </div>
+712: </header>
+713: 
+714: <main>
+715: <section class="hero">
+716: <div class="radial-glow"></div>
+717: <svg class="grid-bg" width="100%" height="460">
+718: <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+719: <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" stroke-width="1" opacity="0.1"/>
+720: </pattern>
+721: <rect width="100%" height="100%" fill="url(#grid)" />
+

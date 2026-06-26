@@ -13,13 +13,13 @@ const initialData = {
     {
       type: "Nav",
       props: {
-        ctaText: "ابدأ مجاناً",
-        ctaLink: "#cta",
+        ctaText: "ابدأ مجانًا",
+        ctaLink: "/login?start=true",
         links: [
-          { label: "المنتج", href: "#features" },
-          { label: "كيف يعمل", href: "#how" },
-          { label: "الأسعار", href: "#pricing" },
-          { label: "الأسئلة الشائعة", href: "/faq" }
+          { label: "الميزات", href: "/#features" },
+          { label: "الأسعار", href: "/#pricing" },
+          { label: "كيف يعمل", href: "/#how_it_works" },
+          { label: "القوالب الجاهزة", href: "/#actual-models" }
         ],
         id: "nav-header"
       }
@@ -182,8 +182,8 @@ const faqFallbackData = {
     {
       type: "Nav",
       props: {
-        ctaText: "ابدأ مجاناً",
-        ctaLink: "#cta",
+        ctaText: "ابدأ مجانًا",
+        ctaLink: "/login?start=true",
         links: [
           { label: "المنتج", href: "/" },
           { label: "كيف يعمل", href: "/#how" },
@@ -214,9 +214,91 @@ const faqFallbackData = {
   }
 };
 
+const blogsFallbackData = {
+  content: [
+    {
+      type: "Nav",
+      props: {
+        ctaText: "ابدأ مجانًا",
+        ctaLink: "/login?start=true",
+        links: [
+          { label: "المنتج", href: "/" },
+          { label: "كيف يعمل", href: "/#how" },
+          { label: "الأسعار", href: "/#pricing" },
+          { label: "الأسئلة الشائعة", href: "/faq" }
+        ],
+        id: "nav-header"
+      }
+    },
+    {
+      type: "BlogList",
+      props: {
+        id: "blogs-block",
+        title: (config.components.BlogList as any).defaultProps?.title || "",
+        subtitle: (config.components.BlogList as any).defaultProps?.subtitle || "",
+        posts: (config.components.BlogList as any).defaultProps?.posts || []
+      }
+    },
+    {
+      type: "Footer",
+      props: {
+        id: "footer-block"
+      }
+    }
+  ],
+  root: {
+    props: {
+      title: "المدوّنة - Examy"
+    }
+  }
+};
+
+const blogDetailsFallbackData = {
+  content: [
+    {
+      type: "Nav",
+      props: {
+        ctaText: "ابدأ مجانًا",
+        ctaLink: "/login?start=true",
+        links: [
+          { label: "المنتج", href: "/" },
+          { label: "كيف يعمل", href: "/#how" },
+          { label: "الأسعار", href: "/#pricing" },
+          { label: "الأسئلة الشائعة", href: "/faq" }
+        ],
+        id: "nav-header"
+      }
+    },
+    {
+      type: "BlogDetails",
+      props: {
+        id: "blog-details-block",
+        title: (config.components.BlogDetails as any).defaultProps?.title || "",
+        subtitle: (config.components.BlogDetails as any).defaultProps?.subtitle || "",
+        date: (config.components.BlogDetails as any).defaultProps?.date || "",
+        author: (config.components.BlogDetails as any).defaultProps?.author || "",
+        image: (config.components.BlogDetails as any).defaultProps?.image || "",
+        content: (config.components.BlogDetails as any).defaultProps?.content || ""
+      }
+    },
+    {
+      type: "Footer",
+      props: {
+        id: "footer-block"
+      }
+    }
+  ],
+  root: {
+    props: {
+      title: "تفاصيل المقالة - Examy"
+    }
+  }
+};
+
+
 function AdminEditorContent() {
   const searchParams = useSearchParams();
-  const slug = searchParams.get("slug") || "home";
+  const slug = searchParams.get("slug") || searchParams.get("slag") || "home";
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -232,12 +314,21 @@ function AdminEditorContent() {
           const migratedContent = parsed.content.map((item: any) => {
             if (item.type === "Nav") {
               const updatedProps = { ...item.props };
-              if (!updatedProps.links) {
+              if (slug === "home") {
                 updatedProps.links = [
-                  { label: "المنتج", href: slug === "faq" ? "/" : "#features" },
-                  { label: "كيف يعمل", href: slug === "faq" ? "/#how" : "#how" },
-                  { label: "الأسعار", href: slug === "faq" ? "/#pricing" : "#pricing" },
+                  { label: "المنتج", href: "#features" },
+                  { label: "كيف يعمل", href: "#how_it_works" },
+                  { label: "نماذج واقعية", href: "#actual-models" },
+                  { label: "الأسعار", href: "#pricing" },
+                  { label: "المدوّنة", href: "/blogs" },
                   { label: "الأسئلة الشائعة", href: "/faq" }
+                ];
+              } else {
+                updatedProps.links = [
+                  { label: "الميزات", href: "/#features" },
+                  { label: "الأسعار", href: "/#pricing" },
+                  { label: "كيف يعمل", href: "/#how_it_works" },
+                  { label: "القوالب الجاهزة", href: "/#actual-models" }
                 ];
               }
               if (!updatedProps.actions) {
@@ -307,11 +398,27 @@ function AdminEditorContent() {
           setData({ ...parsed, content: filteredContent });
         } else {
           // تحميل البيانات الافتراضية
-          setData(slug === "faq" ? faqFallbackData : initialData);
+          setData(
+            slug === "faq"
+              ? faqFallbackData
+              : slug === "blogs"
+              ? blogsFallbackData
+              : slug === "blog-details"
+              ? blogDetailsFallbackData
+              : initialData
+          );
         }
       } catch (e) {
         console.error("Failed to load page data:", e);
-        setData(slug === "faq" ? faqFallbackData : initialData);
+        setData(
+          slug === "faq"
+            ? faqFallbackData
+            : slug === "blogs"
+            ? blogsFallbackData
+            : slug === "blog-details"
+            ? blogDetailsFallbackData
+            : initialData
+        );
       } finally {
         setLoading(false);
       }
@@ -321,7 +428,14 @@ function AdminEditorContent() {
 
   const handleSave = async (newData: any) => {
     try {
-      const defaultTitle = slug === "faq" ? "الأسئلة الشائعة - Examy" : "الصفحة الرئيسية - Examy";
+      const defaultTitle = 
+        slug === "faq"
+          ? "الأسئلة الشائعة - Examy"
+          : slug === "blogs"
+          ? "المدوّنة - Examy"
+          : slug === "blog-details"
+          ? "تفاصيل المقالة - Examy"
+          : "الصفحة الرئيسية - Examy";
       const pageTitle = newData.root?.props?.title || defaultTitle;
       
       await savePageData(slug, pageTitle, newData);
@@ -350,11 +464,17 @@ function AdminEditorContent() {
 
   const editorConfig = { ...config } as any;
   if (slug === "home") {
-    const { FAQ, ...restComponents } = config.components;
+    const { FAQ, BlogList, BlogDetails, ...restComponents } = config.components;
     editorConfig.components = restComponents;
   } else if (slug === "faq") {
     const { Nav, FAQ, Footer } = config.components;
     editorConfig.components = { Nav, FAQ, Footer };
+  } else if (slug === "blogs") {
+    const { Nav, BlogList, Footer } = config.components;
+    editorConfig.components = { Nav, BlogList, Footer };
+  } else if (slug === "blog-details") {
+    const { Nav, BlogDetails, Footer } = config.components;
+    editorConfig.components = { Nav, BlogDetails, Footer };
   }
 
   return (

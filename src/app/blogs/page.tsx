@@ -8,7 +8,7 @@ import { getPageData } from "../actions";
 import { AmbientBackground } from "../../components/AmbientBackground";
 import { LiveActivity } from "../../components/LiveActivity";
 
-const faqFallbackData = {
+const blogsFallbackData = {
   content: [
     {
       type: "Nav",
@@ -16,20 +16,21 @@ const faqFallbackData = {
         ctaText: "ابدأ مجانًا",
         ctaLink: "/login?start=true",
         links: [
-          { label: "المنتج", href: "/#features" },
+          { label: "الميزات", href: "/#features" },
+          { label: "الأسعار", href: "/#pricing" },
           { label: "كيف يعمل", href: "/#how_it_works" },
-          { label: "نماذج واقعية", href: "/#actual-models" },
-          { label: "المدوّنة", href: "/blogs" },
-          { label: "الأسئلة الشائعة", href: "/faq" }
+          { label: "القوالب الجاهزة", href: "/#actual-models" }
         ],
         id: "nav-header"
       }
     },
     {
-      type: "FAQ",
+      type: "BlogList",
       props: {
-        id: "faq-block",
-        categories: (config.components.FAQ as any).defaultProps?.categories || []
+        id: "blogs-block",
+        title: (config.components.BlogList as any).defaultProps?.title || "",
+        subtitle: (config.components.BlogList as any).defaultProps?.subtitle || "",
+        posts: (config.components.BlogList as any).defaultProps?.posts || []
       }
     },
     {
@@ -41,18 +42,18 @@ const faqFallbackData = {
   ],
   root: {
     props: {
-      title: "الأسئلة الشائعة - Examy"
+      title: "المدوّنة - Examy"
     }
   }
 };
 
-export default function FAQPage() {
-  const [data, setData] = useState<any>(faqFallbackData);
+export default function BlogsPage() {
+  const [data, setData] = useState<any>(blogsFallbackData);
 
   useEffect(() => {
     async function load() {
       try {
-        const dbData = await getPageData("faq");
+        const dbData = await getPageData("blogs");
         if (dbData && dbData.puckData) {
           const parsed = typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData;
           if (parsed.content) {
@@ -60,11 +61,10 @@ export default function FAQPage() {
               if (item.type === "Nav") {
                 const updatedProps = { ...item.props };
                 updatedProps.links = [
-                  { label: "المنتج", href: "/#features" },
+                  { label: "الميزات", href: "/#features" },
+                  { label: "الأسعار", href: "/#pricing" },
                   { label: "كيف يعمل", href: "/#how_it_works" },
-                  { label: "نماذج واقعية", href: "/#actual-models" },
-                  { label: "المدوّنة", href: "/blogs" },
-                  { label: "الأسئلة الشائعة", href: "/faq" }
+                  { label: "القوالب الجاهزة", href: "/#actual-models" }
                 ];
                 if (!updatedProps.actions) {
                   updatedProps.actions = [
@@ -74,16 +74,16 @@ export default function FAQPage() {
                 }
                 return { ...item, props: updatedProps };
               }
-              if (item.type === "FAQ") {
+              if (item.type === "BlogList") {
                 const updatedProps = { ...item.props };
-                if (!updatedProps.categories || updatedProps.categories.length === 0) {
-                  updatedProps.categories = (config.components.FAQ as any).defaultProps?.categories || [];
+                if (!updatedProps.posts || updatedProps.posts.length === 0) {
+                  updatedProps.posts = (config.components.BlogList as any).defaultProps?.posts || [];
                 }
                 if (updatedProps.title === undefined || updatedProps.title === "") {
-                  updatedProps.title = (config.components.FAQ as any).defaultProps?.title || "";
+                  updatedProps.title = (config.components.BlogList as any).defaultProps?.title || "";
                 }
                 if (updatedProps.subtitle === undefined || updatedProps.subtitle === "") {
-                  updatedProps.subtitle = (config.components.FAQ as any).defaultProps?.subtitle || "";
+                  updatedProps.subtitle = (config.components.BlogList as any).defaultProps?.subtitle || "";
                 }
                 return { ...item, props: updatedProps };
               }
@@ -107,24 +107,22 @@ export default function FAQPage() {
             });
             setData({ ...parsed, content: migratedContent });
           } else {
-            setData(faqFallbackData);
+            setData(blogsFallbackData);
           }
         } else {
-          setData(faqFallbackData);
+          setData(blogsFallbackData);
         }
       } catch (e) {
         console.error("Error loading page data from DB:", e);
-        setData(faqFallbackData);
+        setData(blogsFallbackData);
       }
     }
     load();
   }, []);
 
   return (
-    <div style={{ minHeight: "100vh", position: "relative", background: "var(--bg)" }}>
-
-
-      <AmbientBackground bgStyle="off" intensity={75} blur={60} speed={100} grain={true} mesh={false} />
+    <div style={{ minHeight: "100vh", position: "relative" }}>
+      <AmbientBackground bgStyle="fluid" intensity={75} blur={60} speed={100} grain={true} mesh={false} />
       <Render config={config} data={data} />
       <LiveActivity />
     </div>

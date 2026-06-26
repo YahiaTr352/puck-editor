@@ -12,13 +12,15 @@ const initialData = {
     {
       type: "Nav",
       props: {
-        ctaText: "ابدأ مجاناً",
-        ctaLink: "#cta",
+        ctaText: "ابدأ مجانًا",
+        ctaLink: "/login?start=true",
         links: [
           { label: "المنتج", href: "#features" },
-          { label: "كيف يعمل", href: "#how" },
+          { label: "كيف يعمل", href: "#how_it_works" },
+          { label: "نماذج واقعية", href: "#actual-models" },
           { label: "الأسعار", href: "#pricing" },
-          { label: "الأسئلة الشائعة", href: "#faq" }
+          { label: "المدوّنة", href: "/blogs" },
+          { label: "الأسئلة الشائعة", href: "/faq" }
         ],
         id: "nav-header"
       }
@@ -170,14 +172,14 @@ export default function HomeAdminEditor() {
           const migratedContent = parsed.content.map((item: any) => {
             if (item.type === "Nav") {
               const updatedProps = { ...item.props };
-              if (!updatedProps.links) {
-                updatedProps.links = [
-                  { label: "المنتج", href: "#features" },
-                  { label: "كيف يعمل", href: "#how" },
-                  { label: "الأسعار", href: "#pricing" },
-                  { label: "الأسئلة الشائعة", href: "#faq" }
-                ];
-              }
+              updatedProps.links = [
+                { label: "المنتج", href: "#features" },
+                { label: "كيف يعمل", href: "#how_it_works" },
+                { label: "نماذج واقعية", href: "#actual-models" },
+                { label: "الأسعار", href: "#pricing" },
+                { label: "المدوّنة", href: "/blogs" },
+                { label: "الأسئلة الشائعة", href: "/faq" }
+              ];
               if (!updatedProps.actions) {
                 updatedProps.actions = [
                   { label: "تسجيل دخول", href: "#login", variant: "link" },

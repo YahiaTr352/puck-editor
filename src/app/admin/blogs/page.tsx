@@ -6,7 +6,7 @@ import "@puckeditor/core/dist/index.css";
 import { config } from "../../../puck/config";
 import { getPageData, savePageData } from "../../actions";
 
-const initialFaqData = {
+const initialBlogsData = {
   content: [
     {
       type: "Nav",
@@ -14,22 +14,21 @@ const initialFaqData = {
         ctaText: "ابدأ مجانًا",
         ctaLink: "/login?start=true",
         links: [
-          { label: "المنتج", href: "/#features" },
+          { label: "الميزات", href: "/#features" },
+          { label: "الأسعار", href: "/#pricing" },
           { label: "كيف يعمل", href: "/#how_it_works" },
-          { label: "نماذج واقعية", href: "/#actual-models" },
-          { label: "المدوّنة", href: "/blogs" },
-          { label: "الأسئلة الشائعة", href: "/faq" }
+          { label: "القوالب الجاهزة", href: "/#actual-models" }
         ],
         id: "nav-header"
       }
     },
     {
-      type: "FAQ",
+      type: "BlogList",
       props: {
-        id: "faq-component",
-        title: "كل ما تريد معرفته عن اختباري",
-        subtitle: "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات، التصحيح، التخصيص، والأسعار. لم تجد إجابتك؟ فريقنا جاهز لمساعدتك.",
-        categories: (config.components.FAQ as any).defaultProps?.categories || []
+        id: "blogs-block",
+        title: (config.components.BlogList as any).defaultProps?.title || "",
+        subtitle: (config.components.BlogList as any).defaultProps?.subtitle || "",
+        posts: (config.components.BlogList as any).defaultProps?.posts || []
       }
     },
     {
@@ -55,7 +54,7 @@ const initialFaqData = {
         col3Title: "موارد",
         col3Links: [
           { label: "مركز المساعدة", href: "#" },
-          { label: "المدوّنة", href: "#" },
+          { label: "المدوّنة", href: "/blogs" },
           { label: "عن اختباري", href: "#" },
           { label: "تواصل معنا", href: "#" }
         ],
@@ -71,19 +70,20 @@ const initialFaqData = {
   ],
   root: {
     props: {
-      title: "الأسئلة الشائعة - Examy"
+      title: "المدوّنة - Examy"
     }
   }
 };
 
-export default function FAQAdminEditor() {
-  const [data, setData] = useState<any>(initialFaqData);
-  const [loading, setLoading] = useState<boolean>(false);
+export default function BlogsAdminEditor() {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     async function loadData() {
+      setLoading(true);
       try {
-        const dbData = await getPageData("faq");
+        const dbData = await getPageData("blogs");
         if (dbData && dbData.puckData) {
           const parsed = typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData;
           if (parsed.content && Array.isArray(parsed.content)) {
@@ -91,11 +91,10 @@ export default function FAQAdminEditor() {
               if (item.type === "Nav") {
                 const updatedProps = { ...item.props };
                 updatedProps.links = [
-                  { label: "المنتج", href: "/#features" },
+                  { label: "الميزات", href: "/#features" },
+                  { label: "الأسعار", href: "/#pricing" },
                   { label: "كيف يعمل", href: "/#how_it_works" },
-                  { label: "نماذج واقعية", href: "/#actual-models" },
-                  { label: "المدوّنة", href: "/blogs" },
-                  { label: "الأسئلة الشائعة", href: "/faq" }
+                  { label: "القوالب الجاهزة", href: "/#actual-models" }
                 ];
                 if (!updatedProps.actions) {
                   updatedProps.actions = [
@@ -105,16 +104,16 @@ export default function FAQAdminEditor() {
                 }
                 return { ...item, props: updatedProps };
               }
-              if (item.type === "FAQ") {
+              if (item.type === "BlogList") {
                 const updatedProps = { ...item.props };
-                if (!updatedProps.categories || updatedProps.categories.length === 0) {
-                  updatedProps.categories = (config.components.FAQ as any).defaultProps?.categories || [];
+                if (!updatedProps.posts || updatedProps.posts.length === 0) {
+                  updatedProps.posts = (config.components.BlogList as any).defaultProps?.posts || [];
                 }
                 if (updatedProps.title === undefined || updatedProps.title === "") {
-                  updatedProps.title = (config.components.FAQ as any).defaultProps?.title || "";
+                  updatedProps.title = (config.components.BlogList as any).defaultProps?.title || "";
                 }
                 if (updatedProps.subtitle === undefined || updatedProps.subtitle === "") {
-                  updatedProps.subtitle = (config.components.FAQ as any).defaultProps?.subtitle || "";
+                  updatedProps.subtitle = (config.components.BlogList as any).defaultProps?.subtitle || "";
                 }
                 return { ...item, props: updatedProps };
               }
@@ -138,14 +137,16 @@ export default function FAQAdminEditor() {
             });
             setData({ ...parsed, content: migratedContent });
           } else {
-            setData(initialFaqData);
+            setData(initialBlogsData);
           }
         } else {
-          setData(initialFaqData);
+          setData(initialBlogsData);
         }
       } catch (e) {
         console.error("Failed to load page data:", e);
-        setData(initialFaqData);
+        setData(initialBlogsData);
+      } finally {
+        setLoading(false);
       }
     }
     loadData();
@@ -153,8 +154,8 @@ export default function FAQAdminEditor() {
 
   const handleSave = async (newData: any) => {
     try {
-      const pageTitle = newData.root?.props?.title || "الأسئلة الشائعة - Examy";
-      await savePageData("faq", pageTitle, newData);
+      const pageTitle = newData.root?.props?.title || "المدوّنة - Examy";
+      await savePageData("blogs", pageTitle, newData);
       alert("تم حفظ التعديلات بنجاح في قاعدة البيانات PostgreSQL!");
     } catch (e) {
       console.error(e);
@@ -162,35 +163,45 @@ export default function FAQAdminEditor() {
     }
   };
 
-  const faqConfig = { ...config } as any;
-  const { Nav, FAQ, Footer } = config.components;
-  faqConfig.components = { Nav, FAQ, Footer };
+  if (loading || !data) {
+    return (
+      <div style={{
+        display: "flex",
+        height: "100vh",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: "sans-serif",
+        fontSize: "1.2rem",
+        color: "#64748b"
+      }}>
+        جاري تحميل محرر المدوّنة...
+      </div>
+    );
+  }
+
+  const blogsConfig = { ...config } as any;
+  const { Nav, BlogList, Footer } = config.components;
+  blogsConfig.components = { Nav, BlogList, Footer };
 
   return (
     <div style={{ height: "100vh", direction: "ltr" }} className="puck-editor-theme-override">
       <Puck
-        config={faqConfig}
+        config={blogsConfig}
         data={data}
         onPublish={handleSave}
         overrides={{
           iframe: ({ children, document }: any) => {
             useEffect(() => {
               if (document) {
-                // Ensure RTL layout for arabic translation inside the iframe preview canvas
                 document.documentElement.dir = "rtl";
                 document.documentElement.lang = "ar";
-                
-                // Examy styling system depends on these dark mode tokens and animations
                 document.body.setAttribute("data-theme", "dark");
                 document.body.setAttribute("data-anims", "on");
                 document.body.className = "min-h-full flex flex-col";
 
                 const copyStyles = () => {
                   const classId = "injected-parent-style";
-                  // Clear previously copied style tags
                   document.querySelectorAll(`.${classId}`).forEach((el: any) => el.remove());
-
-                  // Clone and inject all parent style/link rules to replicate visitor environment
                   window.parent.document.querySelectorAll('style, link[rel="stylesheet"]').forEach((styleEl) => {
                     try {
                       const clone = styleEl.cloneNode(true) as HTMLElement;
@@ -203,11 +214,8 @@ export default function FAQAdminEditor() {
                 };
 
                 copyStyles();
-                // Delay copy to guarantee Dev Server Webpack/Turbopack injected stylesheet updates are synced
                 const timeoutId = setTimeout(copyStyles, 250);
                 const observer = new MutationObserver(copyStyles);
-
-                // Observe parent head changes to hot-reload styles in iframe preview
                 observer.observe(window.parent.document.head, {
                   childList: true,
                   subtree: true,

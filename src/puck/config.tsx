@@ -3,6 +3,8 @@ import { Config } from "@puckeditor/core";
 import { Icon } from "./icons";
 import { AmbientBackground } from "../components/AmbientBackground";
 import { LiveActivity } from "../components/LiveActivity";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 
 /* ────────────────────────────────────────────────────────────────────────
@@ -10,12 +12,13 @@ import { LiveActivity } from "../components/LiveActivity";
    ──────────────────────────────────────────────────────────────────────── */
 
 // Real "اختباري · EXAMY" logo lockup
-export const Logo = ({ size = 36, color }: { size?: number; color?: string }) => {
+export const Logo = ({ size = 36, color, id }: { size?: number; color?: string; id?: string }) => {
   const height = size * 1.05;
   const width = height * (1046 / 374);
-  const maskUrl = "/assets/logo-mask.png";
+  const maskUrl = "https://examy.ai/v2/landing/src/assets/Group.png";
   return (
     <div
+      id={id || "logo-mask"}
       style={{
         width,
         height,
@@ -1235,6 +1238,26 @@ export type PuckConfig = {
         }[];
       }[];
     };
+    BlogList: {
+      title?: string;
+      subtitle?: string;
+      posts?: {
+        title: string;
+        description: string;
+        image?: string;
+        date?: string;
+        author?: string;
+        slug: string;
+      }[];
+    };
+    BlogDetails: {
+      title?: string;
+      subtitle?: string;
+      date?: string;
+      author?: string;
+      image?: string;
+      content?: string;
+    };
   };
 };
 
@@ -1281,23 +1304,33 @@ export const config: Config<PuckConfig> = {
       defaultProps: {
         logoImageUrl: "",
         logoText: "اختباري Examy",
-        logoLink: "#",
+        logoLink: "/",
         logoSize: 36,
         links: [
-          { label: "المنتج", href: "#features" },
-          { label: "كيف يعمل", href: "#how" },
-          { label: "الأسعار", href: "#pricing" },
-          { label: "الأسئلة الشائعة", href: "#faq" },
+          { label: "المنتج", href: "/#features" },
+          { label: "كيف يعمل", href: "/#how_it_works" },
+          { label: "نماذج واقعية", href: "/#actual-models" },
+          { label: "الأسعار", href: "/#pricing" },
+          { label: "المدوّنة", href: "/blogs" },
+          { label: "الأسئلة الشائعة", href: "/faq" },
         ],
         actions: [
-          { label: "تسجيل دخول", href: "#login", variant: "link" },
-          { label: "ابدأ مجاناً", href: "#cta", variant: "primary" }
+          { label: "تسجيل الدخول", href: "/login", variant: "link" },
+          { label: "ابدأ مجانًا", href: "/login?start=true", variant: "primary" }
         ],
       },
       render: ({ ctaText, ctaLink, links, actions, logoImageUrl = "", logoText = "اختباري Examy", logoLink = "#", logoSize = 36 }) => {
         const [scrolled, setScrolled] = useState(false);
         const [menuOpen, setMenuOpen] = useState(false);
         const [theme, setTheme] = useState("light");
+        let pathname = "";
+        try {
+          pathname = usePathname() || "";
+        } catch (e) {
+          if (typeof window !== "undefined") {
+            pathname = window.location.pathname || "";
+          }
+        }
 
         useEffect(() => {
           if (typeof window === "undefined") return;
@@ -1333,20 +1366,29 @@ export const config: Config<PuckConfig> = {
           document.body.setAttribute("data-theme", newTheme);
           localStorage.setItem("theme", newTheme);
           setTheme(newTheme);
+          if (typeof window !== "undefined") {
+            if ((window as any).ReactNativeWebView) {
+              (window as any).ReactNativeWebView.postMessage(JSON.stringify({ type: 'TOGGLE_THEME', theme: newTheme }));
+            } else if (window.parent) {
+              window.parent.postMessage({ type: 'TOGGLE_THEME', theme: newTheme }, '*');
+            }
+          }
         };
 
         const defaultLinks = [
-          { label: "المنتج", href: "#features" },
-          { label: "كيف يعمل", href: "#how" },
-          { label: "الأسعار", href: "#pricing" },
-          { label: "الأسئلة الشائعة", href: "#faq" },
+          { label: "المنتج", href: "/#features" },
+          { label: "كيف يعمل", href: "/#how_it_works" },
+          { label: "نماذج واقعية", href: "/#actual-models" },
+          { label: "الأسعار", href: "/#pricing" },
+          { label: "المدوّنة", href: "/blogs" },
+          { label: "الأسئلة الشائعة", href: "/faq" },
         ];
 
         const activeLinks = links || defaultLinks;
 
         const defaultActions: { label: string; href: string; variant: "link" | "primary" }[] = [
-          { label: "تسجيل دخول", href: "#login", variant: "link" },
-          { label: ctaText || "ابدأ مجاناً", href: ctaLink || "#cta", variant: "primary" }
+          { label: "تسجيل الدخول", href: "/login", variant: "link" },
+          { label: ctaText || "ابدأ مجانًا", href: ctaLink || "/login?start=true", variant: "primary" }
         ];
 
         const activeActions = actions || defaultActions;
@@ -1380,6 +1422,7 @@ export const config: Config<PuckConfig> = {
                 gap: 16,
               }}
             >
+              {/* Logo */}
               <a href={logoLink} aria-label={logoText} style={{ display: "flex", flexShrink: 0, alignItems: "center" }}>
                 {logoImageUrl ? (
                   <img
@@ -1393,35 +1436,41 @@ export const config: Config<PuckConfig> = {
                     }}
                   />
                 ) : (
-                  <Logo size={logoSize} />
+                  <Logo size={logoSize} id="logo-mask" />
                 )}
               </a>
+
+              {/* Centered navigation links on desktop */}
               <nav
                 style={{ display: "flex", gap: 4, alignItems: "center" }}
                 className="nav-links"
               >
-                {activeLinks.map((l, i) => (
-                  <a
-                    key={`${l.href}-${i}`}
-                    href={l.href}
-                    style={{
-                      padding: "8px 14px",
-                      fontSize: 14,
-                      color: "var(--text-muted)",
-                      borderRadius: 8,
-                      fontWeight: 500,
-                      transition: "color 0.15s",
-                      whiteSpace: "nowrap",
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text)")}
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.color = "var(--text-muted)")
-                    }
-                  >
-                    {l.label}
-                  </a>
-                ))}
+                {activeLinks.map((l, i) => {
+                  const isActive = (l.href === "/" && pathname === "/") || (l.href !== "/" && pathname === l.href) || (l.href === "/faq" && pathname.includes("/faq")) || (l.href === "/blogs" && pathname.includes("/blogs")) || (l.href === "/blogs" && pathname.includes("/blog-details"));
+                  return (
+                    <Link
+                      key={`${l.href}-${i}`}
+                      href={l.href}
+                      style={{
+                        padding: "8px 14px",
+                        fontSize: 14,
+                        color: isActive ? "var(--brand)" : "var(--text-muted)",
+                        borderRadius: 8,
+                        fontWeight: 500,
+                        transition: "color 0.15s",
+                        whiteSpace: "nowrap",
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text)")}
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.color = isActive ? "var(--brand)" : "var(--text-muted)")
+                      }
+                    >
+                      {l.label}
+                    </Link>
+                  );
+                })}
               </nav>
+
               <div
                 style={{ display: "flex", gap: 10, alignItems: "center" }}
                 className="nav-actions"
@@ -1429,29 +1478,30 @@ export const config: Config<PuckConfig> = {
                 {/* Theme Toggle Button (Desktop) */}
                 <button
                   type="button"
+                  id="theme-toggle-header-btn"
                   className="theme-toggle-desktop"
                   onClick={toggleTheme}
                   aria-label="تبديل المظهر"
                   style={{
-                    width: 40,
-                    height: 40,
+                    width: 36,
+                    height: 36,
                     borderRadius: "50%",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    background: theme === "dark" 
-                      ? "rgba(255, 255, 255, 0.08)" 
-                      : "rgba(10, 24, 20, 0.05)",
-                    border: "1px solid var(--border)",
-                    backdropFilter: "blur(8px)",
-                    WebkitBackdropFilter: "blur(8px)",
-                    color: theme === "dark" ? "#00E08A" : "var(--text-muted)",
-                    boxShadow: theme === "dark"
-                      ? "0 0 14px rgba(0, 224, 138, 0.3)"
-                      : "none",
+                    background: theme === "light" 
+                      ? "rgba(10, 24, 20, 0.05)" 
+                      : "rgba(255, 255, 255, 0.08)",
+                    border: theme === "light"
+                      ? "1px solid rgba(10, 24, 20, 0.1)"
+                      : "1px solid rgba(255, 255, 255, 0.15)",
+                    color: theme === "light" ? "#0A1814" : "#E8F1EE",
                     cursor: "pointer",
                     transition: "all 0.2s ease",
-                    marginLeft: 4,
+                    marginLeft: 12,
+                    marginInlineEnd: 12,
+                    outline: "none",
+                    zIndex: 9999,
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.color = "var(--text)";
@@ -1459,25 +1509,19 @@ export const config: Config<PuckConfig> = {
                     e.currentTarget.style.background = theme === "dark"
                       ? "rgba(255, 255, 255, 0.14)"
                       : "rgba(10, 24, 20, 0.08)";
-                    e.currentTarget.style.boxShadow = theme === "dark"
-                      ? "0 0 20px -2px var(--brand)"
-                      : "none";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.color = theme === "dark" ? "#00E08A" : "var(--text-muted)";
-                    e.currentTarget.style.borderColor = "var(--border)";
-                    e.currentTarget.style.background = theme === "dark"
-                      ? "rgba(255, 255, 255, 0.08)"
-                      : "rgba(10, 24, 20, 0.05)";
-                    e.currentTarget.style.boxShadow = theme === "dark"
-                      ? "0 0 14px rgba(0, 224, 138, 0.3)"
-                      : "none";
+                    e.currentTarget.style.color = theme === "light" ? "#0A1814" : "#E8F1EE";
+                    e.currentTarget.style.borderColor = theme === "light" ? "rgba(10, 24, 20, 0.1)" : "rgba(255, 255, 255, 0.15)";
+                    e.currentTarget.style.background = theme === "light"
+                      ? "rgba(10, 24, 20, 0.05)"
+                      : "rgba(255, 255, 255, 0.08)";
                   }}
                 >
                   {theme === "dark" ? (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" /></svg>
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                   ) : (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg>
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                   )}
                 </button>
                 {activeActions.map((act, idx) => {
@@ -1512,37 +1556,40 @@ export const config: Config<PuckConfig> = {
               </div>
               
               {/* Theme Toggle & Hamburger Button (Mobile Container) */}
-              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <div 
+                className="mobile-nav-container"
+                style={{ display: "flex", gap: 10, alignItems: "center" }}
+              >
                 {/* Theme Toggle Button (Mobile) */}
                 <button
                   type="button"
+                  id="theme-toggle-header-btn-mobile"
                   className="theme-toggle-mobile"
                   onClick={toggleTheme}
                   aria-label="تبديل المظهر"
                   style={{
                     display: "none",
-                    width: 40,
-                    height: 40,
+                    width: 36,
+                    height: 36,
                     borderRadius: "50%",
                     alignItems: "center",
                     justifyContent: "center",
-                    background: theme === "dark" 
-                      ? "rgba(255, 255, 255, 0.08)" 
-                      : "rgba(10, 24, 20, 0.05)",
-                    border: "1px solid var(--border)",
-                    backdropFilter: "blur(8px)",
-                    WebkitBackdropFilter: "blur(8px)",
-                    color: theme === "dark" ? "#00E08A" : "var(--text)",
-                    boxShadow: theme === "dark"
-                      ? "0 0 14px rgba(0, 224, 138, 0.3)"
-                      : "none",
+                    background: theme === "light" 
+                      ? "rgba(10, 24, 20, 0.05)" 
+                      : "rgba(255, 255, 255, 0.08)",
+                    border: theme === "light"
+                      ? "1px solid rgba(10, 24, 20, 0.1)"
+                      : "1px solid rgba(255, 255, 255, 0.15)",
+                    color: theme === "light" ? "#0A1814" : "#E8F1EE",
                     cursor: "pointer",
+                    outline: "none",
+                    zIndex: 9999,
                   }}
                 >
                   {theme === "dark" ? (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" /></svg>
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                   ) : (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg>
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                   )}
                 </button>
                 
@@ -1576,74 +1623,72 @@ export const config: Config<PuckConfig> = {
 
             {/* Mobile dropdown */}
             <div
+              id="mobile-menu"
               className="nav-mobile-panel"
               style={{
                 overflow: "hidden",
                 maxHeight: menuOpen ? 460 : 0,
                 opacity: menuOpen ? 1 : 0,
                 transition:
-                  "max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease",
+                  "max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.25s ease, padding 0.25s ease",
+                background: "var(--bg-elev-1)",
+                borderBottom: menuOpen ? "1px solid var(--border)" : "1px solid transparent",
+                padding: menuOpen ? "20px 24px" : "0 24px",
+                display: "flex",
+                flexDirection: "column",
+                gap: menuOpen ? 16 : 0,
               }}
             >
-              <div
-                className="container"
-                style={{ paddingTop: 14, paddingBottom: 18 }}
-              >
-                <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                  {activeLinks.map((l, i) => (
-                    <a
-                      key={`${l.href}-${i}`}
-                      href={l.href}
-                      onClick={() => setMenuOpen(false)}
-                      style={{
-                        padding: "14px 14px",
-                        fontSize: 16,
-                        fontWeight: 600,
-                        borderRadius: 12,
-                        color: "var(--text-muted)",
-                      }}
-                    >
-                      {l.label}
-                    </a>
-                  ))}
-                </div>
-                <div
+              {activeLinks.map((l, i) => (
+                <Link
+                  key={`${l.href}-${i}`}
+                  href={l.href}
+                  onClick={() => setMenuOpen(false)}
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 10,
-                    marginTop: 16,
+                    fontSize: 15,
+                    color: "var(--text-muted)",
+                    fontWeight: 500,
                   }}
                 >
-                  {activeActions.map((act, idx) => {
-                    if (act.variant === "primary") {
-                      return (
-                        <a
-                          key={`act-mob-${idx}`}
-                          href={act.href}
-                          onClick={() => setMenuOpen(false)}
-                          className="btn btn-primary btn-lg"
-                          style={{ width: "100%", textAlign: "center" }}
-                        >
-                          {act.label}
-                          <Icon.ArrowLeft width="18" height="18" />
-                        </a>
-                      );
-                    }
-                    return (
-                      <a
-                        key={`act-mob-${idx}`}
-                        href={act.href}
-                        onClick={() => setMenuOpen(false)}
-                        className="btn btn-ghost btn-lg"
-                        style={{ width: "100%", textAlign: "center" }}
-                      >
-                        {act.label}
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
+                  {l.label}
+                </Link>
+              ))}
+              <div style={{ height: 1, background: "var(--border)", margin: "8px 0" }} />
+              {activeActions.map((act, idx) => {
+                if (act.variant === "primary") {
+                  return (
+                    <a
+                      key={`act-mob-${idx}`}
+                      href={act.href}
+                      onClick={() => setMenuOpen(false)}
+                      className="btn btn-primary"
+                      style={{
+                        padding: 12,
+                        textAlign: "center",
+                        borderRadius: 10,
+                        display: "block",
+                      }}
+                    >
+                      {act.label}
+                    </a>
+                  );
+                }
+                return (
+                  <a
+                    key={`act-mob-${idx}`}
+                    href={act.href}
+                    onClick={() => setMenuOpen(false)}
+                    style={{
+                      fontSize: 15,
+                      color: "var(--text-muted)",
+                      fontWeight: 500,
+                      display: "block",
+                    }}
+                  >
+                    {act.label}
+                  </a>
+                );
+              })}
             </div>
 
             <style>{`
@@ -1652,9 +1697,11 @@ export const config: Config<PuckConfig> = {
                 .nav-actions { display: none !important; }
                 .nav-burger { display: inline-flex !important; }
                 .theme-toggle-mobile { display: inline-flex !important; }
+                .mobile-nav-container { display: flex !important; }
               }
               @media (min-width: 881px) {
                 .nav-mobile-panel { display: none !important; }
+                .mobile-nav-container { display: none !important; }
               }
             `}</style>
           </header>
@@ -4064,20 +4111,46 @@ export const config: Config<PuckConfig> = {
         };
 
         const renderIcon = (iconName: string) => {
-          const props = { width: 18, height: 18, style: { color: "var(--brand)" } };
+          const props = { width: 20, height: 20, fill: "none", stroke: "currentColor", strokeWidth: 2 };
           switch (iconName) {
             case "general":
-              return <Icon.Book {...props} />;
+              return (
+                <svg viewBox="0 0 24 24" {...props}>
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16v-4M12 8h.01" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              );
             case "creation":
-              return <Icon.Bolt {...props} />;
+              return (
+                <svg viewBox="0 0 24 24" {...props}>
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              );
             case "customization":
-              return <Icon.Settings {...props} />;
+              return (
+                <svg viewBox="0 0 24 24" {...props}>
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              );
             case "grading":
-              return <Icon.Chart {...props} />;
+              return (
+                <svg viewBox="0 0 24 24" {...props}>
+                  <path d="M18 20V10M12 20V4M6 20v-6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              );
             case "pricing":
-              return <Icon.Target {...props} />;
+              return (
+                <svg viewBox="0 0 24 24" {...props}>
+                  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82zM7 7h.01" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              );
             default:
-              return <Icon.Book {...props} />;
+              return (
+                <svg viewBox="0 0 24 24" {...props}>
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16v-4M12 8h.01" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              );
           }
         };
 
@@ -4085,52 +4158,124 @@ export const config: Config<PuckConfig> = {
         const displaySubtitle = subtitle !== undefined ? subtitle : "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات، التصحيح، التخصيص، والأسعار. لم تجد إجابتك؟ فريقنا جاهز لمساعدتك.";
 
         return (
-          <section
-            className="section"
-            style={{
-              direction: "rtl",
-              textAlign: "right",
-              position: "relative",
-              background: "transparent",
-              color: "var(--text)",
-            }}
-          >
-            <div className="container" style={{ maxWidth: 880 }}>
-              <div style={{ textAlign: "center", marginBottom: 48 }}>
-                <h2 style={{ fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 800 }}>{displayTitle}</h2>
+          <div style={{ position: "relative", direction: "rtl", textAlign: "right", background: "#000000", color: "var(--text)" }}>
+            {/* Hero Section */}
+            <section style={{ position: "relative", paddingTop: 150, paddingBottom: 20 }}>
+              <div
+                className="grid-bg"
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  backgroundImage: "linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)",
+                  backgroundSize: "56px 56px",
+                  WebkitMaskImage: "radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%)",
+                  maskImage: "radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%)",
+                  pointerEvents: "none",
+                  height: 340,
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  insetInline: 0,
+                  height: 340,
+                  pointerEvents: "none",
+                  background: "radial-gradient(ellipse 50% 60% at 50% 0%, var(--brand-soft), transparent 70%)",
+                }}
+              />
+              <div className="container" style={{ position: "relative", maxWidth: 760, textAlign: "center" }}>
+                <div
+                  className="eyebrow"
+                  style={{
+                    margin: "0 auto",
+                  }}
+                >
+                  <span
+                    className="dot"
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: "50%",
+                      background: "var(--brand)",
+                      boxShadow: "0 0 10px var(--brand)",
+                    }}
+                  />
+                  الأسئلة الشائعة
+                </div>
+                <h1
+                  style={{
+                    fontSize: "clamp(34px, 5vw, 56px)",
+                    fontWeight: 900,
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.16,
+                    marginTop: 18,
+                    textWrap: "balance",
+                    marginInline: 0,
+                  }}
+                >
+                  {displayTitle.includes("اختباري") ? (
+                    <>
+                      {displayTitle.substring(0, displayTitle.indexOf("اختباري"))}
+                      <span style={{ color: "var(--brand)" }}>اختباري</span>
+                      {displayTitle.substring(displayTitle.indexOf("اختباري") + 7)}
+                    </>
+                  ) : (
+                    displayTitle
+                  )}
+                </h1>
                 {displaySubtitle && (
-                  <p style={{ color: "var(--text-muted)", marginTop: 12, fontSize: 15, lineHeight: 1.6 }}>
+                  <p
+                    style={{
+                      fontSize: "clamp(17px, 2vw, 20px)",
+                      color: "var(--text-muted)",
+                      lineHeight: 1.8,
+                      marginTop: 20,
+                      marginInline: 0,
+                    }}
+                  >
                     {displaySubtitle}
                   </p>
                 )}
               </div>
+            </section>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+            {/* FAQ Accordions by Category */}
+            <section style={{ padding: "48px 0 80px" }}>
+              <div className="container" style={{ maxWidth: 880, display: "flex", flexDirection: "column", gap: 56 }}>
                 {categories.map((cat, i) => (
-                  <div key={i} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  <div key={i}>
                     <div
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: 10,
-                        borderBottom: "1px solid var(--border)",
-                        paddingBottom: 8,
+                        gap: 12,
+                        marginBottom: 22,
                       }}
                     >
-                      <span
+                      <div
                         style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 8,
+                          width: 40,
+                          height: 40,
+                          borderRadius: 11,
+                          flexShrink: 0,
                           background: "var(--brand-soft)",
+                          border: "1px solid color-mix(in oklch, var(--brand) 25%, transparent)",
+                          color: "var(--brand)",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                         }}
                       >
                         {renderIcon(cat.iconName)}
+                      </div>
+                      <h2 style={{ fontSize: "clamp(22px, 2.6vw, 28px)", fontWeight: 800, letterSpacing: "-0.01em", margin: 0 }}>
+                        {cat.label}
+                      </h2>
+                      <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
+                      <span style={{ fontSize: 13, color: "var(--text-subtle)" }}>
+                        {cat.items ? `${cat.items.length} أسئلة` : "0 أسئلة"}
                       </span>
-                      <h3 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>{cat.label}</h3>
                     </div>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -4139,22 +4284,24 @@ export const config: Config<PuckConfig> = {
                         return (
                           <div
                             key={idx}
+                            className="faq-card"
                             style={{
                               background: "var(--bg-elev-1)",
-                              border: "1px solid " + (isOpen ? "rgba(0, 224, 138, 0.35)" : "var(--border)"),
-                              borderRadius: 12,
+                              border: "1px solid " + (isOpen ? "var(--brand)" : "var(--border)"),
+                              borderRadius: 16,
                               overflow: "hidden",
                               transition: "all 0.2s ease",
                             }}
                           >
                             <button
+                              className="faq-header"
                               onClick={() => toggle(item.q)}
                               style={{
                                 width: "100%",
                                 display: "flex",
                                 justifyContent: "space-between",
                                 alignItems: "center",
-                                padding: "16px 20px",
+                                padding: "20px 24px",
                                 background: "none",
                                 border: "none",
                                 cursor: "pointer",
@@ -4165,53 +4312,79 @@ export const config: Config<PuckConfig> = {
                                 boxShadow: "none",
                               }}
                             >
-                              <span style={{ fontSize: 15, fontWeight: 600, flex: 1, paddingLeft: 16, textAlign: "right" }}>{item.q}</span>
-                              <span
+                              <span style={{ fontSize: 16, fontWeight: 600, flex: 1, paddingLeft: 16, textAlign: "right", color: "var(--text)" }}>{item.q}</span>
+                              <div
+                                className="toggle-icon"
                                 style={{
-                                  width: 24,
-                                  height: 24,
-                                  borderRadius: "50%",
-                                  background: "var(--brand-soft)",
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: 8,
+                                  background: isOpen ? "var(--brand)" : "var(--bg-elev-2)",
+                                  border: isOpen ? "1px solid transparent" : "1px solid var(--border)",
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "center",
-                                  color: "var(--brand)",
+                                  color: isOpen ? "var(--brand-on)" : "var(--text-muted)",
                                   transform: isOpen ? "rotate(45deg)" : "none",
-                                  transition: "transform 0.2s ease",
+                                  transition: "all 0.2s ease",
                                 }}
                               >
-                                +
-                              </span>
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                              </div>
                             </button>
 
                             {isOpen && (
                               <div
+                                className="faq-content"
                                 style={{
-                                  padding: "0 20px 20px",
+                                  padding: "0 24px 22px",
                                   borderTop: "1px solid var(--border)",
                                   paddingTop: 16,
                                   color: "var(--text-muted)",
-                                  fontSize: 14.5,
-                                  lineHeight: 1.6,
+                                  fontSize: 15,
+                                  lineHeight: 1.8,
                                 }}
                               >
-                                <p style={{ margin: 0 }}>{item.a}</p>
-                                {item.list && item.list.length > 0 && (
-                                  <ul
-                                    style={{
-                                      paddingRight: 20,
-                                      marginTop: 10,
-                                      listStyleType: "circle",
-                                      display: "flex",
-                                      flexDirection: "column",
-                                      gap: 6,
-                                    }}
-                                  >
-                                    {item.list.map((li, k) => (
-                                      <li key={k}>{li.value}</li>
-                                    ))}
-                                  </ul>
-                                )}
+                                <div className="faq-body">
+                                  {item.a}
+                                  {item.list && item.list.length > 0 && (
+                                    <ul
+                                      className="bullet-list"
+                                      style={{
+                                        margin: "14px 0 0",
+                                        padding: 0,
+                                        listStyle: "none",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        gap: 9,
+                                      }}
+                                    >
+                                      {item.list.map((li, k) => (
+                                        <li
+                                          key={k}
+                                          style={{
+                                            position: "relative",
+                                            paddingInlineStart: 22,
+                                          }}
+                                        >
+                                          <span
+                                            style={{
+                                              position: "absolute",
+                                              insetInlineStart: 2,
+                                              top: 9,
+                                              width: 7,
+                                              height: 7,
+                                              borderRadius: "50%",
+                                              background: "var(--brand)",
+                                              boxShadow: "0 0 8px color-mix(in oklch, var(--brand) 60%, transparent)",
+                                            }}
+                                          />
+                                          {li.value}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  )}
+                                </div>
                               </div>
                             )}
                           </div>
@@ -4221,10 +4394,277 @@ export const config: Config<PuckConfig> = {
                   </div>
                 ))}
               </div>
+            </section>
+
+            {/* Support/CTA Section */}
+            <section style={{ padding: "0 0 80px" }}>
+              <div className="container" style={{ maxWidth: 880 }}>
+                <div
+                  className="card"
+                  style={{
+                    padding: 40,
+                    textAlign: "center",
+                    position: "relative",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      pointerEvents: "none",
+                      background: "radial-gradient(ellipse 60% 120% at 50% 0%, var(--brand-soft), transparent 65%)",
+                    }}
+                  />
+                  <div style={{ position: "relative" }}>
+                    <h2 style={{ fontSize: "clamp(26px, 3.4vw, 38px)", fontWeight: 900, letterSpacing: "-0.02em", margin: 0 }}>
+                      لم تجد إجابتك؟
+                    </h2>
+                    <p
+                      style={{
+                        fontSize: 17,
+                        color: "var(--text-muted)",
+                        marginTop: 14,
+                        maxWidth: 520,
+                        marginInline: "auto",
+                        lineHeight: 1.8,
+                      }}
+                    >
+                      ابدأ مجانًا اليوم وجرّب إنشاء أول اختبار خلال دقائق، أو تواصل مع فريقنا لأي استفسار.
+                    </p>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 12,
+                        marginTop: 28,
+                        justifyContent: "center",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <a
+                        href="/login"
+                        className="btn btn-primary btn-lg"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 8,
+                          borderRadius: 12,
+                          fontWeight: 600,
+                          transition: "all 0.15s ease",
+                        }}
+                      >
+                        ابدأ مجانًا الآن
+                        <svg
+                          viewBox="0 0 24 24"
+                          width="18"
+                          height="18"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          style={{ transform: "scaleX(-1)" }}
+                        >
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                          <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                      </a>
+                      <a
+                        href="https://api.whatsapp.com/send/?phone=%2B966115107063"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-ghost btn-lg"
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 8,
+                          borderRadius: 12,
+                          fontWeight: 600,
+                          transition: "all 0.15s ease",
+                        }}
+                      >
+                        تواصل معنا عبر واتساب 💬
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        );
+      },
+    },
+    BlogList: {
+      fields: {
+        title: { type: "text", label: "عنوان المدوّنة", placeholder: "مثال: مدوّنة اختباري" },
+        subtitle: { type: "textarea", label: "الوصف الفرعي", placeholder: "اكتب الوصف الفرعي هنا..." },
+        posts: {
+          type: "array",
+          label: "المقالات",
+          getItemSummary: (item) => item.title || "مقالة جديدة",
+          arrayFields: {
+            title: { type: "text", label: "عنوان المقالة" },
+            description: { type: "textarea", label: "وصف قصير" },
+            image: { type: "text", label: "رابط الصورة (اختياري)" },
+            date: { type: "text", label: "التاريخ" },
+            author: { type: "text", label: "الكاتب" },
+            slug: { type: "text", label: "معرّف المقالة (Slug)" },
+          },
+          defaultItemProps: {
+            title: "عنوان المقالة الجديدة",
+            description: "هذا وصف قصير للمقالة الجديدة يوضح محتواها وأهم النقاط الواردة فيها.",
+            image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop",
+            date: "26 يونيو 2026",
+            author: "فريق اختباري",
+            slug: "new-article"
+          }
+        }
+      },
+      defaultProps: {
+        title: "مدوّنة اختباري التعليمية",
+        subtitle: "نصائح وإرشادات تعليمية، مقالات متخصصة في الذكاء الاصطناعي والتقويم المدرسي لمساعدتك على التفوق.",
+        posts: [
+          {
+            title: "كيف يغير الذكاء الاصطناعي طرق التدريس في المدارس السعودية؟",
+            description: "تعرف على أهم التقنيات الحديثة وكيف تسهم أدوات توليد الاختبارات آلياً في توفير وقت المعلمين ورفع مستوى نواتج التعلم.",
+            image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop",
+            date: "26 يونيو 2026",
+            author: "أ. سارة الحربي",
+            slug: "ai-in-saudi-education"
+          },
+          {
+            title: "دليلك الشامل لتصميم اختبار مدرسي متوازن",
+            description: "نستعرض في هذا المقال جدول المواصفات، ومستويات بلوم المعرفية، وكيفية صياغة أسئلة تقيس الفهم الفعلي للطلاب.",
+            image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=600&auto=format&fit=crop",
+            date: "24 يونيو 2026",
+            author: "د. خالد السديري",
+            slug: "balanced-exam-design"
+          }
+        ]
+      },
+      render: ({ title, subtitle, posts = [] }) => {
+        return (
+          <section style={{ padding: "80px 24px", direction: "rtl" }}>
+            <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+              <div style={{ textAlign: "center", marginBottom: 50 }}>
+                <h2 style={{ fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 800, color: "#ffffff" }}>{title}</h2>
+                {subtitle && (
+                  <p style={{ color: "var(--text-muted)", marginTop: 12, fontSize: 16, lineHeight: 1.6, maxWidth: 600, marginInline: "auto" }}>
+                    {subtitle}
+                  </p>
+                )}
+              </div>
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+                gap: 30
+              }}>
+                {posts.map((post, i) => (
+                  <a
+                    key={i}
+                    href={`/blog-details?slug=${post.slug}`}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      background: "var(--bg-elev-1)",
+                      border: "1px solid var(--border)",
+                      borderRadius: 16,
+                      overflow: "hidden",
+                      textDecoration: "none",
+                      color: "inherit",
+                      transition: "transform 0.2s ease, border-color 0.2s ease",
+                    }}
+                  >
+                    {post.image && (
+                      <div style={{ height: 200, overflow: "hidden", position: "relative" }}>
+                        <img
+                          src={post.image}
+                          alt={post.title}
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                      </div>
+                    )}
+                    <div style={{ padding: 24, display: "flex", flexDirection: "column", flex: 1 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--text-muted)", marginBottom: 12 }}>
+                        <span>{post.author}</span>
+                        <span>{post.date}</span>
+                      </div>
+                      <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 10, color: "#ffffff", lineHeight: 1.4 }}>{post.title}</h3>
+                      <p style={{ color: "var(--text-muted)", fontSize: 14.5, lineHeight: 1.6, flex: 1 }}>{post.description}</p>
+                      <div style={{ marginTop: 20, color: "var(--brand)", fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}>
+                        اقرأ المزيد <span>←</span>
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
             </div>
           </section>
         );
+      }
+    },
+    BlogDetails: {
+      fields: {
+        title: { type: "text", label: "عنوان المقالة الرئيسي", placeholder: "اكتب العنوان هنا..." },
+        subtitle: { type: "textarea", label: "مقدمة المقالة / عنوان فرعي", placeholder: "مقدمة المقالة هنا..." },
+        date: { type: "text", label: "التاريخ" },
+        author: { type: "text", label: "الكاتب" },
+        image: { type: "text", label: "رابط الصورة الرئيسية" },
+        content: { type: "textarea", label: "محتوى المقالة (يدعم HTML أو فقرات)" }
       },
+      defaultProps: {
+        title: "كيف يغير الذكاء الاصطناعي طرق التدريس في المدارس السعودية؟",
+        subtitle: "دراسة شاملة عن أثر تقنيات الذكاء الاصطناعي التوليدي في تحسين جودة التعليم وتخفيف الأعباء الإدارية عن كاهل المعلمين.",
+        date: "26 يونيو 2026",
+        author: "أ. سارة الحربي",
+        image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop",
+        content: `دخل الذكاء الاصطناعي قطاع التعليم كأداة ثورية تهدف لمساعدة المعلمين وتحسين جودة مخرجات التعليم. في المناهج السعودية الحديثة، يواجه المعلمون تحديات في تصميم اختبارات تقيس بشكل دقيق مخرجات التعلم المتنوعة.
+
+من هنا تأتي أهمية أدوات الذكاء الاصطناعي التوليدي التي تُمكّن المعلم من إنشاء اختبارات شاملة مبنية على مستويات بلوم المعرفية في ثوانٍ معدودة.
+
+أهم الفوائد التي تجنيها البيئة التعليمية:
+1. توفير وقت الإعداد والتحضير للتركيز على التدريس الفعلي.
+2. أسئلة منوعة تتوافق بدقة مع المنهج والدروس المقررة.
+3. التقييم العادل والمستمر لمستوى الطلاب الدراسي.
+
+تعد منصة "اختباري" خطوة رائدة في هذا الاتجاه لتوفير حلول ذكاء اصطناعي وطنية مستضافة داخل المملكة لتخدم المعلم والطالب السعودي بأمان وكفاءة.`
+      },
+      render: ({ title, subtitle, date, author, image, content = "" }) => {
+        return (
+          <article style={{ padding: "80px 24px", direction: "rtl", color: "#ffffff" }}>
+            <div style={{ maxWidth: 800, margin: "0 auto" }}>
+              <div style={{ marginBottom: 40, textAlign: "center" }}>
+                <h1 style={{ fontSize: "clamp(30px, 5vw, 48px)", fontWeight: 800, lineHeight: 1.3, marginBottom: 20 }}>{title}</h1>
+                <div style={{ display: "flex", justifyContent: "center", gap: 20, color: "var(--text-muted)", fontSize: 14 }}>
+                  <span>بواسطة: {author}</span>
+                  <span>|</span>
+                  <span>{date}</span>
+                </div>
+              </div>
+              {image && (
+                <div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 40 }}>
+                  <img src={image} alt={title} style={{ width: "100%", height: "auto", display: "block" }} />
+                </div>
+              )}
+              {subtitle && (
+                <p style={{ fontSize: 18, lineHeight: 1.6, color: "var(--brand)", fontWeight: 500, marginBottom: 30, paddingRight: 16, borderRight: "4px solid var(--brand)" }}>
+                  {subtitle}
+                </p>
+              )}
+              <div style={{ fontSize: 16, lineHeight: 1.8, color: "var(--text-muted)", whiteSpace: "pre-line" }}>
+                {content}
+              </div>
+              <div style={{ marginTop: 50, paddingTop: 30, borderTop: "1px solid var(--border)", display: "flex", justifyContent: "space-between" }}>
+                <a href="/blogs" style={{ color: "var(--brand)", textDecoration: "none", fontWeight: 700 }}>
+                  ← العودة للمدوّنة
+                </a>
+              </div>
+            </div>
+          </article>
+        );
+      }
     },
   },
   root: {
@@ -4235,7 +4675,6 @@ export const config: Config<PuckConfig> = {
           <div style={{ position: "relative", zIndex: 1 }}>
             {children}
           </div>
-          <LiveActivity />
         </div>
       );
     }

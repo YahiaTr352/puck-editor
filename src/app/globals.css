@@ -28,7 +28,7 @@ img { display: block; max-width: 100%; }
 ::selection { background: var(--brand); color: var(--brand-on); }
 
 body {
-  --bg: #07100E;
+  --bg: #000000;
   --bg-elev-1: #0C1815;
   --bg-elev-2: #122520;
   --surface: #0F1E1A;

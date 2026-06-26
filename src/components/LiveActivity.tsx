@@ -124,7 +124,9 @@ export const LiveActivity = () => {
                         (window.parent && window.parent.location.search.includes("puck")) ||
                         !!document.querySelector(".puck-editor-theme-override") ||
                         (window.parent && !!window.parent.document.querySelector(".puck-editor-theme-override"));
-        if (isIframe || isAdmin) {
+        const isFaq = window.location.pathname.includes("/faq") ||
+                      (window.parent && window.parent.location.pathname.includes("/faq"));
+        if (isIframe || isAdmin || isFaq) {
           setDismissed(true);
           return;
         }
