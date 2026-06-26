@@ -586,13 +586,14 @@ body[data-anims="off"] .la-progress-fill { width: 100%; }
 .puck-editor-theme-override select,
 .puck-editor-theme-override [class*="input" i],
 .puck-editor-theme-override [class*="textarea" i],
-.puck-editor-theme-override [class*="select" i],
 .puck-editor-theme-override [class*="field" i] input,
 .puck-editor-theme-override [class*="field" i] textarea,
 .puck-editor-theme-override [class*="field" i] select {
   background-color: #ffffff !important;
   color: #0a1814 !important;
   border: 1px solid rgba(10, 24, 20, 0.12) !important;
+  direction: rtl !important;
+  text-align: right !important;
 }
 
 /* Input focus state */
@@ -600,8 +601,7 @@ body[data-anims="off"] .la-progress-fill { width: 100%; }
 .puck-editor-theme-override textarea:focus,
 .puck-editor-theme-override select:focus,
 .puck-editor-theme-override [class*="input" i]:focus,
-.puck-editor-theme-override [class*="textarea" i]:focus,
-.puck-editor-theme-override [class*="select" i]:focus {
+.puck-editor-theme-override [class*="textarea" i]:focus {
   background-color: #ffffff !important;
   color: #0a1814 !important;
   border-color: #00e08a !important;
@@ -620,8 +620,7 @@ body[data-anims="off"] .la-progress-fill { width: 100%; }
 
 /* Fix option elements text inside dropdowns */
 .puck-editor-theme-override select option,
-.puck-editor-theme-override [class*="dropdown" i] option,
-.puck-editor-theme-override [class*="select" i] option {
+.puck-editor-theme-override [class*="dropdown" i] option {
   background-color: #ffffff !important;
   color: #0a1814 !important;
 }

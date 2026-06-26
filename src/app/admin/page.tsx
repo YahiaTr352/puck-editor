@@ -270,17 +270,33 @@ function AdminEditorContent() {
               delete updatedProps.secondaryCtaLink;
               return { ...item, props: updatedProps };
             }
-            if (item.type === "FAQ") {
+             if (item.type === "FAQ") {
               const updatedProps = { ...item.props };
               if (!updatedProps.categories || updatedProps.categories.length === 0) {
                 updatedProps.categories = (config.components.FAQ as any).defaultProps?.categories || [];
               }
-              if (updatedProps.title === undefined) {
+              if (updatedProps.title === undefined || updatedProps.title === "") {
                 updatedProps.title = (config.components.FAQ as any).defaultProps?.title || "";
               }
-              if (updatedProps.subtitle === undefined) {
+              if (updatedProps.subtitle === undefined || updatedProps.subtitle === "") {
                 updatedProps.subtitle = (config.components.FAQ as any).defaultProps?.subtitle || "";
               }
+              return { ...item, props: updatedProps };
+            }
+            if (item.type === "Footer") {
+              const updatedProps = { ...item.props };
+              const defs = (config.components.Footer as any).defaultProps || {};
+              Object.keys(defs).forEach(key => {
+                const val = updatedProps[key];
+                if (
+                  val === undefined ||
+                  val === null ||
+                  val === "" ||
+                  (Array.isArray(val) && val.length === 0)
+                ) {
+                  updatedProps[key] = defs[key];
+                }
+              });
               return { ...item, props: updatedProps };
             }
             return item;

@@ -3969,7 +3969,7 @@ export const config: Config<PuckConfig> = {
               label: "قائمة الأسئلة",
               getItemSummary: (qItem) => qItem.q || "سؤال جديد",
               arrayFields: {
-                q: { type: "text", label: "السؤال", placeholder: "مثال: ما هي منصة اختباري؟" },
+                q: { type: "textarea", label: "السؤال", placeholder: "مثال: ما هي منصة اختباري؟" },
                 a: { type: "textarea", label: "الإجابة", placeholder: "اكتب إجابة هذا السؤال هنا..." },
                 list: {
                   type: "array",
@@ -4091,17 +4091,8 @@ export const config: Config<PuckConfig> = {
               direction: "rtl",
               textAlign: "right",
               position: "relative",
-              background: "#07100E",
-              color: "#E8F1EE",
-              ["--bg" as any]: "#07100E",
-              ["--bg-elev-1" as any]: "#0C1815",
-              ["--bg-elev-2" as any]: "#122520",
-              ["--surface" as any]: "#0F1E1A",
-              ["--border" as any]: "rgba(255,255,255,0.08)",
-              ["--border-strong" as any]: "rgba(255,255,255,0.14)",
-              ["--text" as any]: "#E8F1EE",
-              ["--text-muted" as any]: "rgba(232,241,238,0.62)",
-              ["--text-subtle" as any]: "rgba(232,241,238,0.42)",
+              background: "transparent",
+              color: "var(--text)",
             }}
           >
             <div className="container" style={{ maxWidth: 880 }}>
@@ -4174,7 +4165,7 @@ export const config: Config<PuckConfig> = {
                                 boxShadow: "none",
                               }}
                             >
-                              <span style={{ fontSize: 15, fontWeight: 600, flex: 1, paddingLeft: 16 }}>{item.q}</span>
+                              <span style={{ fontSize: 15, fontWeight: 600, flex: 1, paddingLeft: 16, textAlign: "right" }}>{item.q}</span>
                               <span
                                 style={{
                                   width: 24,

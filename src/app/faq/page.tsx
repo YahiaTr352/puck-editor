@@ -80,12 +80,28 @@ export default function FAQPage() {
                 if (!updatedProps.categories || updatedProps.categories.length === 0) {
                   updatedProps.categories = (config.components.FAQ as any).defaultProps?.categories || [];
                 }
-                if (updatedProps.title === undefined) {
+                if (updatedProps.title === undefined || updatedProps.title === "") {
                   updatedProps.title = (config.components.FAQ as any).defaultProps?.title || "";
                 }
-                if (updatedProps.subtitle === undefined) {
+                if (updatedProps.subtitle === undefined || updatedProps.subtitle === "") {
                   updatedProps.subtitle = (config.components.FAQ as any).defaultProps?.subtitle || "";
                 }
+                return { ...item, props: updatedProps };
+              }
+              if (item.type === "Footer") {
+                const updatedProps = { ...item.props };
+                const defs = (config.components.Footer as any).defaultProps || {};
+                Object.keys(defs).forEach(key => {
+                  const val = updatedProps[key];
+                  if (
+                    val === undefined ||
+                    val === null ||
+                    val === "" ||
+                    (Array.isArray(val) && val.length === 0)
+                  ) {
+                    updatedProps[key] = defs[key];
+                  }
+                });
                 return { ...item, props: updatedProps };
               }
               return item;
@@ -123,50 +139,7 @@ export default function FAQPage() {
 
   return (
     <div style={{ minHeight: "100vh", position: "relative" }}>
-      {/* شريط توجيهي علوي يربط بين الصفحة والمحرر البصري */}
-      <div style={{
-        backgroundColor: "rgba(12, 24, 21, 0.95)",
-        color: "#ffffff",
-        padding: "12px 24px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        fontSize: "0.95rem",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-        borderBottom: "1px solid rgba(255,255,255,0.05)",
-        direction: "rtl",
-        position: "relative",
-        zIndex: 100
-      }}>
-        <span>💡 هذه هي صفحة الأسئلة الشائعة العامة للزوار. تم تصميمها بالكامل بواسطة Puck Editor!</span>
-        <div style={{ display: "flex", gap: "10px" }}>
-          <a href="/admin?slug=home" style={{
-            backgroundColor: "rgba(255,255,255,0.1)",
-            color: "#ffffff",
-            padding: "8px 16px",
-            borderRadius: "8px",
-            textDecoration: "none",
-            fontWeight: "bold",
-            fontSize: "0.85rem",
-            border: "1px solid rgba(255,255,255,0.2)",
-            transition: "background 0.2s"
-          }}>
-            تعديل الصفحة الرئيسية 🛠️
-          </a>
-          <a href="/admin?slug=faq" style={{
-            backgroundColor: "#00E08A",
-            color: "#06120E",
-            padding: "8px 16px",
-            borderRadius: "8px",
-            textDecoration: "none",
-            fontWeight: "bold",
-            fontSize: "0.85rem",
-            transition: "background 0.2s"
-          }}>
-            تعديل صفحة الأسئلة الشائعة 🛠️
-          </a>
-        </div>
-      </div>
+
 
       <AmbientBackground bgStyle="fluid" intensity={75} blur={60} speed={100} grain={true} mesh={false} />
       <Render config={config} data={data} />
