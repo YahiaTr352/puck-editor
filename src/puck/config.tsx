@@ -4170,6 +4170,8 @@ export const config: Config<PuckConfig> = {
                                 color: "inherit",
                                 fontFamily: "inherit",
                                 textAlign: "right",
+                                outline: "none",
+                                boxShadow: "none",
                               }}
                             >
                               <span style={{ fontSize: 15, fontWeight: 600, flex: 1, paddingLeft: 16 }}>{item.q}</span>

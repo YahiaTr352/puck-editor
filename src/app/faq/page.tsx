@@ -80,6 +80,12 @@ export default function FAQPage() {
                 if (!updatedProps.categories || updatedProps.categories.length === 0) {
                   updatedProps.categories = (config.components.FAQ as any).defaultProps?.categories || [];
                 }
+                if (updatedProps.title === undefined) {
+                  updatedProps.title = (config.components.FAQ as any).defaultProps?.title || "";
+                }
+                if (updatedProps.subtitle === undefined) {
+                  updatedProps.subtitle = (config.components.FAQ as any).defaultProps?.subtitle || "";
+                }
                 return { ...item, props: updatedProps };
               }
               return item;

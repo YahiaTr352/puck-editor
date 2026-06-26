@@ -555,53 +555,98 @@ body[data-anims="off"] .la-progress-fill { width: 100%; }
 }
 
 /* ==========================================================================
-   PUCK EDITOR CUSTOM DARK MODE THEME OVERRIDES
+   PUCK EDITOR LIGHT MODE OVERRIDES
    ========================================================================== */
 .puck-editor-theme-override {
-  --puck-color-white: #0c1815 !important; /* Replaces white with dark theme bg */
-  --puck-color-grey-12: #07100E !important; /* Panel background */
-  --puck-color-grey-11: #0c1815 !important;
-  --puck-color-grey-10: #122520 !important; /* Inputs, blocks card background */
-  --puck-color-grey-09: #1c322b !important;
-  --puck-color-grey-08: #364e46 !important;
-  --puck-color-grey-07: #5a756b !important;
-  --puck-color-grey-06: #8ca399 !important;
-  --puck-color-grey-05: #b8c8c2 !important;
-  --puck-color-grey-04: #dce6e2 !important;
-  --puck-color-grey-03: #e8f1ee !important; /* Text colors */
-  --puck-color-grey-02: #f2f7f5 !important;
-  --puck-color-grey-01: #ffffff !important;
-  --puck-color-black: #ffffff !important;
+  background-color: #f7f9f8 !important;
 }
 
-/* Force dark styling on all blocks list, drawers, items, and sidebars */
-.puck-editor-theme-override [class*="Drawer"],
-.puck-editor-theme-override [class*="Sidebar"],
-.puck-editor-theme-override [class*="Components"] {
-  background-color: #07100E !important;
-  color: #E8F1EE !important;
+/* Force dark text color on all editor UI elements so they don't inherit the page's global dark theme text color */
+.puck-editor-theme-override,
+.puck-editor-theme-override [class*="sidebar" i],
+.puck-editor-theme-override [class*="drawer" i],
+.puck-editor-theme-override [class*="components" i],
+.puck-editor-theme-override [class*="topbar" i],
+.puck-editor-theme-override [class*="menu" i],
+.puck-editor-theme-override [class*="field" i],
+.puck-editor-theme-override [class*="label" i],
+.puck-editor-theme-override [class*="category" i],
+.puck-editor-theme-override label,
+.puck-editor-theme-override span,
+.puck-editor-theme-override input,
+.puck-editor-theme-override textarea,
+.puck-editor-theme-override select,
+.puck-editor-theme-override button {
+  color: #0a1814 !important;
 }
 
-.puck-editor-theme-override [class*="Item-button"],
-.puck-editor-theme-override button[class*="Item"],
-.puck-editor-theme-override [class*="Drawer-item"] {
-  background-color: #0c1815 !important;
-  color: #E8F1EE !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+/* Ensure inputs, textareas, and selects inside Puck have clean light backgrounds and dark text */
+.puck-editor-theme-override input,
+.puck-editor-theme-override textarea,
+.puck-editor-theme-override select,
+.puck-editor-theme-override [class*="input" i],
+.puck-editor-theme-override [class*="textarea" i],
+.puck-editor-theme-override [class*="select" i],
+.puck-editor-theme-override [class*="field" i] input,
+.puck-editor-theme-override [class*="field" i] textarea,
+.puck-editor-theme-override [class*="field" i] select {
+  background-color: #ffffff !important;
+  color: #0a1814 !important;
+  border: 1px solid rgba(10, 24, 20, 0.12) !important;
 }
 
-.puck-editor-theme-override [class*="Item-button"]:hover,
-.puck-editor-theme-override button[class*="Item"]:hover,
-.puck-editor-theme-override [class*="Drawer-item"]:hover {
-  background-color: #122520 !important;
-  border-color: var(--brand) !important;
+/* Input focus state */
+.puck-editor-theme-override input:focus,
+.puck-editor-theme-override textarea:focus,
+.puck-editor-theme-override select:focus,
+.puck-editor-theme-override [class*="input" i]:focus,
+.puck-editor-theme-override [class*="textarea" i]:focus,
+.puck-editor-theme-override [class*="select" i]:focus {
+  background-color: #ffffff !important;
+  color: #0a1814 !important;
+  border-color: #00e08a !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(0, 224, 138, 0.15) !important;
 }
 
-/* Make sure text fields, label text, and categories look clear in dark theme */
-.puck-editor-theme-override [class*="Field"],
-.puck-editor-theme-override [class*="Label"],
-.puck-editor-theme-override [class*="Category"] {
-  color: #E8F1EE !important;
+/* Ensure placeholder hint (like for "عنوان قسم الأسئلة") is visible (dark gray) on light background */
+.puck-editor-theme-override input::placeholder,
+.puck-editor-theme-override textarea::placeholder,
+.puck-editor-theme-override [class*="input" i]::placeholder,
+.puck-editor-theme-override [class*="textarea" i]::placeholder {
+  color: #7a8c87 !important;
+  opacity: 0.75 !important;
 }
 
+/* Fix option elements text inside dropdowns */
+.puck-editor-theme-override select option,
+.puck-editor-theme-override [class*="dropdown" i] option,
+.puck-editor-theme-override [class*="select" i] option {
+  background-color: #ffffff !important;
+  color: #0a1814 !important;
+}
 
+/* Hover and active states for list items, drawers, and buttons */
+.puck-editor-theme-override button:hover,
+.puck-editor-theme-override [class*="button" i]:hover,
+.puck-editor-theme-override [class*="item-button" i]:hover,
+.puck-editor-theme-override [class*="drawer-item" i]:hover {
+  background-color: rgba(10, 24, 20, 0.05) !important;
+  color: #00b873 !important;
+}
+
+/* Ensure primary green buttons have dark text and look clean */
+.puck-editor-theme-override button[class*="primary" i],
+.puck-editor-theme-override [class*="button" i][class*="primary" i] {
+  background-color: #00e08a !important;
+  color: #06120e !important;
+}
+.puck-editor-theme-override button[class*="primary" i]:hover,
+.puck-editor-theme-override [class*="button" i][class*="primary" i]:hover {
+  background-color: #00b873 !important;
+  color: #06120e !important;
+}
+.puck-editor-theme-override button[class*="primary" i] *,
+.puck-editor-theme-override [class*="button" i][class*="primary" i] * {
+  color: #06120e !important;
+}
