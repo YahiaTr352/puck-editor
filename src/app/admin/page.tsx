@@ -19,7 +19,7 @@ const initialData = {
           { label: "المنتج", href: "#features" },
           { label: "كيف يعمل", href: "#how" },
           { label: "الأسعار", href: "#pricing" },
-          { label: "الأسئلة الشائعة", href: "#faq" }
+          { label: "الأسئلة الشائعة", href: "/faq" }
         ],
         id: "nav-header"
       }
@@ -42,6 +42,35 @@ const initialData = {
     {
       type: "HowItWorks",
       props: {
+        eyebrowText: "كيف يعمل",
+        title: "أربع خطوات. اختبارٌ كامل.",
+        subtitle: "من فكرة في رأس المعلم إلى اختبار جاهز للطلاب — مساعدُك في كل خطوة.",
+        steps: [
+          {
+            n: "01",
+            t: "صِف الاختبار",
+            d: "اكتب وصفاً بالعربية، أو اختر من القوالب. حدّد المادة والصف والعدد.",
+            iconName: "Edit"
+          },
+          {
+            n: "02",
+            t: "يولّد الذكاء الاصطناعي",
+            d: "يُنشئ النظام الأسئلة من بنك مرتبط بالمنهج السعودي ونواتج التعلم.",
+            iconName: "Brain"
+          },
+          {
+            n: "03",
+            t: "راجع وعدّل",
+            d: "حرّر أي سؤال، بدّل المستوى البلومي، أو أضف نماذج (A/B) بضغطة.",
+            iconName: "Layers"
+          },
+          {
+            n: "04",
+            t: "شارك وحلّل",
+            d: "أرسل للطلاب، صحّح آلياً، واحصل على تحليلات الأداء فوراً.",
+            iconName: "Chart"
+          }
+        ],
         id: "how-it-works"
       }
     },
@@ -60,7 +89,15 @@ const initialData = {
     {
       type: "Stats",
       props: {
-        id: "stats-banner"
+        id: "stats-banner",
+        eyebrowText: "أرقام تتحدّث",
+        title: "آلاف المعلمين يستخدمون اختباري يومياً",
+        items: [
+          { label: "دقّة في التوليد", sub: "نتائج مراجعة من خبراء تربويين" },
+          { label: "اختبار شهرياً", sub: "يُنشَأ على اختباري" },
+          { label: "معلم ومعلمة", sub: "يستخدمون المنصة يومياً" },
+          { label: "مدرسة وجامعة", sub: "في المملكة العربية السعودية" }
+        ]
       }
     },
     {
@@ -69,12 +106,7 @@ const initialData = {
         id: "testimonials-block"
       }
     },
-    {
-      type: "FAQ",
-      props: {
-        id: "faq-block"
-      }
-    },
+
     {
       type: "Pricing",
       props: {
@@ -84,13 +116,56 @@ const initialData = {
     {
       type: "FinalCTA",
       props: {
-        id: "final-cta"
+        id: "final-cta",
+        title: "جاهز لتختصر وقتك و",
+        titleAccent: "تطوّر طريقتك",
+        titleSuffix: " في الاختبارات؟",
+        subtitle: "ابدأ مجاناً اليوم. لا حاجة لبطاقة ائتمان — ٥ اختبارات شهرياً للأبد.",
+        ctas: [
+          { label: "ابدأ مجاناً الآن", href: "#", variant: "primary" },
+          { label: "تحدّث مع المبيعات", href: "#", variant: "ghost" }
+        ],
+        features: [
+          { value: "مجاني للأبد" },
+          { value: "دعم بالعربية" },
+          { value: "مستضاف في السعودية" }
+        ]
       }
     },
     {
       type: "Footer",
       props: {
-        id: "footer-block"
+        id: "footer-block",
+        description: "منصة سعودية مدعومة بالذكاء اصطناعي لإنشاء وإدارة الاختبارات، مرتبطة بالمنهج السعودي.",
+        twitterUrl: "https://x.com/examyai",
+        instagramUrl: "https://www.instagram.com/examy.ai/",
+        col1Title: "المنتج",
+        col1Links: [
+          { label: "الميزات", href: "#" },
+          { label: "كيف يعمل", href: "#" },
+          { label: "القوالب الجاهزة", href: "#" }
+        ],
+        col2Title: "لمن",
+        col2Links: [
+          { label: "للمعلمين", href: "#" },
+          { label: "للمدارس", href: "#" },
+          { label: "للجامعات", href: "#" },
+          { label: "للجهات التعليمية", href: "#" }
+        ],
+        col3Title: "موارد",
+        col3Links: [
+          { label: "مركز المساعدة", href: "#" },
+          { label: "المدوّنة", href: "#" },
+          { label: "عن اختباري", href: "#" },
+          { label: "تواصل معنا", href: "#" }
+        ],
+        col4Title: "الشركة",
+        col4Links: [
+          { label: "سياسة الخصوصية", href: "#" },
+          { label: "الشروط والأحكام", href: "#" }
+        ],
+        copyrightText: "© ٢٠٢٦ اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦",
+        statusText: "توليد ذكي وموثوق"
       }
     }
   ],
@@ -196,7 +271,10 @@ function AdminEditorContent() {
             }
             return item;
           });
-          setData({ ...parsed, content: migratedContent });
+          const filteredContent = slug === "home" 
+            ? migratedContent.filter((item: any) => item && item.type !== "FAQ")
+            : migratedContent;
+          setData({ ...parsed, content: filteredContent });
         } else {
           // تحميل البيانات الافتراضية
           setData(slug === "faq" ? faqFallbackData : initialData);
@@ -240,9 +318,70 @@ function AdminEditorContent() {
     );
   }
 
+  const editorConfig = { ...config } as any;
+  if (slug === "home") {
+    const { FAQ, ...restComponents } = config.components;
+    editorConfig.components = restComponents;
+  }
+
   return (
-    <div style={{ height: "100vh", direction: "ltr" }}>
-      <Puck config={config} data={data} onPublish={handleSave} />
+    <div style={{ height: "100vh", direction: "ltr" }} className="puck-editor-theme-override">
+      <Puck
+        config={editorConfig}
+        data={data}
+        onPublish={handleSave}
+        overrides={{
+          iframe: ({ children, document }: any) => {
+            useEffect(() => {
+              if (document) {
+                // Ensure RTL layout for arabic translation inside the iframe preview canvas
+                document.documentElement.dir = "rtl";
+                document.documentElement.lang = "ar";
+                
+                // Examy styling system depends on these dark mode tokens and animations
+                document.body.setAttribute("data-theme", "dark");
+                document.body.setAttribute("data-anims", "on");
+                document.body.className = "min-h-full flex flex-col";
+
+                const copyStyles = () => {
+                  const classId = "injected-parent-style";
+                  // Clear previously copied style tags
+                  document.querySelectorAll(`.${classId}`).forEach((el: any) => el.remove());
+
+                  // Clone and inject all parent style/link rules to replicate visitor environment
+                  window.parent.document.querySelectorAll('style, link[rel="stylesheet"]').forEach((styleEl) => {
+                    try {
+                      const clone = styleEl.cloneNode(true) as HTMLElement;
+                      clone.classList.add(classId);
+                      document.head.appendChild(clone);
+                    } catch (e) {
+                      console.error("Style injection error:", e);
+                    }
+                  });
+                };
+
+                copyStyles();
+                // Delay copy to guarantee Dev Server Webpack/Turbopack injected stylesheet updates are synced
+                const timeoutId = setTimeout(copyStyles, 250);
+                const observer = new MutationObserver(copyStyles);
+
+                // Observe parent head changes to hot-reload styles in iframe preview
+                observer.observe(window.parent.document.head, {
+                  childList: true,
+                  subtree: true,
+                });
+
+                return () => {
+                  clearTimeout(timeoutId);
+                  observer.disconnect();
+                };
+              }
+            }, [document]);
+
+            return <>{children}</>;
+          },
+        }}
+      />
     </div>
   );
 }

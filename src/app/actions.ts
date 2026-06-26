@@ -48,7 +48,7 @@ export async function savePageData(slug: string, title: string, puckData: any) {
     });
 
     if (result.docs.length > 0) {
-      // Update existing page (saving it as a draft to support version history)
+      // Update existing page and publish it directly to the main pages table
       const pageId = result.docs[0].id;
       const updated = await payload.update({
         collection: 'pages',
@@ -56,20 +56,22 @@ export async function savePageData(slug: string, title: string, puckData: any) {
         data: {
           title,
           puckData,
+          status: 'published',
         },
-        draft: true, // Save as draft so it creates a version history snapshot
+        draft: false, // Save as published directly to the main pages table
       });
       return { success: true, doc: updated };
     } else {
-      // Create new page
+      // Create and publish new page
       const created = await payload.create({
         collection: 'pages',
         data: {
           title,
           slug,
           puckData,
-          status: 'draft',
+          status: 'published',
         },
+        draft: false, // Save as published directly to the main pages table
       });
       return { success: true, doc: created };
     }

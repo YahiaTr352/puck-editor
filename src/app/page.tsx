@@ -5,9 +5,6 @@ import { Render } from "@puckeditor/core";
 import { config } from "../puck/config";
 import { getPageData } from "./actions";
 
-import { AmbientBackground } from "../components/AmbientBackground";
-import { LiveActivity } from "../components/LiveActivity";
-
 const fallbackData = {
   content: [
     {
@@ -42,6 +39,35 @@ const fallbackData = {
     {
       type: "HowItWorks",
       props: {
+        eyebrowText: "كيف يعمل",
+        title: "أربع خطوات. اختبارٌ كامل.",
+        subtitle: "من فكرة في رأس المعلم إلى اختبار جاهز للطلاب — مساعدُك في كل خطوة.",
+        steps: [
+          {
+            n: "01",
+            t: "صِف الاختبار",
+            d: "اكتب وصفاً بالعربية، أو اختر من القوالب. حدّد المادة والصف والعدد.",
+            iconName: "Edit"
+          },
+          {
+            n: "02",
+            t: "يولّد الذكاء الاصطناعي",
+            d: "يُنشئ النظام الأسئلة من بنك مرتبط بالمنهج السعودي ونواتج التعلم.",
+            iconName: "Brain"
+          },
+          {
+            n: "03",
+            t: "راجع وعدّل",
+            d: "حرّر أي سؤال، بدّل المستوى البلومي، أو أضف نماذج (A/B) بضغطة.",
+            iconName: "Layers"
+          },
+          {
+            n: "04",
+            t: "شارك وحلّل",
+            d: "أرسل للطلاب، صحّح آلياً، واحصل على تحليلات الأداء فوراً.",
+            iconName: "Chart"
+          }
+        ],
         id: "how-it-works"
       }
     },
@@ -60,19 +86,21 @@ const fallbackData = {
     {
       type: "Stats",
       props: {
-        id: "stats-banner"
+        id: "stats-banner",
+        eyebrowText: "أرقام تتحدّث",
+        title: "آلاف المعلمين يستخدمون اختباري يومياً",
+        items: [
+          { label: "دقّة في التوليد", sub: "نتائج مراجعة من خبراء تربويين" },
+          { label: "اختبار شهرياً", sub: "يُنشَأ على اختباري" },
+          { label: "معلم ومعلمة", sub: "يستخدمون المنصة يومياً" },
+          { label: "مدرسة وجامعة", sub: "في المملكة العربية السعودية" }
+        ]
       }
     },
     {
       type: "Testimonials",
       props: {
         id: "testimonials-block"
-      }
-    },
-    {
-      type: "FAQ",
-      props: {
-        id: "faq-block"
       }
     },
     {
@@ -84,13 +112,56 @@ const fallbackData = {
     {
       type: "FinalCTA",
       props: {
-        id: "final-cta"
+        id: "final-cta",
+        title: "جاهز لتختصر وقتك و",
+        titleAccent: "تطوّر طريقتك",
+        titleSuffix: " في الاختبارات؟",
+        subtitle: "ابدأ مجاناً اليوم. لا حاجة لبطاقة ائتمان — ٥ اختبارات شهرياً للأبد.",
+        ctas: [
+          { label: "ابدأ مجاناً الآن", href: "#", variant: "primary" },
+          { label: "تحدّث مع المبيعات", href: "#", variant: "ghost" }
+        ],
+        features: [
+          { value: "مجاني للأبد" },
+          { value: "دعم بالعربية" },
+          { value: "مستضاف في السعودية" }
+        ]
       }
     },
     {
       type: "Footer",
       props: {
-        id: "footer-block"
+        id: "footer-block",
+        description: "منصة سعودية مدعومة بالذكاء اصطناعي لإنشاء وإدارة الاختبارات، مرتبطة بالمنهج السعودي.",
+        twitterUrl: "https://x.com/examyai",
+        instagramUrl: "https://www.instagram.com/examy.ai/",
+        col1Title: "المنتج",
+        col1Links: [
+          { label: "الميزات", href: "#" },
+          { label: "كيف يعمل", href: "#" },
+          { label: "القوالب الجاهزة", href: "#" }
+        ],
+        col2Title: "لمن",
+        col2Links: [
+          { label: "للمعلمين", href: "#" },
+          { label: "للمدارس", href: "#" },
+          { label: "للجامعات", href: "#" },
+          { label: "للجهات التعليمية", href: "#" }
+        ],
+        col3Title: "موارد",
+        col3Links: [
+          { label: "مركز المساعدة", href: "#" },
+          { label: "المدوّنة", href: "#" },
+          { label: "عن اختباري", href: "#" },
+          { label: "تواصل معنا", href: "#" }
+        ],
+        col4Title: "الشركة",
+        col4Links: [
+          { label: "سياسة الخصوصية", href: "#" },
+          { label: "الشروط والأحكام", href: "#" }
+        ],
+        copyrightText: "© ٢٠٢٦ اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦",
+        statusText: "توليد ذكي وموثوق"
       }
     }
   ],
@@ -155,7 +226,8 @@ export default function Home() {
               }
               return item;
             });
-            setData({ ...parsed, content: migratedContent });
+            const filteredContent = migratedContent.filter((item: any) => item && item.type !== "FAQ");
+            setData({ ...parsed, content: filteredContent });
           } else {
             setData(fallbackData);
           }
@@ -188,61 +260,8 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: "100vh", position: "relative" }}>
-      {/* الخلفية التفاعلية المضيئة المرفقة بالتصميم الأصلي */}
-      <AmbientBackground bgStyle="fluid" intensity={75} blur={60} speed={100} grain={true} mesh={false} />
-
-      {/* شريط توجيهي علوي يربط بين الصفحة والمحرر البصري */}
-      <div style={{
-        backgroundColor: "rgba(12, 24, 21, 0.95)",
-        color: "#ffffff",
-        padding: "12px 24px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        fontSize: "0.95rem",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-        borderBottom: "1px solid rgba(255,255,255,0.05)",
-        direction: "rtl",
-        position: "relative",
-        zIndex: 100
-      }}>
-        <span>💡 هذه هي الصفحة العامة للزوار. تم تصميمها بالكامل بواسطة Puck Editor!</span>
-        <div style={{ display: "flex", gap: "10px" }}>
-          <a href="/admin?slug=home" style={{
-            backgroundColor: "#00E08A",
-            color: "#06120E",
-            padding: "8px 16px",
-            borderRadius: "8px",
-            textDecoration: "none",
-            fontWeight: "bold",
-            fontSize: "0.85rem",
-            transition: "background 0.2s"
-          }}>
-            تعديل الصفحة الرئيسية 🛠️
-          </a>
-          <a href="/admin?slug=faq" style={{
-            backgroundColor: "rgba(255,255,255,0.1)",
-            color: "#ffffff",
-            padding: "8px 16px",
-            borderRadius: "8px",
-            textDecoration: "none",
-            fontWeight: "bold",
-            fontSize: "0.85rem",
-            border: "1px solid rgba(255,255,255,0.2)",
-            transition: "background 0.2s"
-          }}>
-            تعديل صفحة الأسئلة الشائعة 🛠️
-          </a>
-        </div>
-      </div>
-
       {/* عرض مكونات Puck البصرية بكامل عرض الشاشة ودون حواجز مقيدة */}
-      <div style={{ direction: "rtl", width: "100%" }}>
-        <Render config={config} data={data} />
-      </div>
-
-      {/* الأنشطة الحية التفاعلية */}
-      <LiveActivity />
+      <Render config={config} data={data} />
     </div>
   );
 }

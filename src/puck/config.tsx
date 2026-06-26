@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Config } from "@puckeditor/core";
 import { Icon } from "./icons";
+import { AmbientBackground } from "../components/AmbientBackground";
+import { LiveActivity } from "../components/LiveActivity";
+
 
 /* ────────────────────────────────────────────────────────────────────────
    Helper Sub-components & Assets
@@ -1239,94 +1242,6 @@ export const config: Config<PuckConfig> = {
   components: {
     Nav: {
       fields: {
-        logoImageUrl: {
-          type: "custom",
-          label: "صورة الشعار المخصص",
-          render: ({ onChange, value }) => {
-            const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-              const file = e.target.files?.[0];
-              if (!file) return;
-              const reader = new FileReader();
-              reader.onload = (event) => {
-                const base64Url = event.target?.result as string;
-                onChange(base64Url);
-              };
-              reader.readAsDataURL(file);
-            };
-
-            return (
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <span style={{ fontSize: "13px", fontWeight: "500", color: "var(--text-muted)" }}>تحميل شعار من جهازك:</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  style={{
-                    padding: "8px",
-                    border: "1px solid var(--border)",
-                    borderRadius: "6px",
-                    background: "var(--bg-elev-1)",
-                    color: "var(--text)",
-                    cursor: "pointer",
-                    fontSize: "12px",
-                    width: "100%",
-                  }}
-                />
-                {value && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "4px" }}>
-                    <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>معاينة الشعار:</span>
-                    <div style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      border: "1px dashed var(--border)",
-                      padding: "8px",
-                      borderRadius: "6px",
-                      background: "rgba(255, 255, 255, 0.03)",
-                    }}>
-                      <img
-                        src={value}
-                        alt="Preview"
-                        style={{
-                          maxHeight: "48px",
-                          maxWidth: "100%",
-                          objectFit: "contain",
-                        }}
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => onChange("")}
-                      style={{
-                        padding: "6px 12px",
-                        fontSize: "12px",
-                        fontWeight: "600",
-                        color: "#ffffff",
-                        background: "#ef4444",
-                        border: "none",
-                        borderRadius: "6px",
-                        cursor: "pointer",
-                        alignSelf: "flex-start",
-                        transition: "all 0.15s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.opacity = "0.9";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.opacity = "1";
-                      }}
-                    >
-                      حذف الصورة 🗑️
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          },
-        },
-        logoText: { type: "text", label: "النص البديل للشعار (Alt text)" },
-        logoLink: { type: "text", label: "رابط توجيه الشعار" },
-        logoSize: { type: "number", label: "حجم الشعار (الارتفاع بالبكسل)" },
         links: {
           type: "array",
           label: "روابط التنقل (Tabs)",
@@ -1403,21 +1318,15 @@ export const config: Config<PuckConfig> = {
 
         useEffect(() => {
           if (typeof window === "undefined") return;
-          const savedTheme = localStorage.getItem("theme");
-          if (savedTheme === "dark" || savedTheme === "light") {
-            document.body.setAttribute("data-theme", savedTheme);
-            setTheme(savedTheme);
-          } else {
-            const currentTheme = document.body.getAttribute("data-theme") || "dark";
-            setTheme(currentTheme);
-          }
+          document.body.setAttribute("data-theme", "dark");
+          localStorage.setItem("theme", "dark");
+          setTheme("dark");
         }, []);
 
         const toggleTheme = () => {
-          const newTheme = theme === "dark" ? "light" : "dark";
-          document.body.setAttribute("data-theme", newTheme);
-          localStorage.setItem("theme", newTheme);
-          setTheme(newTheme);
+          document.body.setAttribute("data-theme", "dark");
+          localStorage.setItem("theme", "dark");
+          setTheme("dark");
         };
 
         const defaultLinks = [
@@ -1511,60 +1420,6 @@ export const config: Config<PuckConfig> = {
                 style={{ display: "flex", gap: 10, alignItems: "center" }}
                 className="nav-actions"
               >
-                {/* Theme Toggle Button (Desktop) */}
-                <button
-                  type="button"
-                  className="theme-toggle-desktop"
-                  onClick={toggleTheme}
-                  aria-label="تبديل المظهر"
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: theme === "dark" 
-                      ? "rgba(255, 255, 255, 0.08)" 
-                      : "rgba(10, 24, 20, 0.05)",
-                    border: "1px solid var(--border)",
-                    backdropFilter: "blur(8px)",
-                    WebkitBackdropFilter: "blur(8px)",
-                    color: theme === "dark" ? "#00E08A" : "var(--text-muted)",
-                    boxShadow: theme === "dark"
-                      ? "0 0 14px rgba(0, 224, 138, 0.3)"
-                      : "none",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    marginLeft: 4,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = "var(--text)";
-                    e.currentTarget.style.borderColor = "var(--brand)";
-                    e.currentTarget.style.background = theme === "dark"
-                      ? "rgba(255, 255, 255, 0.14)"
-                      : "rgba(10, 24, 20, 0.08)";
-                    e.currentTarget.style.boxShadow = theme === "dark"
-                      ? "0 0 20px -2px var(--brand)"
-                      : "none";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = theme === "dark" ? "#00E08A" : "var(--text-muted)";
-                    e.currentTarget.style.borderColor = "var(--border)";
-                    e.currentTarget.style.background = theme === "dark"
-                      ? "rgba(255, 255, 255, 0.08)"
-                      : "rgba(10, 24, 20, 0.05)";
-                    e.currentTarget.style.boxShadow = theme === "dark"
-                      ? "0 0 14px rgba(0, 224, 138, 0.3)"
-                      : "none";
-                  }}
-                >
-                  {theme === "dark" ? (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" /></svg>
-                  ) : (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg>
-                  )}
-                </button>
                 {activeActions.map((act, idx) => {
                   if (act.variant === "primary") {
                     return (
@@ -1598,38 +1453,6 @@ export const config: Config<PuckConfig> = {
               
               {/* Theme Toggle & Hamburger Button (Mobile Container) */}
               <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                {/* Theme Toggle Button (Mobile) */}
-                <button
-                  type="button"
-                  className="theme-toggle-mobile"
-                  onClick={toggleTheme}
-                  aria-label="تبديل المظهر"
-                  style={{
-                    display: "none",
-                    width: 40,
-                    height: 40,
-                    borderRadius: "50%",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: theme === "dark" 
-                      ? "rgba(255, 255, 255, 0.08)" 
-                      : "rgba(10, 24, 20, 0.05)",
-                    border: "1px solid var(--border)",
-                    backdropFilter: "blur(8px)",
-                    WebkitBackdropFilter: "blur(8px)",
-                    color: theme === "dark" ? "#00E08A" : "var(--text)",
-                    boxShadow: theme === "dark"
-                      ? "0 0 14px rgba(0, 224, 138, 0.3)"
-                      : "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  {theme === "dark" ? (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" /></svg>
-                  ) : (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg>
-                  )}
-                </button>
                 
                 <button
                   type="button"
@@ -1798,6 +1621,30 @@ export const config: Config<PuckConfig> = {
         // Spotlight interaction
         const ref = useRef<HTMLDivElement>(null);
         const [pos, setPos] = useState({ x: 50, y: 30 });
+        const [activeTeachers, setActiveTeachers] = useState("+12,000 معلم");
+        const [trustedSchools, setTrustedSchools] = useState("+340 مدرسة");
+
+        useEffect(() => {
+          async function loadStats() {
+            try {
+              const res = await fetch("http://localhost:8000/api/landing-stats").catch(() => null);
+              if (!res) return;
+              const json = await res.json().catch(() => null);
+              if (json && json.data) {
+                const data = json.data;
+                if (data.active_teachers && data.active_teachers.count) {
+                  setActiveTeachers(`+${Number(data.active_teachers.count).toLocaleString("en-US")} معلم`);
+                }
+                if (data.trusted_schools && data.trusted_schools.count) {
+                  setTrustedSchools(`+${Number(data.trusted_schools.count).toLocaleString("en-US")} مدرسة`);
+                }
+              }
+            } catch (e) {
+              console.error("Error fetching stats in Hero:", e);
+            }
+          }
+          loadStats();
+        }, []);
 
         const HeroBadge = () => (
           <div className="eyebrow reveal">
@@ -1930,12 +1777,12 @@ export const config: Config<PuckConfig> = {
                     <Icon.Star key={i} width="12" height="12" style={{ color: "#FFB454" }} />
                   ))}
                 </div>
-                <strong style={{ color: "var(--text)" }}>+12,000 معلم</strong> يستخدمون اختباري
+                <strong style={{ color: "var(--text)" }}>{activeTeachers}</strong> يستخدمون اختباري
               </div>
             </div>
             <div style={{ width: 1, height: 36, background: "var(--border)" }} />
             <div style={{ fontSize: 13, color: "var(--text-muted)" }}>
-              موثوق من <strong style={{ color: "var(--text)" }}>+340 مدرسة</strong> في المملكة
+              موثوق من <strong style={{ color: "var(--text)" }}>{trustedSchools}</strong> في المملكة
             </div>
           </div>
         );
@@ -2957,12 +2804,35 @@ export const config: Config<PuckConfig> = {
           { label: "مدرسة وجامعة", sub: "في المملكة العربية السعودية" },
         ];
 
-        const statsData = [
+        const [statsData, setStatsData] = useState([
           { v: 98, suffix: "%" },
           { v: 120000, suffix: "+" },
           { v: 12000, suffix: "+" },
           { v: 340, suffix: "+" },
-        ];
+        ]);
+
+        useEffect(() => {
+          async function loadStats() {
+            try {
+              const res = await fetch("http://localhost:8000/api/landing-stats").catch(() => null);
+              if (!res) return;
+              const json = await res.json().catch(() => null);
+              if (json && json.data) {
+                const data = json.data;
+                const newStats = [
+                  { v: data.generation_accuracy?.percentage || 98, suffix: "%" },
+                  { v: data.monthly_exams?.count || 120000, suffix: "+" },
+                  { v: data.daily_teachers?.count || 12000, suffix: "+" },
+                  { v: data.total_institutions?.count || 340, suffix: "+" },
+                ];
+                setStatsData(newStats);
+              }
+            } catch (e) {
+              console.error("Error loading stats in Stats component:", e);
+            }
+          }
+          loadStats();
+        }, []);
 
         const stats = statsData.map((data, i) => {
           const item = items[i] || defaultItems[i];
@@ -4256,6 +4126,19 @@ export const config: Config<PuckConfig> = {
       },
     },
   },
+  root: {
+    render: ({ children }) => {
+      return (
+        <div style={{ direction: "rtl", minHeight: "100vh", position: "relative", width: "100%" }}>
+          <AmbientBackground bgStyle="fluid" intensity={75} blur={60} speed={100} grain={true} mesh={false} />
+          <div style={{ position: "relative", zIndex: 1 }}>
+            {children}
+          </div>
+          <LiveActivity />
+        </div>
+      );
+    }
+  }
 };
 
 /* ────────────────────────────────────────────────────────────────────────

@@ -52,17 +52,6 @@ body {
   --max-w: 1240px;
 }
 
-body[data-theme="light"] {
-  --bg: #F7F9F8;
-  --bg-elev-1: #FFFFFF;
-  --bg-elev-2: #FFFFFF;
-  --surface: #FFFFFF;
-  --border: rgba(15,30,26,0.08);
-  --border-strong: rgba(15,30,26,0.14);
-  --text: #0A1814;
-  --text-muted: rgba(10,24,20,0.64);
-  --text-subtle: rgba(10,24,20,0.48);
-}
 
 /* Reusable styles */
 .container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
@@ -552,4 +541,55 @@ body[data-anims="off"] .la-progress-fill { width: 100%; }
   .la-quote, .la-sub { font-size: 12px; }
   .la-role { font-size: 11px; }
 }
+
+/* ==========================================================================
+   PUCK EDITOR CUSTOM DARK MODE THEME OVERRIDES
+   ========================================================================== */
+.puck-editor-theme-override {
+  --puck-color-white: #0c1815 !important; /* Replaces white with dark theme bg */
+  --puck-color-grey-12: #07100E !important; /* Panel background */
+  --puck-color-grey-11: #0c1815 !important;
+  --puck-color-grey-10: #122520 !important; /* Inputs, blocks card background */
+  --puck-color-grey-09: #1c322b !important;
+  --puck-color-grey-08: #364e46 !important;
+  --puck-color-grey-07: #5a756b !important;
+  --puck-color-grey-06: #8ca399 !important;
+  --puck-color-grey-05: #b8c8c2 !important;
+  --puck-color-grey-04: #dce6e2 !important;
+  --puck-color-grey-03: #e8f1ee !important; /* Text colors */
+  --puck-color-grey-02: #f2f7f5 !important;
+  --puck-color-grey-01: #ffffff !important;
+  --puck-color-black: #ffffff !important;
+}
+
+/* Force dark styling on all blocks list, drawers, items, and sidebars */
+.puck-editor-theme-override [class*="Drawer"],
+.puck-editor-theme-override [class*="Sidebar"],
+.puck-editor-theme-override [class*="Components"] {
+  background-color: #07100E !important;
+  color: #E8F1EE !important;
+}
+
+.puck-editor-theme-override [class*="Item-button"],
+.puck-editor-theme-override button[class*="Item"],
+.puck-editor-theme-override [class*="Drawer-item"] {
+  background-color: #0c1815 !important;
+  color: #E8F1EE !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.puck-editor-theme-override [class*="Item-button"]:hover,
+.puck-editor-theme-override button[class*="Item"]:hover,
+.puck-editor-theme-override [class*="Drawer-item"]:hover {
+  background-color: #122520 !important;
+  border-color: var(--brand) !important;
+}
+
+/* Make sure text fields, label text, and categories look clear in dark theme */
+.puck-editor-theme-override [class*="Field"],
+.puck-editor-theme-override [class*="Label"],
+.puck-editor-theme-override [class*="Category"] {
+  color: #E8F1EE !important;
+}
+
 

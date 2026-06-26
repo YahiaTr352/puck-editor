@@ -108,9 +108,6 @@ export default function FAQPage() {
 
   return (
     <div style={{ minHeight: "100vh", position: "relative" }}>
-      {/* الخلفية التفاعلية المضيئة المرفقة بالتصميم الأصلي */}
-      <AmbientBackground bgStyle="fluid" intensity={75} blur={60} speed={100} grain={true} mesh={false} />
-
       {/* شريط توجيهي علوي يربط بين الصفحة والمحرر البصري */}
       <div style={{
         backgroundColor: "rgba(12, 24, 21, 0.95)",
@@ -156,10 +153,7 @@ export default function FAQPage() {
         </div>
       </div>
 
-      {/* عرض مكونات Puck البصرية بكامل عرض الشاشة ودون حواجز مقيدة */}
-      <div style={{ direction: "rtl", width: "100%" }}>
-        <Render config={config} data={data} />
-      </div>
+      <Render config={config} data={data} />
     </div>
   );
 }

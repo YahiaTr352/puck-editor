@@ -116,8 +116,63 @@ export default function FAQAdminEditor() {
   }
 
   return (
-    <div style={{ height: "100vh", direction: "ltr" }}>
-      <Puck config={config} data={data} onPublish={handleSave} />
+    <div style={{ height: "100vh", direction: "ltr" }} className="puck-editor-theme-override">
+      <Puck
+        config={config}
+        data={data}
+        onPublish={handleSave}
+        overrides={{
+          iframe: ({ children, document }: any) => {
+            useEffect(() => {
+              if (document) {
+                // Ensure RTL layout for arabic translation inside the iframe preview canvas
+                document.documentElement.dir = "rtl";
+                document.documentElement.lang = "ar";
+                
+                // Examy styling system depends on these dark mode tokens and animations
+                document.body.setAttribute("data-theme", "dark");
+                document.body.setAttribute("data-anims", "on");
+                document.body.className = "min-h-full flex flex-col";
+
+                const copyStyles = () => {
+                  const classId = "injected-parent-style";
+                  // Clear previously copied style tags
+                  document.querySelectorAll(`.${classId}`).forEach((el: any) => el.remove());
+
+                  // Clone and inject all parent style/link rules to replicate visitor environment
+                  window.parent.document.querySelectorAll('style, link[rel="stylesheet"]').forEach((styleEl) => {
+                    try {
+                      const clone = styleEl.cloneNode(true) as HTMLElement;
+                      clone.classList.add(classId);
+                      document.head.appendChild(clone);
+                    } catch (e) {
+                      console.error("Style injection error:", e);
+                    }
+                  });
+                };
+
+                copyStyles();
+                // Delay copy to guarantee Dev Server Webpack/Turbopack injected stylesheet updates are synced
+                const timeoutId = setTimeout(copyStyles, 250);
+                const observer = new MutationObserver(copyStyles);
+
+                // Observe parent head changes to hot-reload styles in iframe preview
+                observer.observe(window.parent.document.head, {
+                  childList: true,
+                  subtree: true,
+                });
+
+                return () => {
+                  clearTimeout(timeoutId);
+                  observer.disconnect();
+                };
+              }
+            }, [document]);
+
+            return <>{children}</>;
+          },
+        }}
+      />
     </div>
   );
 }
