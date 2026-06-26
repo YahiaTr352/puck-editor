@@ -114,6 +114,25 @@ export const LiveActivity = () => {
   const [dismissed, setDismissed] = useState(true); // default to true, load client-side
 
   useEffect(() => {
+    // If inside an iframe (like Puck preview canvas) or in admin route, disable live activity
+    if (typeof window !== "undefined") {
+      try {
+        const isIframe = window.self !== window.top;
+        const isAdmin = window.location.pathname.includes("/admin") || 
+                        (window.parent && window.parent.location.pathname.includes("/admin")) ||
+                        window.location.search.includes("puck") ||
+                        (window.parent && window.parent.location.search.includes("puck")) ||
+                        !!document.querySelector(".puck-editor-theme-override") ||
+                        (window.parent && !!window.parent.document.querySelector(".puck-editor-theme-override"));
+        if (isIframe || isAdmin) {
+          setDismissed(true);
+          return;
+        }
+      } catch (err) {
+        console.warn("Editor check error:", err);
+      }
+    }
+
     // Session storage check on client mount
     try {
       const isDismissed = sessionStorage.getItem('examy_la_dismissed') === '1';

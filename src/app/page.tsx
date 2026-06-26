@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react";
 import { Render } from "@puckeditor/core";
 import { config } from "../puck/config";
 import { getPageData } from "./actions";
+import { AmbientBackground } from "../components/AmbientBackground";
+import { LiveActivity } from "../components/LiveActivity";
 
 const fallbackData = {
   content: [
@@ -260,8 +262,9 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: "100vh", position: "relative" }}>
-      {/* عرض مكونات Puck البصرية بكامل عرض الشاشة ودون حواجز مقيدة */}
+      <AmbientBackground bgStyle="fluid" intensity={75} blur={60} speed={100} grain={true} mesh={false} />
       <Render config={config} data={data} />
+      <LiveActivity />
     </div>
   );
 }

@@ -1318,15 +1318,21 @@ export const config: Config<PuckConfig> = {
 
         useEffect(() => {
           if (typeof window === "undefined") return;
-          document.body.setAttribute("data-theme", "dark");
-          localStorage.setItem("theme", "dark");
-          setTheme("dark");
+          const savedTheme = localStorage.getItem("theme");
+          if (savedTheme === "dark" || savedTheme === "light") {
+            document.body.setAttribute("data-theme", savedTheme);
+            setTheme(savedTheme);
+          } else {
+            const currentTheme = document.body.getAttribute("data-theme") || "dark";
+            setTheme(currentTheme);
+          }
         }, []);
 
         const toggleTheme = () => {
-          document.body.setAttribute("data-theme", "dark");
-          localStorage.setItem("theme", "dark");
-          setTheme("dark");
+          const newTheme = theme === "dark" ? "light" : "dark";
+          document.body.setAttribute("data-theme", newTheme);
+          localStorage.setItem("theme", newTheme);
+          setTheme(newTheme);
         };
 
         const defaultLinks = [
@@ -1420,6 +1426,60 @@ export const config: Config<PuckConfig> = {
                 style={{ display: "flex", gap: 10, alignItems: "center" }}
                 className="nav-actions"
               >
+                {/* Theme Toggle Button (Desktop) */}
+                <button
+                  type="button"
+                  className="theme-toggle-desktop"
+                  onClick={toggleTheme}
+                  aria-label="تبديل المظهر"
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: theme === "dark" 
+                      ? "rgba(255, 255, 255, 0.08)" 
+                      : "rgba(10, 24, 20, 0.05)",
+                    border: "1px solid var(--border)",
+                    backdropFilter: "blur(8px)",
+                    WebkitBackdropFilter: "blur(8px)",
+                    color: theme === "dark" ? "#00E08A" : "var(--text-muted)",
+                    boxShadow: theme === "dark"
+                      ? "0 0 14px rgba(0, 224, 138, 0.3)"
+                      : "none",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    marginLeft: 4,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = "var(--text)";
+                    e.currentTarget.style.borderColor = "var(--brand)";
+                    e.currentTarget.style.background = theme === "dark"
+                      ? "rgba(255, 255, 255, 0.14)"
+                      : "rgba(10, 24, 20, 0.08)";
+                    e.currentTarget.style.boxShadow = theme === "dark"
+                      ? "0 0 20px -2px var(--brand)"
+                      : "none";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = theme === "dark" ? "#00E08A" : "var(--text-muted)";
+                    e.currentTarget.style.borderColor = "var(--border)";
+                    e.currentTarget.style.background = theme === "dark"
+                      ? "rgba(255, 255, 255, 0.08)"
+                      : "rgba(10, 24, 20, 0.05)";
+                    e.currentTarget.style.boxShadow = theme === "dark"
+                      ? "0 0 14px rgba(0, 224, 138, 0.3)"
+                      : "none";
+                  }}
+                >
+                  {theme === "dark" ? (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" /></svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg>
+                  )}
+                </button>
                 {activeActions.map((act, idx) => {
                   if (act.variant === "primary") {
                     return (
@@ -1453,6 +1513,38 @@ export const config: Config<PuckConfig> = {
               
               {/* Theme Toggle & Hamburger Button (Mobile Container) */}
               <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                {/* Theme Toggle Button (Mobile) */}
+                <button
+                  type="button"
+                  className="theme-toggle-mobile"
+                  onClick={toggleTheme}
+                  aria-label="تبديل المظهر"
+                  style={{
+                    display: "none",
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: theme === "dark" 
+                      ? "rgba(255, 255, 255, 0.08)" 
+                      : "rgba(10, 24, 20, 0.05)",
+                    border: "1px solid var(--border)",
+                    backdropFilter: "blur(8px)",
+                    WebkitBackdropFilter: "blur(8px)",
+                    color: theme === "dark" ? "#00E08A" : "var(--text)",
+                    boxShadow: theme === "dark"
+                      ? "0 0 14px rgba(0, 224, 138, 0.3)"
+                      : "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  {theme === "dark" ? (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" /></svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg>
+                  )}
+                </button>
                 
                 <button
                   type="button"
@@ -3853,14 +3945,14 @@ export const config: Config<PuckConfig> = {
     },
     FAQ: {
       fields: {
-        title: { type: "text", label: "عنوان قسم الأسئلة" },
-        subtitle: { type: "textarea", label: "الوصف الفرعي" },
+        title: { type: "text", label: "عنوان قسم الأسئلة", placeholder: "مثال: كل ما تريد معرفته عن اختباري" },
+        subtitle: { type: "textarea", label: "الوصف الفرعي", placeholder: "اكتب الوصف الفرعي هنا..." },
         categories: {
           type: "array",
           label: "التصنيفات والأسئلة",
           getItemSummary: (item) => item.label || "تصنيف جديد",
           arrayFields: {
-            label: { type: "text", label: "اسم التصنيف" },
+            label: { type: "text", label: "اسم التصنيف", placeholder: "مثال: عن اختباري" },
             iconName: {
               type: "select",
               label: "الأيقونة",
@@ -3877,32 +3969,30 @@ export const config: Config<PuckConfig> = {
               label: "قائمة الأسئلة",
               getItemSummary: (qItem) => qItem.q || "سؤال جديد",
               arrayFields: {
-                q: { type: "text", label: "السؤال" },
-                a: { type: "textarea", label: "الإجابة" },
+                q: { type: "text", label: "السؤال", placeholder: "مثال: ما هي منصة اختباري؟" },
+                a: { type: "textarea", label: "الإجابة", placeholder: "اكتب إجابة هذا السؤال هنا..." },
                 list: {
                   type: "array",
                   label: "قائمة نقاط إضافية (اختياري)",
                   getItemSummary: (li) => li.value || "نقطة جديدة",
                   arrayFields: {
-                    value: { type: "text", label: "النص" }
+                    value: { type: "text", label: "النص", placeholder: "اكتب نقطة إضافية هنا..." }
                   },
                   defaultItemProps: {
-                    value: "نقطة جديدة"
+                    value: ""
                   }
                 }
               },
               defaultItemProps: {
-                q: "سؤال جديد؟",
-                a: "إجابة هذا السؤال..."
+                q: "",
+                a: ""
               }
             }
           },
           defaultItemProps: {
-            label: "تصنيف جديد",
+            label: "",
             iconName: "general",
-            items: [
-              { q: "سؤال جديد؟", a: "إجابة هذا السؤال..." }
-            ]
+            items: []
           }
         }
       },
@@ -3995,7 +4085,25 @@ export const config: Config<PuckConfig> = {
         const displaySubtitle = subtitle !== undefined ? subtitle : "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات، التصحيح، التخصيص، والأسعار. لم تجد إجابتك؟ فريقنا جاهز لمساعدتك.";
 
         return (
-          <section className="section" style={{ direction: "rtl", textAlign: "right", position: "relative" }}>
+          <section
+            className="section"
+            style={{
+              direction: "rtl",
+              textAlign: "right",
+              position: "relative",
+              background: "#07100E",
+              color: "#E8F1EE",
+              ["--bg" as any]: "#07100E",
+              ["--bg-elev-1" as any]: "#0C1815",
+              ["--bg-elev-2" as any]: "#122520",
+              ["--surface" as any]: "#0F1E1A",
+              ["--border" as any]: "rgba(255,255,255,0.08)",
+              ["--border-strong" as any]: "rgba(255,255,255,0.14)",
+              ["--text" as any]: "#E8F1EE",
+              ["--text-muted" as any]: "rgba(232,241,238,0.62)",
+              ["--text-subtle" as any]: "rgba(232,241,238,0.42)",
+            }}
+          >
             <div className="container" style={{ maxWidth: 880 }}>
               <div style={{ textAlign: "center", marginBottom: 48 }}>
                 <h2 style={{ fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 800 }}>{displayTitle}</h2>

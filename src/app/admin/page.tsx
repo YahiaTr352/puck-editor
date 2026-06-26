@@ -196,7 +196,8 @@ const faqFallbackData = {
     {
       type: "FAQ",
       props: {
-        id: "faq-block"
+        id: "faq-block",
+        categories: (config.components.FAQ as any).defaultProps?.categories || []
       }
     },
     {
@@ -269,6 +270,13 @@ function AdminEditorContent() {
               delete updatedProps.secondaryCtaLink;
               return { ...item, props: updatedProps };
             }
+            if (item.type === "FAQ") {
+              const updatedProps = { ...item.props };
+              if (!updatedProps.categories || updatedProps.categories.length === 0) {
+                updatedProps.categories = (config.components.FAQ as any).defaultProps?.categories || [];
+              }
+              return { ...item, props: updatedProps };
+            }
             return item;
           });
           const filteredContent = slug === "home" 
@@ -322,6 +330,9 @@ function AdminEditorContent() {
   if (slug === "home") {
     const { FAQ, ...restComponents } = config.components;
     editorConfig.components = restComponents;
+  } else if (slug === "faq") {
+    const { Nav, FAQ, Footer } = config.components;
+    editorConfig.components = { Nav, FAQ, Footer };
   }
 
   return (

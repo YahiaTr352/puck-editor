@@ -6,6 +6,7 @@ import { config } from "../../puck/config";
 import { getPageData } from "../actions";
 
 import { AmbientBackground } from "../../components/AmbientBackground";
+import { LiveActivity } from "../../components/LiveActivity";
 
 const faqFallbackData = {
   content: [
@@ -26,7 +27,8 @@ const faqFallbackData = {
     {
       type: "FAQ",
       props: {
-        id: "faq-block"
+        id: "faq-block",
+        categories: (config.components.FAQ as any).defaultProps?.categories || []
       }
     },
     {
@@ -70,6 +72,13 @@ export default function FAQPage() {
                     { label: "تسجيل دخول", href: "#login", variant: "link" },
                     { label: updatedProps.ctaText || "ابدأ مجاناً", href: updatedProps.ctaLink || "#cta", variant: "primary" }
                   ];
+                }
+                return { ...item, props: updatedProps };
+              }
+              if (item.type === "FAQ") {
+                const updatedProps = { ...item.props };
+                if (!updatedProps.categories || updatedProps.categories.length === 0) {
+                  updatedProps.categories = (config.components.FAQ as any).defaultProps?.categories || [];
                 }
                 return { ...item, props: updatedProps };
               }
@@ -153,7 +162,9 @@ export default function FAQPage() {
         </div>
       </div>
 
+      <AmbientBackground bgStyle="fluid" intensity={75} blur={60} speed={100} grain={true} mesh={false} />
       <Render config={config} data={data} />
+      <LiveActivity />
     </div>
   );
 }

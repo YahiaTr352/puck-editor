@@ -52,6 +52,18 @@ body {
   --max-w: 1240px;
 }
 
+body[data-theme="light"] {
+  --bg: #F7F9F8;
+  --bg-elev-1: #FFFFFF;
+  --bg-elev-2: #FFFFFF;
+  --surface: #FFFFFF;
+  --border: rgba(15,30,26,0.08);
+  --border-strong: rgba(15,30,26,0.14);
+  --text: #0A1814;
+  --text-muted: rgba(10,24,20,0.64);
+  --text-subtle: rgba(10,24,20,0.48);
+}
+
 
 /* Reusable styles */
 .container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }

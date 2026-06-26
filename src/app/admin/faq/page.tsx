@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Puck } from "@puckeditor/core";
 import "@puckeditor/core/dist/index.css";
 import { config } from "../../../puck/config";
+import { getPageData, savePageData } from "../../actions";
 
 const initialFaqData = {
   content: [
@@ -26,7 +27,8 @@ const initialFaqData = {
       props: {
         id: "faq-component",
         title: "كل ما تريد معرفته عن اختباري",
-        subtitle: "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات، التصحيح، التخصيص، والأسعار. لم تجد إجابتك؟ فريقنا جاهز لمساعدتك."
+        subtitle: "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات، التصحيح، التخصيص، والأسعار. لم تجد إجابتك؟ فريقنا جاهز لمساعدتك.",
+        categories: (config.components.FAQ as any).defaultProps?.categories || []
       }
     },
     {
@@ -75,31 +77,55 @@ const initialFaqData = {
 
 export default function FAQAdminEditor() {
   const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const savedData = localStorage.getItem("puck-faq-data");
-    if (savedData) {
+    async function loadData() {
+      setLoading(true);
       try {
-        const parsed = JSON.parse(savedData);
-        if (parsed.content && Array.isArray(parsed.content)) {
-          setData(parsed);
+        const dbData = await getPageData("faq");
+        if (dbData && dbData.puckData) {
+          const parsed = typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData;
+          if (parsed.content && Array.isArray(parsed.content)) {
+            const migratedContent = parsed.content.map((item: any) => {
+              if (item.type === "FAQ") {
+                const updatedProps = { ...item.props };
+                if (!updatedProps.categories || updatedProps.categories.length === 0) {
+                  updatedProps.categories = (config.components.FAQ as any).defaultProps?.categories || [];
+                }
+                return { ...item, props: updatedProps };
+              }
+              return item;
+            });
+            setData({ ...parsed, content: migratedContent });
+          } else {
+            setData(initialFaqData);
+          }
         } else {
           setData(initialFaqData);
         }
       } catch (e) {
+        console.error("Failed to load page data:", e);
         setData(initialFaqData);
+      } finally {
+        setLoading(false);
       }
-    } else {
-      setData(initialFaqData);
     }
+    loadData();
   }, []);
 
   const handleSave = async (newData: any) => {
-    localStorage.setItem("puck-faq-data", JSON.stringify(newData));
-    alert("تم حفظ التعديلات بنجاح");
+    try {
+      const pageTitle = newData.root?.props?.title || "الأسئلة الشائعة - Examy";
+      await savePageData("faq", pageTitle, newData);
+      alert("تم حفظ التعديلات بنجاح في قاعدة البيانات PostgreSQL!");
+    } catch (e) {
+      console.error(e);
+      alert("حدث خطأ أثناء حفظ التعديلات في قاعدة البيانات.");
+    }
   };
 
-  if (!data) {
+  if (loading || !data) {
     return (
       <div style={{
         display: "flex",
@@ -115,10 +141,14 @@ export default function FAQAdminEditor() {
     );
   }
 
+  const faqConfig = { ...config } as any;
+  const { Nav, FAQ, Footer } = config.components;
+  faqConfig.components = { Nav, FAQ, Footer };
+
   return (
     <div style={{ height: "100vh", direction: "ltr" }} className="puck-editor-theme-override">
       <Puck
-        config={config}
+        config={faqConfig}
         data={data}
         onPublish={handleSave}
         overrides={{
