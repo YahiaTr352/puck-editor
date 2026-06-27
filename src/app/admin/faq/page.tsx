@@ -29,7 +29,7 @@ const initialFaqData = {
         id: "faq-component",
         title: "كل ما تريد معرفته عن اختباري",
         subtitle: "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات، التصحيح، التخصيص، والأسعار. لم تجد إجابتك؟ فريقنا جاهز لمساعدتك.",
-        categories: (config.components.FAQ as any).defaultProps?.categories || []
+        categories: []
       }
     },
     {
@@ -108,19 +108,50 @@ export default function FAQAdminEditor() {
               if (item.type === "FAQ") {
                 const updatedProps = { ...item.props };
                 if (!updatedProps.categories || updatedProps.categories.length === 0) {
-                  updatedProps.categories = (config.components.FAQ as any).defaultProps?.categories || [];
+                  updatedProps.categories = [];
                 }
                 if (updatedProps.title === undefined || updatedProps.title === "") {
-                  updatedProps.title = (config.components.FAQ as any).defaultProps?.title || "";
+                  updatedProps.title = "كل ما تريد معرفته عن اختباري";
                 }
                 if (updatedProps.subtitle === undefined || updatedProps.subtitle === "") {
-                  updatedProps.subtitle = (config.components.FAQ as any).defaultProps?.subtitle || "";
+                  updatedProps.subtitle = "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات، التصحيح، التخصيص، والأسعار. لم تجد إجابتك؟ فريقنا جاهز لمساعدتك.";
                 }
                 return { ...item, props: updatedProps };
               }
               if (item.type === "Footer") {
                 const updatedProps = { ...item.props };
-                const defs = (config.components.Footer as any).defaultProps || {};
+                const defs = {
+                  description: "منصة سعودية مدعومة بالذكاء الاصطناعي لإنشاء وإدارة الاختبارات، مرتبطة بالمنهج السعودي.",
+                  twitterUrl: "https://x.com/examyai",
+                  instagramUrl: "https://www.instagram.com/examy.ai/",
+                  col1Title: "المنتج",
+                  col1Links: [
+                    { label: "الميزات", href: "#" },
+                    { label: "كيف يعمل", href: "#" },
+                    { label: "القوالب الجاهزة", href: "#" }
+                  ],
+                  col2Title: "لمن",
+                  col2Links: [
+                    { label: "للمعلمين", href: "#" },
+                    { label: "للمدارس", href: "#" },
+                    { label: "للجامعات", href: "#" },
+                    { label: "للجهات التعليمية", href: "#" }
+                  ],
+                  col3Title: "موارد",
+                  col3Links: [
+                    { label: "مركز المساعدة", href: "#" },
+                    { label: "المدوّنة", href: "#" },
+                    { label: "عن اختباري", href: "#" },
+                    { label: "تواصل معنا", href: "#" }
+                  ],
+                  col4Title: "الشركة",
+                  col4Links: [
+                    { label: "سياسة الخصوصية", href: "#" },
+                    { label: "الشروط والأحكام", href: "#" }
+                  ],
+                  copyrightText: "© ٢٠٢٦ اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦",
+                  statusText: "توليد ذكي وموثوق"
+                };
                 Object.keys(defs).forEach(key => {
                   const val = updatedProps[key];
                   if (
@@ -129,7 +160,7 @@ export default function FAQAdminEditor() {
                     val === "" ||
                     (Array.isArray(val) && val.length === 0)
                   ) {
-                    updatedProps[key] = defs[key];
+                    updatedProps[key] = (defs as any)[key];
                   }
                 });
                 return { ...item, props: updatedProps };
@@ -163,8 +194,12 @@ export default function FAQAdminEditor() {
   };
 
   const faqConfig = { ...config } as any;
-  const { Nav, FAQ, Footer } = config.components;
-  faqConfig.components = { Nav, FAQ, Footer };
+  const puckComponents = config.components || {};
+  faqConfig.components = {
+    Nav: puckComponents.Nav,
+    FAQ: puckComponents.FAQ,
+    Footer: puckComponents.Footer
+  };
 
   return (
     <div style={{ height: "100vh", direction: "ltr" }} className="puck-editor-theme-override">

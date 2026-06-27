@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useRef } from "react";
 import { Config } from "@puckeditor/core";
 import { Icon } from "./icons";
@@ -1414,35 +1416,37 @@ export const config: Config<PuckConfig> = {
             }}
           >
             <div
-              className="container"
+              className="container header-container"
               style={{
-                display: "flex",
+                display: "grid",
+                gridTemplateColumns: "1fr auto 1fr",
                 alignItems: "center",
-                justifyContent: "space-between",
                 gap: 16,
               }}
             >
               {/* Logo */}
-              <a href={logoLink} aria-label={logoText} style={{ display: "flex", flexShrink: 0, alignItems: "center" }}>
-                {logoImageUrl ? (
-                  <img
-                    src={logoImageUrl}
-                    alt={logoText}
-                    style={{
-                      height: logoSize,
-                      width: "auto",
-                      objectFit: "contain",
-                      flexShrink: 0,
-                    }}
-                  />
-                ) : (
-                  <Logo size={logoSize} id="logo-mask" />
-                )}
-              </a>
+              <div style={{ display: "flex", justifyContent: "flex-start" }}>
+                <a href={logoLink} aria-label={logoText} style={{ display: "flex", flexShrink: 0, alignItems: "center" }}>
+                  {logoImageUrl ? (
+                    <img
+                      src={logoImageUrl}
+                      alt={logoText}
+                      style={{
+                        height: logoSize,
+                        width: "auto",
+                        objectFit: "contain",
+                        flexShrink: 0,
+                      }}
+                    />
+                  ) : (
+                    <Logo size={logoSize} id="logo-mask" />
+                  )}
+                </a>
+              </div>
 
               {/* Centered navigation links on desktop */}
               <nav
-                style={{ display: "flex", gap: 4, alignItems: "center" }}
+                style={{ display: "flex", gap: 4, alignItems: "center", justifyContent: "center" }}
                 className="nav-links"
               >
                 {activeLinks.map((l, i) => {
@@ -1456,7 +1460,7 @@ export const config: Config<PuckConfig> = {
                         fontSize: 14,
                         color: isActive ? "var(--brand)" : "var(--text-muted)",
                         borderRadius: 8,
-                        fontWeight: 500,
+                        fontWeight: isActive ? 700 : 500,
                         transition: "color 0.15s",
                         whiteSpace: "nowrap",
                       }}
@@ -1472,7 +1476,7 @@ export const config: Config<PuckConfig> = {
               </nav>
 
               <div
-                style={{ display: "flex", gap: 10, alignItems: "center" }}
+                style={{ display: "flex", gap: 10, alignItems: "center", justifyContent: "flex-end" }}
                 className="nav-actions"
               >
                 {/* Theme Toggle Button (Desktop) */}
@@ -1698,6 +1702,7 @@ export const config: Config<PuckConfig> = {
                 .nav-burger { display: inline-flex !important; }
                 .theme-toggle-mobile { display: inline-flex !important; }
                 .mobile-nav-container { display: flex !important; }
+                .header-container { display: flex !important; justify-content: space-between !important; }
               }
               @media (min-width: 881px) {
                 .nav-mobile-panel { display: none !important; }
@@ -4525,83 +4530,568 @@ export const config: Config<PuckConfig> = {
       defaultProps: {
         title: "مدوّنة اختباري التعليمية",
         subtitle: "نصائح وإرشادات تعليمية، مقالات متخصصة في الذكاء الاصطناعي والتقويم المدرسي لمساعدتك على التفوق.",
-        posts: [
-          {
-            title: "كيف يغير الذكاء الاصطناعي طرق التدريس في المدارس السعودية؟",
-            description: "تعرف على أهم التقنيات الحديثة وكيف تسهم أدوات توليد الاختبارات آلياً في توفير وقت المعلمين ورفع مستوى نواتج التعلم.",
-            image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop",
-            date: "26 يونيو 2026",
-            author: "أ. سارة الحربي",
-            slug: "ai-in-saudi-education"
-          },
-          {
-            title: "دليلك الشامل لتصميم اختبار مدرسي متوازن",
-            description: "نستعرض في هذا المقال جدول المواصفات، ومستويات بلوم المعرفية، وكيفية صياغة أسئلة تقيس الفهم الفعلي للطلاب.",
-            image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=600&auto=format&fit=crop",
-            date: "24 يونيو 2026",
-            author: "د. خالد السديري",
-            slug: "balanced-exam-design"
-          }
-        ]
+        posts: []
       },
       render: ({ title, subtitle, posts = [] }) => {
+        const [searchQuery, setSearchQuery] = useState("");
+        const [selectedCategory, setSelectedCategory] = useState("الكل");
+
+        const getCategoryDetails = (postTitle: string, postDesc: string) => {
+          const text = `${postTitle} ${postDesc}`.toLowerCase();
+          if (text.includes('ذكاء') || text.includes('ai') || text.includes('اصطناعي') || text.includes('qa') || text.includes('ضمان جودة') || text.includes('specialist') || text.includes('فروق فردية')) {
+            return { name: 'الذكاء الاصطناعي', color: '#00E08A', bgColor: 'rgba(0, 224, 138, 0.12)', icon: '🧠' };
+          }
+          if (text.includes('تقويم') || text.includes('اختبار') || text.includes('تحصيل') || text.includes('إحصائي') || text.includes('أسئلة') || text.includes('بنك') || text.includes('تصحيح') || text.includes('موضوعي') || text.includes('مقالي')) {
+            return { name: 'التقويم والاختبارات', color: '#3B82F6', bgColor: 'rgba(59, 130, 246, 0.12)', icon: '📝' };
+          }
+          if (text.includes('منهج') || text.includes('سعودي') || text.includes('مملكة') || text.includes('السعودية') || text.includes('دمج') || text.includes('مدمج')) {
+            return { name: 'المنهج السعودي', color: '#1FA89F', bgColor: 'rgba(31, 168, 159, 0.12)', icon: '🇸🇦' };
+          }
+          if (text.includes('نصائح') || text.includes('معلم') || text.includes('بلوم') || text.includes('تحضير')) {
+            return { name: 'نصائح للمعلمين', color: '#F59E0B', bgColor: 'rgba(245, 158, 11, 0.12)', icon: '💡' };
+          }
+          return { name: 'عام', color: '#6B7280', bgColor: 'rgba(107, 114, 128, 0.12)', icon: '📄' };
+        };
+
+        const getPostIcon = (postTitle: string, color: string, size: number = 130) => {
+          const t = postTitle.toLowerCase();
+          if (t.includes("ضمان جودة") || t.includes("qa specialist") || t.includes("الذكاء الاصطناعي") || t.includes("تطبيقات الذكاء") || t.includes("الفروق الفردية")) {
+            return (
+              <svg viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}>
+                <rect x="4" y="6" width="16" height="14" rx="3"></rect>
+                <path d="M9 10v6M15 10v6M9 13h6"></path>
+                <circle cx="12" cy="3" r="1.5" fill={color}></circle>
+                <path d="M12 4.5V6"></path>
+              </svg>
+            );
+          }
+          if (t.includes("اختبار") || t.includes("تقويم") || t.includes("تحصيل") || t.includes("إحصائي") || t.includes("أسئلة") || t.includes("بنك") || t.includes("تصحيح") || t.includes("موضوعي") || t.includes("مقالي")) {
+            return (
+              <svg viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}>
+                <path d="M3 3v18h18"></path>
+                <rect x="7" y="13" width="3" height="5"></rect>
+                <rect x="12" y="9" width="3" height="9"></rect>
+                <rect x="17" y="5" width="3" height="13"></rect>
+              </svg>
+            );
+          }
+          if (t.includes("الالكتروني والتقليدي") || t.includes("التحضير للاختبارات")) {
+            return (
+              <svg viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}>
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            );
+          }
+          if (t.includes("المملكة") || t.includes("السعودية") || t.includes("نظام التعليم") || t.includes("دمج") || t.includes("مدمج")) {
+            return (
+              <svg viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}>
+                <path d="M12 2 4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4z"></path>
+                <path d="M8 11h8M9 14h6M10 8h4"></path>
+              </svg>
+            );
+          }
+          return (
+            <svg viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}>
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 16v-4M12 8h.01"></path>
+            </svg>
+          );
+        };
+
+        const filteredPosts = React.useMemo(() => {
+          return posts.filter(post => {
+            const titleMatch = post.title ? post.title.toLowerCase().includes(searchQuery.toLowerCase()) : false;
+            const descMatch = post.description ? post.description.toLowerCase().includes(searchQuery.toLowerCase()) : false;
+            const matchesSearch = titleMatch || descMatch;
+
+            if (selectedCategory === "الكل") return matchesSearch;
+
+            const catDetails = getCategoryDetails(post.title || "", post.description || "");
+            return matchesSearch && catDetails.name === selectedCategory;
+          });
+        }, [posts, searchQuery, selectedCategory]);
+
+        const featuredPost = ((selectedCategory === "الكل" && searchQuery === "") ? filteredPosts[0] : null) as any;
+        const regularPosts = featuredPost ? filteredPosts.slice(1) : filteredPosts;
+
         return (
-          <section style={{ padding: "80px 24px", direction: "rtl" }}>
-            <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-              <div style={{ textAlign: "center", marginBottom: 50 }}>
-                <h2 style={{ fontSize: "clamp(28px, 4vw, 42px)", fontWeight: 800, color: "#ffffff" }}>{title}</h2>
-                {subtitle && (
-                  <p style={{ color: "var(--text-muted)", marginTop: 12, fontSize: 16, lineHeight: 1.6, maxWidth: 600, marginInline: "auto" }}>
-                    {subtitle}
-                  </p>
-                )}
+          <div style={{ width: "100%", backgroundColor: "#07100E", minHeight: "100vh", position: "relative", paddingBottom: 64 }}>
+            <style>{`
+              .examy-blog-hero {
+                position: relative;
+                padding-top: 100px;
+                padding-bottom: 40px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                overflow: hidden;
+                width: 100%;
+                text-align: center;
+              }
+
+              .examy-blog-grid-bg {
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;
+                pointer-events: none;
+                opacity: 0.35;
+              }
+
+              .examy-blog-radial-glow {
+                position: absolute;
+                top: 0; left: 0; right: 0;
+                height: 460px;
+                pointer-events: none;
+                z-index: 0;
+                background: radial-gradient(55% 60% at 50% 0%, rgba(0, 224, 138, 0.16) 0%, rgba(0, 224, 138, 0) 100%);
+              }
+
+              .examy-blog-hero-content {
+                position: relative;
+                z-index: 10;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 0 20px;
+                max-width: 820px;
+                text-align: center;
+              }
+
+              .examy-blog-eyebrow {
+                display: flex;
+                align-items: center;
+                padding: 7px 14px;
+                border-radius: 999px;
+                border: 1px solid rgba(0, 224, 138, 0.25);
+                background-color: rgba(0, 224, 138, 0.12);
+                margin-bottom: 20px;
+              }
+
+              .examy-blog-eyebrow-text {
+                font-size: 13px;
+                font-weight: 700;
+                color: #00E08A;
+                font-family: 'Cairo', sans-serif;
+              }
+
+              .examy-blog-eyebrow-dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 3px;
+                background-color: #00E08A;
+                margin-left: 8px;
+                box-shadow: 0 0 4px rgba(0, 224, 138, 0.8);
+              }
+
+              .examy-blog-hero-title {
+                font-size: 44px;
+                font-weight: 800;
+                line-height: 1.2;
+                margin-bottom: 16px;
+                color: #E8F1EE;
+                font-family: 'Cairo', sans-serif;
+              }
+
+              .examy-blog-hero-title span {
+                color: #00E08A;
+              }
+
+              .examy-blog-hero-desc {
+                font-size: 18px;
+                color: rgba(232, 241, 238, 0.62);
+                line-height: 1.55;
+                font-family: 'Cairo', sans-serif;
+                margin: 0;
+              }
+
+              .examy-blog-main-wrapper {
+                padding: 32px 24px 0;
+                max-width: 1180px;
+                width: 100%;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+                gap: 40px;
+              }
+
+              /* FEATURED CARD */
+              .examy-blog-featured-card {
+                display: flex;
+                background-color: #0C1815;
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 16px;
+                overflow: hidden;
+                width: 100%;
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+                text-align: right;
+                cursor: pointer;
+                transition: transform 0.2s, box-shadow 0.2s;
+                text-decoration: none;
+                color: inherit;
+              }
+
+              .examy-blog-featured-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+              }
+
+              .examy-blog-featured-image-wrapper {
+                width: 53.5%;
+                position: relative;
+                background-color: #07100E;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 380px;
+              }
+
+              .examy-blog-featured-image-wrapper img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                opacity: 0.85;
+                display: block;
+                position: absolute;
+                top: 0; left: 0;
+              }
+
+              .examy-blog-placeholder-image {
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #07100E;
+              }
+
+              .examy-blog-featured-text-wrapper {
+                width: 46.5%;
+                padding: 36px 36px 36px 24px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: flex-start;
+                gap: 16px;
+                direction: rtl;
+              }
+
+              .examy-blog-featured-eyebrow-row {
+                display: flex;
+                align-items: center;
+                margin-bottom: 4px;
+              }
+
+              .examy-blog-featured-eyebrow {
+                font-size: 13px;
+                font-weight: 700;
+                color: #00E08A;
+                font-family: 'Cairo', sans-serif;
+              }
+
+              .examy-blog-featured-title {
+                font-size: 26px;
+                font-weight: 800;
+                line-height: 1.3;
+                color: #E8F1EE;
+                font-family: 'Cairo', sans-serif;
+                margin: 0;
+                text-align: right;
+              }
+
+              .examy-blog-featured-desc {
+                font-size: 15px;
+                color: rgba(232, 241, 238, 0.62);
+                line-height: 1.6;
+                font-family: 'Cairo', sans-serif;
+                margin: 0;
+                text-align: right;
+              }
+
+              .examy-blog-meta-date {
+                font-size: 12px;
+                color: rgba(232, 241, 238, 0.62);
+                font-family: 'Cairo', sans-serif;
+              }
+
+              .examy-blog-read-article-btn {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 20px;
+                border-radius: 8px;
+                background-color: #00E08A;
+                margin-top: 4px;
+                font-size: 13px;
+                font-weight: 700;
+                color: #06120E;
+                font-family: 'Cairo', sans-serif;
+                cursor: pointer;
+              }
+
+              .examy-blog-read-article-btn svg {
+                width: 16px;
+                height: 16px;
+                stroke: #06120E;
+              }
+
+              .examy-blog-floating-badge {
+                position: absolute;
+                top: 14px;
+                right: 14px;
+                padding: 6px 12px;
+                border-radius: 999px;
+                border: 1px solid rgba(0, 224, 138, 0.38);
+                background-color: rgba(7, 16, 14, 0.8);
+                font-size: 12px;
+                font-weight: 700;
+                color: #00E08A;
+                font-family: 'Cairo', sans-serif;
+                z-index: 10;
+              }
+
+              /* GRID */
+              .examy-blog-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+                width: 100%;
+                margin-bottom: 40px;
+              }
+
+              .examy-blog-card {
+                background-color: #0C1815;
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 14px;
+                overflow: hidden;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                display: flex;
+                flex-direction: column;
+                cursor: pointer;
+                transition: transform 0.2s, box-shadow 0.2s;
+                text-align: right;
+                text-decoration: none;
+                color: inherit;
+              }
+
+              .examy-blog-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+              }
+
+              .examy-blog-card-image {
+                position: relative;
+                width: 100%;
+                padding-bottom: 50%; /* 2:1 aspect ratio */
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                background-color: #07100E;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              }
+
+              .examy-blog-card-image img {
+                position: absolute;
+                top: 0; left: 0;
+                width: 100%; height: 100%;
+                object-fit: cover;
+                opacity: 0.9;
+              }
+
+              .examy-blog-placeholder-card-image {
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #07100E;
+              }
+
+              .examy-blog-card-body {
+                padding: 16px 16px 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                flex: 1;
+                direction: rtl;
+              }
+
+              .examy-blog-card-title {
+                font-size: 17px;
+                font-weight: 700;
+                line-height: 1.4;
+                color: #E8F1EE;
+                font-family: 'Cairo', sans-serif;
+                margin: 0;
+                text-align: right;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+              }
+
+              .examy-blog-card-desc {
+                font-size: 13.5px;
+                color: rgba(232, 241, 238, 0.62);
+                line-height: 1.5;
+                font-family: 'Cairo', sans-serif;
+                margin: 0;
+                text-align: right;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                flex: 1;
+              }
+
+              .examy-blog-card-footer {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                margin-top: 4px;
+              }
+
+              .examy-blog-footer-author-name {
+                font-size: 11.5px;
+                font-weight: 700;
+                color: rgba(232, 241, 238, 0.62);
+                font-family: 'Cairo', sans-serif;
+                margin-left: auto;
+              }
+
+              /* Responsive */
+              @media (max-width: 980px) {
+                .examy-blog-grid {
+                  grid-template-columns: repeat(2, 1fr);
+                }
+                .examy-blog-featured-card {
+                  flex-direction: column;
+                }
+                .examy-blog-featured-image-wrapper, .examy-blog-featured-text-wrapper {
+                  width: 100%;
+                }
+                .examy-blog-featured-text-wrapper {
+                  padding: 24px;
+                }
+              }
+
+              @media (max-width: 600px) {
+                .examy-blog-grid {
+                  grid-template-columns: 1fr;
+                }
+                .examy-blog-hero-title {
+                  font-size: 32px;
+                }
+              }
+            `}</style>
+
+            <section className="examy-blog-hero">
+              <div className="examy-blog-radial-glow"></div>
+              <svg className="examy-blog-grid-bg" width="100%" height="460">
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <path key={`h-${i}`} d={`M0 ${i * 40} H2000`} stroke="var(--border)" strokeWidth="1" />
+                ))}
+                {Array.from({ length: 50 }).map((_, i) => (
+                  <path key={`v-${i}`} d={`M${i * 40} 0 V460`} stroke="var(--border)" strokeWidth="1" />
+                ))}
+              </svg>
+              
+              <div className="examy-blog-hero-content">
+                <div className="examy-blog-eyebrow">
+                  <div className="examy-blog-eyebrow-dot"></div>
+                  <span className="examy-blog-eyebrow-text">مدوّنة اختباري</span>
+                </div>
+                <h1 className="examy-blog-hero-title">
+                  {title === "مدوّنة اختباري التعليمية" || title === "المدوّنة - Examy" ? (
+                    <>
+                      رؤى ومقالات لمعلّمي
+                      <br />
+                      <span>الغد في المملكة</span>
+                    </>
+                  ) : title}
+                </h1>
+                <p className="examy-blog-hero-desc">
+                  {subtitle || "أفكار عملية عن الذكاء الاصطناعي في التعليم، التقويم المتوازن، والمنهج السعودي — من فريق اختباري ونخبة من المعلمين."}
+                </p>
               </div>
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-                gap: 30
-              }}>
-                {posts.map((post, i) => (
-                  <a
-                    key={i}
-                    href={`/blog-details?slug=${post.slug}`}
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      background: "var(--bg-elev-1)",
-                      border: "1px solid var(--border)",
-                      borderRadius: 16,
-                      overflow: "hidden",
-                      textDecoration: "none",
-                      color: "inherit",
-                      transition: "transform 0.2s ease, border-color 0.2s ease",
-                    }}
-                  >
-                    {post.image && (
-                      <div style={{ height: 200, overflow: "hidden", position: "relative" }}>
-                        <img
-                          src={post.image}
-                          alt={post.title}
-                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                        />
+            </section>
+            <div className="examy-blog-main-wrapper">
+              
+              {/* Featured Post Card */}
+              {featuredPost && (
+                <Link href={`/blog-details?slug=${featuredPost.slug}`} className="examy-blog-featured-card">
+                  <div className="examy-blog-featured-image-wrapper">
+                    {featuredPost.image ? (
+                      <img src={featuredPost.image} alt={featuredPost.title} />
+                    ) : (
+                      <div className="examy-blog-placeholder-image">
+                        {getPostIcon(featuredPost.title, "rgba(0, 224, 138, 0.16)", 190)}
                       </div>
                     )}
-                    <div style={{ padding: 24, display: "flex", flexDirection: "column", flex: 1 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--text-muted)", marginBottom: 12 }}>
-                        <span>{post.author}</span>
-                        <span>{post.date}</span>
-                      </div>
-                      <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 10, color: "#ffffff", lineHeight: 1.4 }}>{post.title}</h3>
-                      <p style={{ color: "var(--text-muted)", fontSize: 14.5, lineHeight: 1.6, flex: 1 }}>{post.description}</p>
-                      <div style={{ marginTop: 20, color: "var(--brand)", fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}>
-                        اقرأ المزيد <span>←</span>
-                      </div>
+                    <div className="examy-blog-floating-badge">مقال مميز</div>
+                  </div>
+                  <div className="examy-blog-featured-text-wrapper">
+                    <div className="examy-blog-featured-eyebrow-row">
+                      <span className="examy-blog-featured-eyebrow">مقال مميّز</span>
+                      <div className="examy-blog-eyebrow-dot" style={{ marginRight: 8, marginLeft: 0 }}></div>
                     </div>
-                  </a>
-                ))}
-              </div>
+                    <h2 className="examy-blog-featured-title">{featuredPost.title}</h2>
+                    <p className="examy-blog-featured-desc">{featuredPost.description}</p>
+                    <span className="examy-blog-meta-date">{featuredPost.date}</span>
+                    <div className="examy-blog-read-article-btn">
+                      اقرأ المقال
+                      <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                      </svg>
+                    </div>
+                  </div>
+                </Link>
+              )}
+
+              {/* Grid of Regular Posts */}
+              {filteredPosts.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "60px 0", color: "rgba(232, 241, 238, 0.62)", fontSize: 16 }}>
+                  لا توجد مقالات تطابق خيارات البحث الحالية.
+                </div>
+              ) : (
+                <div className="examy-blog-grid">
+                  {regularPosts.map((post, i) => {
+                    const cat = getCategoryDetails(post.title || "", post.description || "");
+                    return (
+                      <Link
+                        key={i}
+                        href={`/blog-details?slug=${post.slug}`}
+                        className="examy-blog-card"
+                      >
+                        <div className="examy-blog-card-image">
+                          {post.image ? (
+                            <img src={post.image} alt={post.title} />
+                          ) : (
+                            <div className="examy-blog-placeholder-card-image">
+                              {getPostIcon(post.title || "", cat.color, 130)}
+                            </div>
+                          )}
+                        </div>
+                        <div className="examy-blog-card-body">
+                          <h3 className="examy-blog-card-title">{post.title}</h3>
+                          <p className="examy-blog-card-desc">{post.description}</p>
+                          <div className="examy-blog-card-footer">
+                            <span className="examy-blog-meta-date">{post.date}</span>
+                            {cat.name === 'نصائح للمعلمين' && (
+                              <span className="examy-blog-footer-author-name">أ. منيرة العتيبي</span>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          </section>
+          </div>
         );
       }
     },
@@ -4620,42 +5110,141 @@ export const config: Config<PuckConfig> = {
         date: "26 يونيو 2026",
         author: "أ. سارة الحربي",
         image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop",
-        content: `دخل الذكاء الاصطناعي قطاع التعليم كأداة ثورية تهدف لمساعدة المعلمين وتحسين جودة مخرجات التعليم. في المناهج السعودية الحديثة، يواجه المعلمون تحديات في تصميم اختبارات تقيس بشكل دقيق مخرجات التعلم المتنوعة.
-
-من هنا تأتي أهمية أدوات الذكاء الاصطناعي التوليدي التي تُمكّن المعلم من إنشاء اختبارات شاملة مبنية على مستويات بلوم المعرفية في ثوانٍ معدودة.
-
-أهم الفوائد التي تجنيها البيئة التعليمية:
-1. توفير وقت الإعداد والتحضير للتركيز على التدريس الفعلي.
-2. أسئلة منوعة تتوافق بدقة مع المنهج والدروس المقررة.
-3. التقييم العادل والمستمر لمستوى الطلاب الدراسي.
-
-تعد منصة "اختباري" خطوة رائدة في هذا الاتجاه لتوفير حلول ذكاء اصطناعي وطنية مستضافة داخل المملكة لتخدم المعلم والطالب السعودي بأمان وكفاءة.`
+        content: ""
       },
       render: ({ title, subtitle, date, author, image, content = "" }) => {
         return (
-          <article style={{ padding: "80px 24px", direction: "rtl", color: "#ffffff" }}>
-            <div style={{ maxWidth: 800, margin: "0 auto" }}>
-              <div style={{ marginBottom: 40, textAlign: "center" }}>
-                <h1 style={{ fontSize: "clamp(30px, 5vw, 48px)", fontWeight: 800, lineHeight: 1.3, marginBottom: 20 }}>{title}</h1>
-                <div style={{ display: "flex", justifyContent: "center", gap: 20, color: "var(--text-muted)", fontSize: 14 }}>
-                  <span>بواسطة: {author}</span>
-                  <span>|</span>
-                  <span>{date}</span>
-                </div>
+          <article style={{ padding: "120px 24px 80px", direction: "rtl", color: "var(--text)", position: "relative" }}>
+            <div className="grid-bg" />
+            
+            <style>{`
+              .blog-rich-content p {
+                margin-bottom: 20px;
+                font-size: 16px;
+                line-height: 1.8;
+                color: var(--text-muted);
+              }
+              .blog-rich-content h2 {
+                margin-top: 36px;
+                margin-bottom: 16px;
+                font-size: 22px;
+                font-weight: 800;
+                color: var(--text);
+              }
+              .blog-rich-content h3 {
+                margin-top: 30px;
+                margin-bottom: 12px;
+                font-size: 19px;
+                font-weight: 700;
+                color: var(--text);
+              }
+              .blog-rich-content ul, .blog-rich-content ol {
+                margin-bottom: 20px;
+                padding-right: 24px;
+                list-style-position: inside;
+              }
+              .blog-rich-content li {
+                margin-bottom: 8px;
+                font-size: 15.5px;
+                color: var(--text-muted);
+              }
+              .blog-rich-content strong {
+                color: var(--text);
+                font-weight: 700;
+              }
+              .blog-rich-content a {
+                color: var(--brand);
+                text-decoration: underline;
+              }
+            `}</style>
+
+            <div style={{ maxWidth: 800, margin: "0 auto", position: "relative", zIndex: 2 }}>
+              <a href="/blogs" style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                color: "var(--brand)",
+                textDecoration: "none",
+                fontSize: 14,
+                fontWeight: 600,
+                marginBottom: 32,
+                transition: "transform 0.2s ease"
+              }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = "translateX(-4px)"}
+                onMouseLeave={(e) => e.currentTarget.style.transform = "translateX(0)"}
+              >
+                <span>→</span> العودة للمدوّنة
+              </a>
+
+              <h1 style={{
+                fontSize: "clamp(26px, 4vw, 42px)",
+                fontWeight: "900",
+                lineHeight: 1.3,
+                color: "var(--text)",
+                marginBottom: 20
+              }}>
+                {title}
+              </h1>
+
+              <div style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 16,
+                color: "var(--text-muted)",
+                fontSize: 13,
+                marginBottom: 32,
+                borderBottom: "1px solid var(--border)",
+                paddingBottom: 16
+              }}>
+                <span>الكاتب: <strong>{author}</strong></span>
+                <span style={{ color: "var(--border-strong)" }}>|</span>
+                <span>تاريخ النشر: <strong>{date}</strong></span>
               </div>
+
               {image && (
-                <div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 40 }}>
+                <div style={{
+                  position: "relative",
+                  borderRadius: 20,
+                  overflow: "hidden",
+                  marginBottom: 40,
+                  border: "1px solid var(--border)",
+                  boxShadow: "0 16px 40px rgba(0,0,0,0.3)"
+                }}>
                   <img src={image} alt={title} style={{ width: "100%", height: "auto", display: "block" }} />
+                  <div style={{
+                    position: "absolute",
+                    inset: 0,
+                    backgroundImage: "linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px)",
+                    backgroundSize: "28px 28px",
+                    pointerEvents: "none"
+                  }} />
                 </div>
               )}
+
               {subtitle && (
-                <p style={{ fontSize: 18, lineHeight: 1.6, color: "var(--brand)", fontWeight: 500, marginBottom: 30, paddingRight: 16, borderRight: "4px solid var(--brand)" }}>
+                <div style={{
+                  fontSize: 18,
+                  lineHeight: 1.6,
+                  color: "var(--brand)",
+                  fontWeight: 600,
+                  marginBottom: 36,
+                  paddingRight: 20,
+                  borderRight: "4px solid var(--brand)",
+                  background: "rgba(0, 224, 138, 0.03)",
+                  paddingTop: 12,
+                  paddingBottom: 12,
+                  borderRadius: "0 8px 8px 0"
+                }}>
                   {subtitle}
-                </p>
+                </div>
               )}
-              <div style={{ fontSize: 16, lineHeight: 1.8, color: "var(--text-muted)", whiteSpace: "pre-line" }}>
-                {content}
-              </div>
+
+              <div 
+                className="blog-rich-content"
+                style={{ fontSize: 16, lineHeight: 1.8, color: "var(--text-muted)" }} 
+                dangerouslySetInnerHTML={{ __html: content }} 
+              />
+
               <div style={{ marginTop: 50, paddingTop: 30, borderTop: "1px solid var(--border)", display: "flex", justifyContent: "space-between" }}>
                 <a href="/blogs" style={{ color: "var(--brand)", textDecoration: "none", fontWeight: 700 }}>
                   ← العودة للمدوّنة

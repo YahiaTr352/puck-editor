@@ -27,12 +27,12 @@ const initialBlogDetailsData = {
       type: "BlogDetails",
       props: {
         id: "blog-details-block",
-        title: (config.components.BlogDetails as any).defaultProps?.title || "",
-        subtitle: (config.components.BlogDetails as any).defaultProps?.subtitle || "",
-        date: (config.components.BlogDetails as any).defaultProps?.date || "",
-        author: (config.components.BlogDetails as any).defaultProps?.author || "",
-        image: (config.components.BlogDetails as any).defaultProps?.image || "",
-        content: (config.components.BlogDetails as any).defaultProps?.content || ""
+        title: "كيف يغير الذكاء الاصطناعي طرق التدريس في المدارس السعودية؟",
+        subtitle: "دراسة شاملة عن أثر تقنيات الذكاء الاصطناعي التوليدي في تحسين جودة التعليم وتخفيف الأعباء الإدارية عن كاهل المعلمين.",
+        date: "26 يونيو 2026",
+        author: "أ. سارة الحربي",
+        image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop",
+        content: ""
       }
     },
     {
@@ -113,18 +113,56 @@ function BlogDetailsAdminContent() {
               }
               if (item.type === "BlogDetails") {
                 const updatedProps = { ...item.props };
-                const defs = (config.components.BlogDetails as any).defaultProps || {};
+                const defs = {
+                  title: "كيف يغير الذكاء الاصطناعي طرق التدريس في المدارس السعودية؟",
+                  subtitle: "دراسة شاملة عن أثر تقنيات الذكاء الاصطناعي التوليدي في تحسين جودة التعليم وتخفيف الأعباء الإدارية عن كاهل المعلمين.",
+                  date: "26 يونيو 2026",
+                  author: "أ. سارة الحربي",
+                  image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop",
+                  content: ""
+                };
                 Object.keys(defs).forEach(key => {
                   const val = updatedProps[key];
                   if (val === undefined || val === null || val === "") {
-                    updatedProps[key] = defs[key];
+                    updatedProps[key] = (defs as any)[key];
                   }
                 });
                 return { ...item, props: updatedProps };
               }
               if (item.type === "Footer") {
                 const updatedProps = { ...item.props };
-                const defs = (config.components.Footer as any).defaultProps || {};
+                const defs = {
+                  description: "منصة سعودية مدعومة بالذكاء الاصطناعي لإنشاء وإدارة الاختبارات، مرتبطة بالمنهج السعودي.",
+                  twitterUrl: "https://x.com/examyai",
+                  instagramUrl: "https://www.instagram.com/examy.ai/",
+                  col1Title: "المنتج",
+                  col1Links: [
+                    { label: "الميزات", href: "#" },
+                    { label: "كيف يعمل", href: "#" },
+                    { label: "القوالب الجاهزة", href: "#" }
+                  ],
+                  col2Title: "لمن",
+                  col2Links: [
+                    { label: "للمعلمين", href: "#" },
+                    { label: "للمدارس", href: "#" },
+                    { label: "للجامعات", href: "#" },
+                    { label: "للجهات التعليمية", href: "#" }
+                  ],
+                  col3Title: "موارد",
+                  col3Links: [
+                    { label: "مركز المساعدة", href: "#" },
+                    { label: "المدوّنة", href: "#" },
+                    { label: "عن اختباري", href: "#" },
+                    { label: "تواصل معنا", href: "#" }
+                  ],
+                  col4Title: "الشركة",
+                  col4Links: [
+                    { label: "سياسة الخصوصية", href: "#" },
+                    { label: "الشروط والأحكام", href: "#" }
+                  ],
+                  copyrightText: "© ٢٠٢٦ اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦",
+                  statusText: "توليد ذكي وموثوق"
+                };
                 Object.keys(defs).forEach(key => {
                   const val = updatedProps[key];
                   if (
@@ -133,7 +171,7 @@ function BlogDetailsAdminContent() {
                     val === "" ||
                     (Array.isArray(val) && val.length === 0)
                   ) {
-                    updatedProps[key] = defs[key];
+                    updatedProps[key] = (defs as any)[key];
                   }
                 });
                 return { ...item, props: updatedProps };
@@ -232,8 +270,12 @@ function BlogDetailsAdminContent() {
   }
 
   const blogDetailsConfig = { ...config } as any;
-  const { Nav, BlogDetails, Footer } = config.components;
-  blogDetailsConfig.components = { Nav, BlogDetails, Footer };
+  const puckComponents = config.components || {};
+  blogDetailsConfig.components = {
+    Nav: puckComponents.Nav,
+    BlogDetails: puckComponents.BlogDetails,
+    Footer: puckComponents.Footer
+  };
 
   return (
     <div style={{ height: "100vh", direction: "ltr" }} className="puck-editor-theme-override">

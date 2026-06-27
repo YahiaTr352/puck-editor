@@ -503,7 +503,8 @@ export default function HomeAdminEditor() {
   }
 
   const homeConfig = { ...config } as any;
-  const { FAQ, ...restComponents } = config.components;
+  const puckComponents = config.components || {};
+  const { FAQ, ...restComponents } = puckComponents;
   homeConfig.components = restComponents;
 
   return (

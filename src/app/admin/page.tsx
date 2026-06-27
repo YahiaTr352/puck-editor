@@ -197,7 +197,7 @@ const faqFallbackData = {
       type: "FAQ",
       props: {
         id: "faq-block",
-        categories: (config.components.FAQ as any).defaultProps?.categories || []
+        categories: []
       }
     },
     {
@@ -234,9 +234,9 @@ const blogsFallbackData = {
       type: "BlogList",
       props: {
         id: "blogs-block",
-        title: (config.components.BlogList as any).defaultProps?.title || "",
-        subtitle: (config.components.BlogList as any).defaultProps?.subtitle || "",
-        posts: (config.components.BlogList as any).defaultProps?.posts || []
+        title: "مدوّنة اختباري التعليمية",
+        subtitle: "نصائح وإرشادات تعليمية، مقالات متخصصة في الذكاء الاصطناعي والتقويم المدرسي لمساعدتك على التفوق.",
+        posts: []
       }
     },
     {
@@ -273,12 +273,12 @@ const blogDetailsFallbackData = {
       type: "BlogDetails",
       props: {
         id: "blog-details-block",
-        title: (config.components.BlogDetails as any).defaultProps?.title || "",
-        subtitle: (config.components.BlogDetails as any).defaultProps?.subtitle || "",
-        date: (config.components.BlogDetails as any).defaultProps?.date || "",
-        author: (config.components.BlogDetails as any).defaultProps?.author || "",
-        image: (config.components.BlogDetails as any).defaultProps?.image || "",
-        content: (config.components.BlogDetails as any).defaultProps?.content || ""
+        title: "كيف يغير الذكاء الاصطناعي طرق التدريس في المدارس السعودية؟",
+        subtitle: "دراسة شاملة عن أثر تقنيات الذكاء الاصطناعي التوليدي في تحسين جودة التعليم وتخفيف الأعباء الإدارية عن كاهل المعلمين.",
+        date: "26 يونيو 2026",
+        author: "أ. سارة الحربي",
+        image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop",
+        content: ""
       }
     },
     {
@@ -364,19 +364,50 @@ function AdminEditorContent() {
              if (item.type === "FAQ") {
               const updatedProps = { ...item.props };
               if (!updatedProps.categories || updatedProps.categories.length === 0) {
-                updatedProps.categories = (config.components.FAQ as any).defaultProps?.categories || [];
+                updatedProps.categories = [];
               }
               if (updatedProps.title === undefined || updatedProps.title === "") {
-                updatedProps.title = (config.components.FAQ as any).defaultProps?.title || "";
+                updatedProps.title = "كل ما تريد معرفته عن اختباري";
               }
               if (updatedProps.subtitle === undefined || updatedProps.subtitle === "") {
-                updatedProps.subtitle = (config.components.FAQ as any).defaultProps?.subtitle || "";
+                updatedProps.subtitle = "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات، التصحيح، التخصيص، والأسعار. لم تجد إجابتك؟ فريقنا جاهز لمساعدتك.";
               }
               return { ...item, props: updatedProps };
             }
             if (item.type === "Footer") {
               const updatedProps = { ...item.props };
-              const defs = (config.components.Footer as any).defaultProps || {};
+              const defs = {
+                description: "منصة سعودية مدعومة بالذكاء الاصطناعي لإنشاء وإدارة الاختبارات، مرتبطة بالمنهج السعودي.",
+                twitterUrl: "https://x.com/examyai",
+                instagramUrl: "https://www.instagram.com/examy.ai/",
+                col1Title: "المنتج",
+                col1Links: [
+                  { label: "الميزات", href: "#" },
+                  { label: "كيف يعمل", href: "#" },
+                  { label: "القوالب الجاهزة", href: "#" }
+                ],
+                col2Title: "لمن",
+                col2Links: [
+                  { label: "للمعلمين", href: "#" },
+                  { label: "للمدارس", href: "#" },
+                  { label: "للجامعات", href: "#" },
+                  { label: "للجهات التعليمية", href: "#" }
+                ],
+                col3Title: "موارد",
+                col3Links: [
+                  { label: "مركز المساعدة", href: "#" },
+                  { label: "المدوّنة", href: "#" },
+                  { label: "عن اختباري", href: "#" },
+                  { label: "تواصل معنا", href: "#" }
+                ],
+                col4Title: "الشركة",
+                col4Links: [
+                  { label: "سياسة الخصوصية", href: "#" },
+                  { label: "الشروط والأحكام", href: "#" }
+                ],
+                copyrightText: "© ٢٠٢٦ اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦",
+                statusText: "توليد ذكي وموثوق"
+              };
               Object.keys(defs).forEach(key => {
                 const val = updatedProps[key];
                 if (
@@ -385,7 +416,7 @@ function AdminEditorContent() {
                   val === "" ||
                   (Array.isArray(val) && val.length === 0)
                 ) {
-                  updatedProps[key] = defs[key];
+                  updatedProps[key] = (defs as any)[key];
                 }
               });
               return { ...item, props: updatedProps };
@@ -463,18 +494,16 @@ function AdminEditorContent() {
   }
 
   const editorConfig = { ...config } as any;
+  const puckComponents = config.components || {};
   if (slug === "home") {
-    const { FAQ, BlogList, BlogDetails, ...restComponents } = config.components;
+    const { FAQ, BlogList, BlogDetails, ...restComponents } = puckComponents;
     editorConfig.components = restComponents;
   } else if (slug === "faq") {
-    const { Nav, FAQ, Footer } = config.components;
-    editorConfig.components = { Nav, FAQ, Footer };
+    editorConfig.components = { Nav: puckComponents.Nav, FAQ: puckComponents.FAQ, Footer: puckComponents.Footer };
   } else if (slug === "blogs") {
-    const { Nav, BlogList, Footer } = config.components;
-    editorConfig.components = { Nav, BlogList, Footer };
+    editorConfig.components = { Nav: puckComponents.Nav, BlogList: puckComponents.BlogList, Footer: puckComponents.Footer };
   } else if (slug === "blog-details") {
-    const { Nav, BlogDetails, Footer } = config.components;
-    editorConfig.components = { Nav, BlogDetails, Footer };
+    editorConfig.components = { Nav: puckComponents.Nav, BlogDetails: puckComponents.BlogDetails, Footer: puckComponents.Footer };
   }
 
   return (

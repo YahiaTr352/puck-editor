@@ -26,9 +26,9 @@ const initialBlogsData = {
       type: "BlogList",
       props: {
         id: "blogs-block",
-        title: (config.components.BlogList as any).defaultProps?.title || "",
-        subtitle: (config.components.BlogList as any).defaultProps?.subtitle || "",
-        posts: (config.components.BlogList as any).defaultProps?.posts || []
+        title: "مدوّنة اختباري التعليمية",
+        subtitle: "نصائح وإرشادات تعليمية، مقالات متخصصة في الذكاء الاصطناعي والتقويم المدرسي لمساعدتك على التفوق.",
+        posts: []
       }
     },
     {
@@ -107,19 +107,50 @@ export default function BlogsAdminEditor() {
               if (item.type === "BlogList") {
                 const updatedProps = { ...item.props };
                 if (!updatedProps.posts || updatedProps.posts.length === 0) {
-                  updatedProps.posts = (config.components.BlogList as any).defaultProps?.posts || [];
+                  updatedProps.posts = [];
                 }
                 if (updatedProps.title === undefined || updatedProps.title === "") {
-                  updatedProps.title = (config.components.BlogList as any).defaultProps?.title || "";
+                  updatedProps.title = "مدوّنة اختباري التعليمية";
                 }
                 if (updatedProps.subtitle === undefined || updatedProps.subtitle === "") {
-                  updatedProps.subtitle = (config.components.BlogList as any).defaultProps?.subtitle || "";
+                  updatedProps.subtitle = "نصائح وإرشادات تعليمية، مقالات متخصصة في الذكاء الاصطناعي والتقويم المدرسي لمساعدتك على التفوق.";
                 }
                 return { ...item, props: updatedProps };
               }
               if (item.type === "Footer") {
                 const updatedProps = { ...item.props };
-                const defs = (config.components.Footer as any).defaultProps || {};
+                const defs = {
+                  description: "منصة سعودية مدعومة بالذكاء الاصطناعي لإنشاء وإدارة الاختبارات، مرتبطة بالمنهج السعودي.",
+                  twitterUrl: "https://x.com/examyai",
+                  instagramUrl: "https://www.instagram.com/examy.ai/",
+                  col1Title: "المنتج",
+                  col1Links: [
+                    { label: "الميزات", href: "#" },
+                    { label: "كيف يعمل", href: "#" },
+                    { label: "القوالب الجاهزة", href: "#" }
+                  ],
+                  col2Title: "لمن",
+                  col2Links: [
+                    { label: "للمعلمين", href: "#" },
+                    { label: "للمدارس", href: "#" },
+                    { label: "للجامعات", href: "#" },
+                    { label: "للجهات التعليمية", href: "#" }
+                  ],
+                  col3Title: "موارد",
+                  col3Links: [
+                    { label: "مركز المساعدة", href: "#" },
+                    { label: "المدوّنة", href: "#" },
+                    { label: "عن اختباري", href: "#" },
+                    { label: "تواصل معنا", href: "#" }
+                  ],
+                  col4Title: "الشركة",
+                  col4Links: [
+                    { label: "سياسة الخصوصية", href: "#" },
+                    { label: "الشروط والأحكام", href: "#" }
+                  ],
+                  copyrightText: "© ٢٠٢٦ اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦",
+                  statusText: "توليد ذكي وموثوق"
+                };
                 Object.keys(defs).forEach(key => {
                   const val = updatedProps[key];
                   if (
@@ -128,7 +159,7 @@ export default function BlogsAdminEditor() {
                     val === "" ||
                     (Array.isArray(val) && val.length === 0)
                   ) {
-                    updatedProps[key] = defs[key];
+                    updatedProps[key] = (defs as any)[key];
                   }
                 });
                 return { ...item, props: updatedProps };
@@ -180,8 +211,12 @@ export default function BlogsAdminEditor() {
   }
 
   const blogsConfig = { ...config } as any;
-  const { Nav, BlogList, Footer } = config.components;
-  blogsConfig.components = { Nav, BlogList, Footer };
+  const puckComponents = config.components || {};
+  blogsConfig.components = {
+    Nav: puckComponents.Nav,
+    BlogList: puckComponents.BlogList,
+    Footer: puckComponents.Footer
+  };
 
   return (
     <div style={{ height: "100vh", direction: "ltr" }} className="puck-editor-theme-override">

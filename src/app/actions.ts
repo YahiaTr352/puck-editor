@@ -9,7 +9,7 @@ import config from '@payload-config';
 export async function getPageData(slug: string) {
   try {
     const payload = await getPayload({ config });
-    const result = await payload.find({
+    let result = await payload.find({
       collection: 'pages',
       where: {
         slug: {
@@ -17,6 +17,21 @@ export async function getPageData(slug: string) {
         },
       },
       draft: true, // Fetch drafts too if versions drafts are enabled
+    });
+
+    if (result.docs.length > 0) {
+      return result.docs[0];
+    }
+
+    // Fallback to published-only query if no draft is found (e.g., raw SQL inserts)
+    result = await payload.find({
+      collection: 'pages',
+      where: {
+        slug: {
+          equals: slug,
+        },
+      },
+      draft: false,
     });
 
     if (result.docs.length > 0) {
