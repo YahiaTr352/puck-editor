@@ -11,7 +11,21 @@ async function run() {
   });
 
   if (existingUsers.docs.length > 0) {
-    console.log(`A user already exists in the database: ${existingUsers.docs[0].email}`);
+    console.log(`A user already exists in the database: ${existingUsers.docs[0].email}. Resetting password to password123...`);
+    await payload.update({
+      collection: 'users',
+      where: {
+        email: {
+          equals: 'admin@examy.ai',
+        },
+      },
+      data: {
+        password: 'password123',
+      },
+    });
+    console.log(`SUCCESS: Admin user password updated!`);
+    console.log(`Email: admin@examy.ai`);
+    console.log(`Password: password123`);
     process.exit(0);
   }
 

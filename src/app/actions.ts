@@ -283,6 +283,7 @@ export async function getPagesList() {
       slug: doc.slug,
       title: doc.title,
       updatedAt: doc.updatedAt,
+      status: doc.status || 'published',
     }));
   } catch (error) {
     console.error('Error fetching pages list:', error);
