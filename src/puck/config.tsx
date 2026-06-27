@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Config } from "@puckeditor/core";
+import { Config, createUsePuck } from "@puckeditor/core";
+
+const usePuck = createUsePuck();
 import { Icon } from "./icons";
 import { AmbientBackground } from "../components/AmbientBackground";
 import { LiveActivity } from "../components/LiveActivity";
@@ -1251,6 +1253,7 @@ export type PuckConfig = {
         date?: string;
         author?: string;
         slug: string;
+        editBtn?: any;
       }[];
     };
     BlogDetails: {
@@ -4520,6 +4523,55 @@ export const config: Config<PuckConfig> = {
             date: { type: "text", label: "التاريخ" },
             author: { type: "text", label: "الكاتب" },
             slug: { type: "text", label: "معرّف المقالة (Slug)" },
+            editBtn: {
+              type: "custom",
+              label: "تعديل المحتوى التفصيلي",
+              render: ({ name }) => {
+                const selectedItem = usePuck((s) => s.selectedItem);
+                const posts = selectedItem?.props?.posts || [];
+                const match = name.match(/posts[\.\[](\d+)/);
+                const index = match ? parseInt(match[1]) : -1;
+                const post = posts[index];
+                const slug = post?.slug || "";
+
+                if (!slug) {
+                  return (
+                    <div style={{ color: "#ef4444", fontSize: 11, padding: "6px 0", fontWeight: 600, fontFamily: "'Cairo', sans-serif" }}>
+                      ⚠️ يرجى إدخال معرّف المقال (Slug) أولاً لتوليد رابط التعديل.
+                    </div>
+                  );
+                }
+
+                return (
+                  <div style={{ marginTop: 8, marginBottom: 8 }}>
+                    <a
+                      href={`/admin/blog-details?slug=${slug}`}
+                      target="_parent"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                        backgroundColor: "#00E08A",
+                        color: "#07100E",
+                        padding: "8px 14px",
+                        borderRadius: 6,
+                        fontWeight: 700,
+                        fontSize: 12,
+                        textDecoration: "none",
+                        transition: "opacity 0.2s",
+                        cursor: "pointer",
+                        fontFamily: "'Cairo', sans-serif",
+                        boxShadow: "0 2px 6px rgba(0, 224, 138, 0.2)"
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.opacity = "0.85"}
+                      onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
+                    >
+                      ✏️ الذهاب لمحرر المقال
+                    </a>
+                  </div>
+                );
+              }
+            }
           },
           defaultItemProps: {
             title: "عنوان المقالة الجديدة",
@@ -4540,6 +4592,11 @@ export const config: Config<PuckConfig> = {
       render: ({ eyebrow = "مدوّنة اختباري", title, subtitle, posts = [] }) => {
         const [searchQuery, setSearchQuery] = useState("");
         const [selectedCategory, setSelectedCategory] = useState("الكل");
+        const [isMounted, setIsMounted] = useState(false);
+
+        useEffect(() => {
+          setIsMounted(true);
+        }, []);
 
         const getCategoryDetails = (postTitle: string, postDesc: string) => {
           const text = `${postTitle} ${postDesc}`.toLowerCase();
@@ -5027,33 +5084,69 @@ export const config: Config<PuckConfig> = {
               
               {/* Featured Post Card */}
               {featuredPost && (
-                <Link href={`/blog-details?slug=${featuredPost.slug}`} className="examy-blog-featured-card">
-                  <div className="examy-blog-featured-image-wrapper">
-                    {featuredPost.image ? (
-                      <img src={featuredPost.image} alt={featuredPost.title} />
-                    ) : (
-                      <div className="examy-blog-placeholder-image">
-                        {getPostIcon(featuredPost.title, "rgba(0, 224, 138, 0.16)", 190)}
+                <div style={{ position: "relative", width: "100%" }}>
+                  <Link href={`/blog-details?slug=${featuredPost.slug}`} className="examy-blog-featured-card">
+                    <div className="examy-blog-featured-image-wrapper">
+                      {featuredPost.image ? (
+                        <img src={featuredPost.image} alt={featuredPost.title} />
+                      ) : (
+                        <div className="examy-blog-placeholder-image">
+                          {getPostIcon(featuredPost.title, "rgba(0, 224, 138, 0.16)", 190)}
+                        </div>
+                      )}
+                      <div className="examy-blog-floating-badge">مقال مميز</div>
+                    </div>
+                    <div className="examy-blog-featured-text-wrapper">
+                      <div className="examy-blog-featured-eyebrow-row">
+                        <span className="examy-blog-featured-eyebrow">مقال مميّز</span>
+                        <div className="examy-blog-eyebrow-dot" style={{ marginRight: 8, marginLeft: 0 }}></div>
                       </div>
-                    )}
-                    <div className="examy-blog-floating-badge">مقال مميز</div>
-                  </div>
-                  <div className="examy-blog-featured-text-wrapper">
-                    <div className="examy-blog-featured-eyebrow-row">
-                      <span className="examy-blog-featured-eyebrow">مقال مميّز</span>
-                      <div className="examy-blog-eyebrow-dot" style={{ marginRight: 8, marginLeft: 0 }}></div>
+                      <h2 className="examy-blog-featured-title">{featuredPost.title}</h2>
+                      <p className="examy-blog-featured-desc">{featuredPost.description}</p>
+                      <span className="examy-blog-meta-date">{featuredPost.date}</span>
+                      <div className="examy-blog-read-article-btn">
+                        اقرأ المقال
+                        <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                          <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                      </div>
                     </div>
-                    <h2 className="examy-blog-featured-title">{featuredPost.title}</h2>
-                    <p className="examy-blog-featured-desc">{featuredPost.description}</p>
-                    <span className="examy-blog-meta-date">{featuredPost.date}</span>
-                    <div className="examy-blog-read-article-btn">
-                      اقرأ المقال
-                      <svg viewBox="0 0 24 24" fill="none" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-                        <path d="M19 12H5M12 19l-7-7 7-7"/>
-                      </svg>
-                    </div>
-                  </div>
-                </Link>
+                  </Link>
+                  {isMounted && (
+                    <a 
+                      href={`/admin/blog-details?slug=${featuredPost.slug}`} 
+                      target={window.parent !== window ? "_parent" : "_self"}
+                      style={{
+                        position: "absolute",
+                        top: 16,
+                        left: 16,
+                        backgroundColor: "#00E08A",
+                        color: "#07100E",
+                        padding: "8px 16px",
+                        borderRadius: 8,
+                        fontWeight: 700,
+                        fontSize: 13,
+                        textDecoration: "none",
+                        zIndex: 9999,
+                        boxShadow: "0 4px 12px rgba(0, 224, 138, 0.4)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                        fontFamily: "'Cairo', sans-serif",
+                        transition: "transform 0.2s ease",
+                        pointerEvents: "auto",
+                        cursor: "pointer"
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                      onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      <span>تعديل المقالة ✏️</span>
+                    </a>
+                  )}
+                </div>
               )}
 
               {/* Grid of Regular Posts */}
@@ -5066,31 +5159,67 @@ export const config: Config<PuckConfig> = {
                   {regularPosts.map((post, i) => {
                     const cat = getCategoryDetails(post.title || "", post.description || "");
                     return (
-                      <Link
-                        key={i}
-                        href={`/blog-details?slug=${post.slug}`}
-                        className="examy-blog-card"
-                      >
-                        <div className="examy-blog-card-image">
-                          {post.image ? (
-                            <img src={post.image} alt={post.title} />
-                          ) : (
-                            <div className="examy-blog-placeholder-card-image">
-                              {getPostIcon(post.title || "", cat.color, 130)}
-                            </div>
-                          )}
-                        </div>
-                        <div className="examy-blog-card-body">
-                          <h3 className="examy-blog-card-title">{post.title}</h3>
-                          <p className="examy-blog-card-desc">{post.description}</p>
-                          <div className="examy-blog-card-footer">
-                            <span className="examy-blog-meta-date">{post.date}</span>
-                            {cat.name === 'نصائح للمعلمين' && (
-                              <span className="examy-blog-footer-author-name">أ. منيرة العتيبي</span>
+                      <div key={i} style={{ position: "relative", width: "100%" }}>
+                        <Link
+                          href={`/blog-details?slug=${post.slug}`}
+                          className="examy-blog-card"
+                          style={{ height: "100%" }}
+                        >
+                          <div className="examy-blog-card-image">
+                            {post.image ? (
+                              <img src={post.image} alt={post.title} />
+                            ) : (
+                              <div className="examy-blog-placeholder-card-image">
+                                {getPostIcon(post.title || "", cat.color, 130)}
+                              </div>
                             )}
                           </div>
-                        </div>
-                      </Link>
+                          <div className="examy-blog-card-body">
+                            <h3 className="examy-blog-card-title">{post.title}</h3>
+                            <p className="examy-blog-card-desc">{post.description}</p>
+                            <div className="examy-blog-card-footer">
+                              <span className="examy-blog-meta-date">{post.date}</span>
+                              {cat.name === 'نصائح للمعلمين' && (
+                                <span className="examy-blog-footer-author-name">أ. منيرة العتيبي</span>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                        {isMounted && (
+                          <a 
+                            href={`/admin/blog-details?slug=${post.slug}`} 
+                            target={window.parent !== window ? "_parent" : "_self"}
+                            style={{
+                              position: "absolute",
+                              top: 12,
+                              left: 12,
+                              backgroundColor: "#00E08A",
+                              color: "#07100E",
+                              padding: "5px 11px",
+                              borderRadius: 6,
+                              fontWeight: 700,
+                              fontSize: 11.5,
+                              textDecoration: "none",
+                              zIndex: 9999,
+                              boxShadow: "0 4px 10px rgba(0, 224, 138, 0.4)",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 4,
+                              fontFamily: "'Cairo', sans-serif",
+                              transition: "transform 0.2s ease",
+                              pointerEvents: "auto",
+                              cursor: "pointer"
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                            onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                          >
+                            <span>تعديل ✏️</span>
+                          </a>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
