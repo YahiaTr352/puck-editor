@@ -11,7 +11,7 @@ async function run() {
         equals: 'blogs'
       }
     },
-    draft: true
+    draft: false
   });
 
   if (result.docs.length === 0) {

@@ -81,7 +81,8 @@ const initialBlogDetailsData = {
 
 function BlogDetailsAdminContent() {
   const searchParams = useSearchParams();
-  const articleSlug = searchParams.get("slug") || "default";
+  const rawSlug = searchParams.get("slug") || "default";
+  const articleSlug = decodeURIComponent(rawSlug);
   const dbSlug = `blog-details-${articleSlug}`;
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -90,7 +91,7 @@ function BlogDetailsAdminContent() {
     async function loadData() {
       setLoading(true);
       try {
-        const dbData = await getPageData(dbSlug);
+        const dbData = await getPageData(dbSlug, { draft: true });
         if (dbData && dbData.puckData) {
           const parsed = typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData;
           if (parsed.content && Array.isArray(parsed.content)) {

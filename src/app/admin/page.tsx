@@ -567,7 +567,7 @@ function AdminEditorContent({ slug }: { slug: string }) {
     async function loadData() {
       setLoading(true);
       try {
-        const dbData = await getPageData(slug);
+        const dbData = await getPageData(slug, { draft: true });
         let rawData = dbData && dbData.puckData 
           ? (typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData)
           : (slug === "faq" ? faqFallbackData : slug === "blogs" ? blogsFallbackData : initialData);
@@ -576,7 +576,7 @@ function AdminEditorContent({ slug }: { slug: string }) {
           let posts: any[] = [];
           if (slug === "blogs") {
             try {
-              posts = await getDynamicBlogsList();
+              posts = await getDynamicBlogsList({ draft: true });
             } catch (err) {
               console.error("Failed to fetch dynamic blogs list for editor:", err);
             }

@@ -56,7 +56,7 @@ type Args = {
 export async function generateMetadata({ searchParams }: Args) {
   try {
     const resolvedSearchParams = await searchParams;
-    const articleSlug = resolvedSearchParams.slug || "default";
+    const articleSlug = decodeURIComponent(resolvedSearchParams.slug || "default");
     const dbData = (await getPageData(`blog-details-${articleSlug}`)) || (await getPageData("blog-details"));
     const puckData = dbData && dbData.puckData 
       ? (typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData)
@@ -80,7 +80,7 @@ export async function generateMetadata({ searchParams }: Args) {
 
 export default async function BlogDetailsPage({ searchParams }: Args) {
   const resolvedSearchParams = await searchParams;
-  const articleSlug = resolvedSearchParams.slug || "default";
+  const articleSlug = decodeURIComponent(resolvedSearchParams.slug || "default");
   
   let data = blogDetailsFallbackData;
 

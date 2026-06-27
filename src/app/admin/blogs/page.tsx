@@ -84,8 +84,8 @@ export default function BlogsAdminEditor() {
     async function loadData() {
       setLoading(true);
       try {
-        const posts = await getDynamicBlogsList();
-        const dbData = await getPageData("blogs");
+        const posts = await getDynamicBlogsList({ draft: true });
+        const dbData = await getPageData("blogs", { draft: true });
         
         let rawData = initialBlogsData;
         if (dbData && dbData.puckData) {
