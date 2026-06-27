@@ -1267,6 +1267,122 @@ export type PuckConfig = {
   };
 };
 
+/* ────────────────────────────────────────────────────────────────────────
+   Visual WYSIWYG HTML Editor for Blog content
+   ──────────────────────────────────────────────────────────────────────── */
+export function SimpleHtmlEditor({ value = "", onChange }: { value: string; onChange: (val: string) => void }) {
+  const editorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.innerHTML !== value) {
+      editorRef.current.innerHTML = value;
+    }
+  }, [value]);
+
+  const handleInput = () => {
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML);
+    }
+  };
+
+  const execCommand = (command: string, arg: string = "") => {
+    document.execCommand(command, false, arg);
+    handleInput();
+  };
+
+  const addLink = () => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0 || selection.toString() === "") {
+      const text = prompt("أدخل نص الرابط (مثال: منصة اختباري):");
+      const url = prompt("أدخل رابط URL (مثال: https://google.com):");
+      if (text && url) {
+        const linkHtml = `<a href="${url}" target="_blank" style="color: #00E08A; text-decoration: underline;">${text}</a>`;
+        execCommand("insertHTML", linkHtml);
+      }
+    } else {
+      const url = prompt("أدخل رابط URL (مثال: https://google.com):");
+      if (url) {
+        execCommand("createLink", url);
+      }
+    }
+  };
+
+  const btnStyle = {
+    backgroundColor: "#ffffff",
+    border: "1px solid #cbd5e1",
+    color: "#0f172a",
+    padding: "6px 10px",
+    borderRadius: 6,
+    fontSize: 12,
+    fontWeight: 600,
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+    fontFamily: "'Cairo', sans-serif"
+  };
+
+  const hoverStyle = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.borderColor = "#00b06c";
+    e.currentTarget.style.color = "#00b06c";
+    e.currentTarget.style.backgroundColor = "#f0fdf4";
+  };
+
+  const leaveStyle = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.borderColor = "#cbd5e1";
+    e.currentTarget.style.color = "#0f172a";
+    e.currentTarget.style.backgroundColor = "#ffffff";
+  };
+
+  return (
+    <div style={{
+      border: "1px solid #cbd5e1",
+      borderRadius: 10,
+      backgroundColor: "#ffffff",
+      overflow: "hidden",
+      marginTop: 8,
+      width: "100%",
+      fontFamily: "'Cairo', sans-serif",
+      direction: "rtl"
+    }}>
+      <div style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 6,
+        padding: 8,
+        borderBottom: "1px solid #cbd5e1",
+        backgroundColor: "#f8fafc"
+      }}>
+        <button type="button" onClick={() => execCommand("bold")} style={btnStyle} onMouseEnter={hoverStyle} onMouseLeave={leaveStyle} title="خط عريض"><b>B</b></button>
+        <button type="button" onClick={() => execCommand("italic")} style={btnStyle} onMouseEnter={hoverStyle} onMouseLeave={leaveStyle} title="خط مائل"><i>I</i></button>
+        <button type="button" onClick={() => execCommand("underline")} style={btnStyle} onMouseEnter={hoverStyle} onMouseLeave={leaveStyle} title="خط تحته"><u>U</u></button>
+        <button type="button" onClick={() => execCommand("formatBlock", "<h2>")} style={btnStyle} onMouseEnter={hoverStyle} onMouseLeave={leaveStyle} title="عنوان رئيسي">H2</button>
+        <button type="button" onClick={() => execCommand("formatBlock", "<h3>")} style={btnStyle} onMouseEnter={hoverStyle} onMouseLeave={leaveStyle} title="عنوان فرعي">H3</button>
+        <button type="button" onClick={() => execCommand("formatBlock", "<p>")} style={btnStyle} onMouseEnter={hoverStyle} onMouseLeave={leaveStyle} title="فقرة">P</button>
+        <button type="button" onClick={() => execCommand("insertUnorderedList")} style={btnStyle} onMouseEnter={hoverStyle} onMouseLeave={leaveStyle} title="قائمة نقطية">قائمة نقطية •</button>
+        <button type="button" onClick={() => execCommand("insertOrderedList")} style={btnStyle} onMouseEnter={hoverStyle} onMouseLeave={leaveStyle} title="قائمة رقمية">قائمة رقمية 1.</button>
+        <button type="button" onClick={() => addLink()} style={btnStyle} onMouseEnter={hoverStyle} onMouseLeave={leaveStyle} title="إضافة رابط">رابط 🔗</button>
+        <button type="button" onClick={() => execCommand("removeFormat")} style={btnStyle} onMouseEnter={hoverStyle} onMouseLeave={leaveStyle} title="مسح التنسيق">مسح ❌</button>
+      </div>
+      <div
+        ref={editorRef}
+        contentEditable
+        onInput={handleInput}
+        style={{
+          minHeight: 200,
+          maxHeight: 400,
+          overflowY: "auto",
+          padding: 14,
+          color: "#0f172a",
+          outline: "none",
+          backgroundColor: "#ffffff",
+          fontSize: 14.5,
+          lineHeight: 1.7,
+          textAlign: "right"
+        }}
+      />
+    </div>
+  );
+}
+
 export const config: Config<PuckConfig> = {
   components: {
     Nav: {
@@ -4525,7 +4641,7 @@ export const config: Config<PuckConfig> = {
             slug: { type: "text", label: "معرّف المقالة (Slug)" },
             editBtn: {
               type: "custom",
-              label: "تعديل المحتوى التفصيلي",
+              label: "الذهاب لتعديل تفاصيل وتصميم المقال",
               render: ({ name }) => {
                 const selectedItem = usePuck((s) => s.selectedItem);
                 const posts = selectedItem?.props?.posts || [];
@@ -4566,7 +4682,7 @@ export const config: Config<PuckConfig> = {
                       onMouseEnter={(e) => e.currentTarget.style.opacity = "0.85"}
                       onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
                     >
-                      ✏️ الذهاب لمحرر المقال
+                      ✏️ تعديل وتنسيق محتوى المقالة
                     </a>
                   </div>
                 );
@@ -5271,7 +5387,13 @@ export const config: Config<PuckConfig> = {
         date: { type: "text", label: "التاريخ" },
         author: { type: "text", label: "الكاتب" },
         image: { type: "text", label: "رابط الصورة الرئيسية" },
-        content: { type: "textarea", label: "محتوى المقالة (يدعم HTML أو فقرات)" }
+        content: {
+          type: "custom",
+          label: "محتوى المقالة (محرر بصري ذكي)",
+          render: ({ value, onChange }) => (
+            <SimpleHtmlEditor value={value || ""} onChange={onChange} />
+          )
+        }
       },
       defaultProps: {
         title: "كيف يغير الذكاء الاصطناعي طرق التدريس في المدارس السعودية؟",
