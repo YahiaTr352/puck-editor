@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Render } from "@puckeditor/core";
-import { config } from "../../puck/config";
+import { config } from "../../../puck/config";
 
 export function BlogsClientView({ data }: { data: any }) {
   return (

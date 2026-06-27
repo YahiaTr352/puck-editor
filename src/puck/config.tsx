@@ -1383,7 +1383,7 @@ export function SimpleHtmlEditor({ value = "", onChange }: { value: string; onCh
   );
 }
 
-export const config: Config<PuckConfig> = {
+export const config: Config<PuckConfig, { title?: string; description?: string }> = {
   components: {
     Nav: {
       fields: {
@@ -5622,6 +5622,10 @@ export const config: Config<PuckConfig> = {
     },
   },
   root: {
+    fields: {
+      title: { type: "text", label: "عنوان الصفحة (SEO Title)" },
+      description: { type: "textarea", label: "وصف الصفحة (SEO Description)" }
+    },
     render: ({ children }) => {
       let pathname = "";
       try {

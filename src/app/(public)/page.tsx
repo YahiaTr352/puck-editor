@@ -1,11 +1,6 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
-import { Render } from "@puckeditor/core";
-import { config } from "../puck/config";
-import { getPageData } from "./actions";
-import { AmbientBackground } from "../components/AmbientBackground";
-import { LiveActivity } from "../components/LiveActivity";
+import React from "react";
+import { getPageData } from "../actions";
+import { HomeClientView } from "./HomeClientView";
 
 const fallbackData = {
   content: [
@@ -176,80 +171,85 @@ const fallbackData = {
   }
 };
 
-export default function Home() {
-  const [data, setData] = useState<any>(fallbackData);
+export async function generateMetadata() {
+  try {
+    const dbData = await getPageData("home");
+    const puckData = dbData && dbData.puckData 
+      ? (typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData)
+      : null;
+    const title = puckData?.root?.props?.title || dbData?.title || "الصفحة الرئيسية - Examy";
+    const heroBlock = puckData?.content?.find((c: any) => c.type === "Hero");
+    const description = puckData?.root?.props?.description || heroBlock?.props?.subtitle || "منصة ذكاء اصطناعي تُولّد الاختبارات وتُديرها وتُحلّل نتائجها حسب المنهج السعودي.";
+    return {
+      title,
+      description,
+    };
+  } catch (e) {
+    return {
+      title: "الصفحة الرئيسية - Examy",
+      description: "منصة سعودية مدعومة بالذكاء اصطناعي لإنشاء وإدارة الاختبارات، مرتبطة بالمنهج السعودي.",
+    };
+  }
+}
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const dbData = await getPageData("home");
-        if (dbData && dbData.puckData) {
-          const parsed = typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData;
-          if (parsed.content) {
-            const migratedContent = parsed.content.map((item: any) => {
-              if (item.type === "Nav") {
-                const updatedProps = { ...item.props };
-                updatedProps.links = [
-                  { label: "المنتج", href: "#features" },
-                  { label: "كيف يعمل", href: "#how_it_works" },
-                  { label: "نماذج واقعية", href: "#actual-models" },
-                  { label: "الأسعار", href: "#pricing" },
-                  { label: "المدوّنة", href: "/blogs" },
-                  { label: "الأسئلة الشائعة", href: "/faq" }
-                ];
-                if (!updatedProps.actions) {
-                  updatedProps.actions = [
-                    { label: "تسجيل دخول", href: "#login", variant: "link" },
-                    { label: updatedProps.ctaText || "ابدأ مجاناً", href: updatedProps.ctaLink || "#cta", variant: "primary" }
-                  ];
-                }
-                return { ...item, props: updatedProps };
-              }
-              if (item.type === "Hero") {
-                const updatedProps = { ...item.props };
-                if (!updatedProps.ctas) {
-                  updatedProps.ctas = [
-                    {
-                      label: updatedProps.primaryCtaText || "ابدأ مجاناً الآن",
-                      href: updatedProps.primaryCtaLink || "#cta",
-                      variant: "primary"
-                    },
-                    {
-                      label: updatedProps.secondaryCtaText || "شاهد كيف يعمل",
-                      href: updatedProps.secondaryCtaLink || "#how",
-                      variant: "secondary"
-                    }
-                  ];
-                }
-                delete updatedProps.primaryCtaText;
-                delete updatedProps.primaryCtaLink;
-                delete updatedProps.secondaryCtaText;
-                delete updatedProps.secondaryCtaLink;
-                return { ...item, props: updatedProps };
-              }
-              return item;
-            });
-            const filteredContent = migratedContent.filter((item: any) => item && item.type !== "FAQ");
-            setData({ ...parsed, content: filteredContent });
-          } else {
-            setData(fallbackData);
+export default async function Home() {
+  let data = fallbackData;
+
+  try {
+    const dbData = await getPageData("home");
+    if (dbData && dbData.puckData) {
+      const parsed = typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData;
+      if (parsed.content) {
+        const migratedContent = parsed.content.map((item: any) => {
+          if (item.type === "Nav") {
+            const updatedProps = { ...item.props };
+            updatedProps.links = [
+              { label: "المنتج", href: "#features" },
+              { label: "كيف يعمل", href: "#how_it_works" },
+              { label: "نماذج واقعية", href: "#actual-models" },
+              { label: "الأسعار", href: "#pricing" },
+              { label: "المدوّنة", href: "/blogs" },
+              { label: "الأسئلة الشائعة", href: "/faq" }
+            ];
+            if (!updatedProps.actions) {
+              updatedProps.actions = [
+                { label: "تسجيل دخول", href: "#login", variant: "link" },
+                { label: updatedProps.ctaText || "ابدأ مجاناً", href: updatedProps.ctaLink || "#cta", variant: "primary" }
+              ];
+            }
+            return { ...item, props: updatedProps };
           }
-        } else {
-          setData(fallbackData);
-        }
-      } catch (e) {
-        console.error("Error loading page data from DB:", e);
-        setData(fallbackData);
+          if (item.type === "Hero") {
+            const updatedProps = { ...item.props };
+            if (!updatedProps.ctas) {
+              updatedProps.ctas = [
+                {
+                  label: updatedProps.primaryCtaText || "ابدأ مجاناً الآن",
+                  href: updatedProps.primaryCtaLink || "#cta",
+                  variant: "primary"
+                },
+                {
+                  label: updatedProps.secondaryCtaText || "شاهد كيف يعمل",
+                  href: updatedProps.secondaryCtaLink || "#how",
+                  variant: "secondary"
+                }
+              ];
+            }
+            delete updatedProps.primaryCtaText;
+            delete updatedProps.primaryCtaLink;
+            delete updatedProps.secondaryCtaText;
+            delete updatedProps.secondaryCtaLink;
+            return { ...item, props: updatedProps };
+          }
+          return item;
+        });
+        const filteredContent = migratedContent.filter((item: any) => item && item.type !== "FAQ");
+        data = { ...parsed, content: filteredContent };
       }
     }
-    load();
-  }, []);
+  } catch (e) {
+    console.error("Error loading page data from DB:", e);
+  }
 
-  return (
-    <div style={{ minHeight: "100vh", position: "relative" }}>
-      <AmbientBackground bgStyle="fluid" intensity={75} blur={60} speed={100} grain={true} mesh={false} />
-      <Render config={config} data={data} />
-      <LiveActivity />
-    </div>
-  );
+  return <HomeClientView data={data} />;
 }

@@ -116,7 +116,7 @@ const faqFallbackData = {
       type: "FAQ",
       props: {
         id: "faq-block",
-        categories: []
+        categories: (config.components.FAQ as any).defaultProps?.categories || []
       }
     },
     {
@@ -286,6 +286,130 @@ const secondaryLeave = (e: React.MouseEvent<HTMLAnchorElement>) => {
 
 // --- dashboard component ---
 function AdminDashboard() {
+  const [pages, setPages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newSlug, setNewSlug] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+
+  const loadPages = async () => {
+    setLoading(true);
+    try {
+      const list = await getPagesList();
+      const sorted = [...list].sort((a, b) => {
+        const coreSlugs = ["home", "blogs", "faq"];
+        const aIsCore = coreSlugs.includes(a.slug);
+        const bIsCore = coreSlugs.includes(b.slug);
+        if (aIsCore && !bIsCore) return -1;
+        if (!aIsCore && bIsCore) return 1;
+        return b.id - a.id;
+      });
+      setPages(sorted);
+    } catch (err) {
+      console.error("Failed to load pages:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPages();
+  }, []);
+
+  const handleDelete = async (slug: string, title: string) => {
+    if (!confirm(`هل أنت متأكد من رغبتك في حذف المقال "${title || slug}" نهائياً؟`)) {
+      return;
+    }
+    try {
+      const res = await deletePageData(slug);
+      if (res.success) {
+        setSuccessMsg("تم حذف المقال بنجاح.");
+        loadPages();
+      } else {
+        setErrorMsg(`فشل الحذف: ${res.error}`);
+      }
+    } catch (err) {
+      setErrorMsg("حدث خطأ أثناء الاتصال بالخادم لحذف المقال.");
+    }
+  };
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg("");
+    setSuccessMsg("");
+
+    if (!newTitle.trim()) {
+      setErrorMsg("الرجاء إدخال عنوان المقال.");
+      return;
+    }
+
+    const cleanSlug = newSlug
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, "-")
+      .replace(/-+/g, "-");
+
+    if (!cleanSlug) {
+      setErrorMsg("الرجاء إدخال معرّف المقال (Slug) باللغة الإنجليزية.");
+      return;
+    }
+
+    const fullSlug = `blog-details-${cleanSlug}`;
+    if (pages.some((p) => p.slug === fullSlug)) {
+      setErrorMsg("معرّف المقال (Slug) مستخدم بالفعل. الرجاء اختيار معرّف آخر.");
+      return;
+    }
+
+    setCreating(true);
+    try {
+      const today = new Date().toLocaleDateString("ar-SA", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      });
+
+      const puckData = {
+        ...newBlogFallbackData,
+        content: newBlogFallbackData.content.map((item) => {
+          if (item.type === "BlogDetails") {
+            return {
+              ...item,
+              props: {
+                ...item.props,
+                title: newTitle,
+                date: today
+              }
+            };
+          }
+          return item;
+        }),
+        root: {
+          props: {
+            title: `${newTitle} - Examy`
+          }
+        }
+      };
+
+      const res = await savePageData(fullSlug, `مقالة: ${newTitle} - Examy`, puckData);
+      if (res.success) {
+        setSuccessMsg("تم إنشاء المقال بنجاح! جاري تحويلك للمحرر البصري...");
+        setTimeout(() => {
+          window.location.href = `/admin/blog-details?slug=${cleanSlug}`;
+        }, 1200);
+      } else {
+        setErrorMsg("حدث خطأ أثناء حفظ المقال في قاعدة البيانات.");
+        setCreating(false);
+      }
+    } catch (err) {
+      setErrorMsg("فشل الاتصال بقاعدة البيانات لإنشاء المقال.");
+      setCreating(false);
+    }
+  };
+
+  const blogPages = pages.filter((p) => p.slug.startsWith("blog-details-"));
+
   return (
     <div style={{
       minHeight: "100vh",
@@ -294,104 +418,342 @@ function AdminDashboard() {
       color: "#ffffff",
       fontFamily: "'Cairo', sans-serif",
       direction: "rtl",
-      padding: "80px 20px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center"
+      padding: "80px 20px"
     }}>
       <div style={{ maxWidth: 1000, width: "100%", margin: "0 auto" }}>
         
         {/* Header */}
         <header style={{
-          textAlign: "center",
-          marginBottom: 60
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+          paddingBottom: 24,
+          marginBottom: 50
         }}>
-          <h1 style={{ 
-            fontSize: "clamp(32px, 4vw, 42px)", 
-            fontWeight: 900, 
-            color: "#ffffff",
-            letterSpacing: "-0.02em",
-            textShadow: "0 0 40px rgba(0, 224, 138, 0.2)"
+          <div>
+            <h1 style={{ 
+              fontSize: "clamp(28px, 4vw, 38px)", 
+              fontWeight: 900, 
+              color: "#ffffff",
+              letterSpacing: "-0.02em",
+              textShadow: "0 0 40px rgba(0, 224, 138, 0.2)"
+            }}>
+              محرر صفحات منصة اختباري
+            </h1>
+            <p style={{ 
+              fontSize: 15, 
+              color: "#8E9F9A", 
+              marginTop: 8,
+              lineHeight: 1.6
+            }}>
+              تعديل وتنسيق محتوى صفحات الموقع والتفاعلات بشكل مرئي وبسيط دون الحاجة لأي برمجة.
+            </p>
+          </div>
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            backgroundColor: "rgba(12, 24, 21, 0.45)",
+            padding: "8px 16px",
+            borderRadius: 8,
+            border: "1px solid rgba(255, 255, 255, 0.08)"
           }}>
-            محرر صفحات منصة اختباري
-          </h1>
-          <p style={{ 
-            fontSize: 16, 
-            color: "#8E9F9A", 
-            marginTop: 12,
-            maxWidth: 600,
-            marginInline: "auto",
-            lineHeight: 1.6
-          }}>
-            تعديل وتنسيق محتوى صفحات الموقع والتفاعلات بشكل مرئي وبسيط دون الحاجة لأي برمجة.
-          </p>
+            <div style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: "#00E08A" }}></div>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "#00E08A" }}>متصل بالخادم</span>
+          </div>
         </header>
 
+        {errorMsg && (
+          <div style={{
+            backgroundColor: "rgba(239, 68, 68, 0.15)",
+            border: "1px solid rgba(239, 68, 68, 0.3)",
+            color: "#f87171",
+            padding: "12px 16px",
+            borderRadius: 8,
+            marginBottom: 24,
+            fontSize: 14,
+            fontWeight: 500
+          }}>
+            ⚠️ {errorMsg}
+          </div>
+        )}
+
+        {successMsg && (
+          <div style={{
+            backgroundColor: "rgba(0, 224, 138, 0.12)",
+            border: "1px solid rgba(0, 224, 138, 0.25)",
+            color: "#00E08A",
+            padding: "12px 16px",
+            borderRadius: 8,
+            marginBottom: 24,
+            fontSize: 14,
+            fontWeight: 500
+          }}>
+            ✅ {successMsg}
+          </div>
+        )}
+
         {/* Cards Grid */}
+        <section style={{ marginBottom: 50 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 20, color: "#ffffff" }}>الصفحات الرئيسية</h2>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: 30
+          }}>
+            {/* Card 1: Homepage */}
+            <div style={cardStyle}>
+              <div style={cardGlowStyle}></div>
+              <div style={{ position: "relative", zIndex: 2 }}>
+                <div style={iconContainerStyle}>🏠</div>
+                <h3 style={cardTitleStyle}>الصفحة الرئيسية (Homepage)</h3>
+                <p style={cardDescStyle}>
+                  تعديل الهيرو، مزايا المنصة، أرقام وإحصائيات اختباري، وقسم الشركاء والأسعار.
+                </p>
+                <a 
+                  href="/admin/home" 
+                  style={primaryBtnStyle}
+                  onMouseEnter={primaryHover}
+                  onMouseLeave={primaryLeave}
+                >
+                  تعديل الصفحة الرئيسية
+                </a>
+              </div>
+            </div>
+
+            {/* Card 2: Blogs */}
+            <div style={cardStyle}>
+              <div style={cardGlowStyle}></div>
+              <div style={{ position: "relative", zIndex: 2 }}>
+                <div style={iconContainerStyle}>📝</div>
+                <h3 style={cardTitleStyle}>صفحة المدوّنة (Blogs Page)</h3>
+                <p style={cardDescStyle}>
+                  تعديل ترويسة صفحة المدوّنة وعناوينها الفرعية التي يعرض فيها المقالات التلقائية.
+                </p>
+                <a 
+                  href="/admin/blogs" 
+                  style={secondaryBtnStyle}
+                  onMouseEnter={secondaryHover}
+                  onMouseLeave={secondaryLeave}
+                >
+                  تعديل صفحة المدوّنة
+                </a>
+              </div>
+            </div>
+
+            {/* Card 3: FAQ */}
+            <div style={cardStyle}>
+              <div style={cardGlowStyle}></div>
+              <div style={{ position: "relative", zIndex: 2 }}>
+                <div style={iconContainerStyle}>🙋‍♂️</div>
+                <h3 style={cardTitleStyle}>الأسئلة الشائعة (FAQ)</h3>
+                <p style={cardDescStyle}>
+                  إضافة أو حذف أو تعديل الأسئلة الشائعة وإجاباتها وتوزيعها في تصنيفات منظمة.
+                </p>
+                <a 
+                  href="/admin/faq" 
+                  style={secondaryBtnStyle}
+                  onMouseEnter={secondaryHover}
+                  onMouseLeave={secondaryLeave}
+                >
+                  تعديل الأسئلة الشائعة
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Bottom Section: Blog List and Creation */}
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: 30
+          gap: 40,
+          marginTop: 40,
+          borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+          paddingTop: 40
         }}>
-          {/* Card 1: Homepage */}
-          <div style={cardStyle}>
-            <div style={cardGlowStyle}></div>
-            <div style={{ position: "relative", zIndex: 2 }}>
-              <div style={iconContainerStyle}>🏠</div>
-              <h3 style={cardTitleStyle}>الصفحة الرئيسية (Homepage)</h3>
-              <p style={cardDescStyle}>
-                تعديل الهيرو، مزايا المنصة، أرقام وإحصائيات اختباري، وقسم الشركاء والأسعار.
-              </p>
-              <a 
-                href="/admin/home" 
-                style={primaryBtnStyle}
-                onMouseEnter={primaryHover}
-                onMouseLeave={primaryLeave}
+          {/* List of articles */}
+          <section>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 800, color: "#ffffff", margin: 0 }}>مقالات المدوّنة المنشورة ({blogPages.length})</h2>
+              <button 
+                onClick={loadPages} 
+                style={{ 
+                  background: "none", 
+                  border: "none", 
+                  color: "#00E08A", 
+                  fontSize: 13, 
+                  fontWeight: 700, 
+                  cursor: "pointer", 
+                  display: "flex", 
+                  alignItems: "center", 
+                  gap: 6,
+                  fontFamily: "inherit"
+                }}
               >
-                تعديل الصفحة الرئيسية
-              </a>
+                🔄 تحديث القائمة
+              </button>
             </div>
-          </div>
 
-          {/* Card 2: Blogs */}
-          <div style={cardStyle}>
-            <div style={cardGlowStyle}></div>
-            <div style={{ position: "relative", zIndex: 2 }}>
-              <div style={iconContainerStyle}>📝</div>
-              <h3 style={cardTitleStyle}>صفحة المدوّنة (Blogs Page)</h3>
-              <p style={cardDescStyle}>
-                تعديل ترويسة صفحة المدوّنة وعناوينها الفرعية التي يعرض فيها المقالات التلقائية.
-              </p>
-              <a 
-                href="/admin/blogs" 
-                style={secondaryBtnStyle}
-                onMouseEnter={secondaryHover}
-                onMouseLeave={secondaryLeave}
-              >
-                تعديل صفحة المدوّنة
-              </a>
-            </div>
-          </div>
+            {loading ? (
+              <div style={{ backgroundColor: "rgba(12, 24, 21, 0.3)", border: "1px solid rgba(255, 255, 255, 0.05)", borderRadius: 16, padding: "50px 0", textAlign: "center", color: "#8E9F9A" }}>
+                جاري تحميل قائمة المقالات...
+              </div>
+            ) : blogPages.length === 0 ? (
+              <div style={{ backgroundColor: "rgba(12, 24, 21, 0.3)", border: "1px solid rgba(255, 255, 255, 0.05)", borderRadius: 16, padding: "50px 0", textAlign: "center", color: "#8E9F9A", fontSize: 14 }}>
+                لا يوجد مقالات منشورة حالياً. استخدم النموذج المقابل لإنشاء مقالك الأول!
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {blogPages.map((page) => {
+                  const cleanSlug = page.slug.replace("blog-details-", "");
+                  return (
+                    <div key={page.id} style={{ 
+                      backgroundColor: "rgba(12, 24, 21, 0.45)", 
+                      border: "1px solid rgba(255, 255, 255, 0.06)", 
+                      borderRadius: 14, 
+                      padding: "20px 24px", 
+                      display: "flex", 
+                      justifyContent: "space-between", 
+                      alignItems: "center",
+                      gap: 16
+                    }}>
+                      <div style={{ flex: 1 }}>
+                        <h4 style={{ fontSize: 15, fontWeight: 700, color: "#ffffff", margin: 0, textAlign: "right" }}>
+                          {page.title ? page.title.replace("مقالة: ", "").replace(" - Examy", "") : "بدون عنوان"}
+                        </h4>
+                        <div style={{ display: "flex", gap: 12, fontSize: 12, color: "#8E9F9A", marginTop: 6, justifyContent: "flex-start" }}>
+                          <span>معرف الرابط (Slug): <strong style={{ color: "#00E08A" }}>{cleanSlug}</strong></span>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                        <a 
+                          href={`/admin/blog-details?slug=${cleanSlug}`} 
+                          style={{ 
+                            backgroundColor: "rgba(255, 255, 255, 0.06)", 
+                            border: "1px solid rgba(255, 255, 255, 0.1)", 
+                            color: "#ffffff", 
+                            textDecoration: "none", 
+                            fontSize: 13, 
+                            fontWeight: 700, 
+                            padding: "8px 14px", 
+                            borderRadius: 8,
+                            transition: "all 0.2s"
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.12)"}
+                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.06)"}
+                        >
+                          تعديل
+                        </a>
+                        <button 
+                          onClick={() => handleDelete(page.slug, page.title)} 
+                          style={{ 
+                            backgroundColor: "rgba(239, 68, 68, 0.06)", 
+                            border: "1px solid rgba(239, 68, 68, 0.15)", 
+                            color: "#f87171", 
+                            fontSize: 13, 
+                            fontWeight: 700, 
+                            padding: "8px 14px", 
+                            borderRadius: 8, 
+                            cursor: "pointer",
+                            transition: "all 0.2s"
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "rgba(239,68,68,0.12)"}
+                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "rgba(239,68,68,0.06)"}
+                        >
+                          حذف
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </section>
 
-          {/* Card 3: FAQ */}
-          <div style={cardStyle}>
-            <div style={cardGlowStyle}></div>
-            <div style={{ position: "relative", zIndex: 2 }}>
-              <div style={iconContainerStyle}>🙋‍♂️</div>
-              <h3 style={cardTitleStyle}>الأسئلة الشائعة (FAQ)</h3>
-              <p style={cardDescStyle}>
-                إضافة أو حذف أو تعديل الأسئلة الشائعة وإجاباتها وتوزيعها في تصنيفات منظمة.
-              </p>
-              <a 
-                href="/admin/faq" 
-                style={secondaryBtnStyle}
-                onMouseEnter={secondaryHover}
-                onMouseLeave={secondaryLeave}
+          {/* Create new article */}
+          <section>
+            <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 20, color: "#ffffff" }}>إضافة مقال جديد</h2>
+            <form onSubmit={handleCreate} style={{ 
+              backgroundColor: "rgba(12, 24, 21, 0.45)", 
+              border: "1px solid rgba(255, 255, 255, 0.06)", 
+              borderRadius: 16, 
+              padding: 24, 
+              display: "flex", 
+              flexDirection: "column", 
+              gap: 20 
+            }}>
+              <div>
+                <label style={{ display: "block", fontSize: 13.5, fontWeight: 700, color: "#8E9F9A", marginBottom: 8, textAlign: "right" }}>عنوان المقال الرئيسي</label>
+                <input 
+                  type="text" 
+                  value={newTitle} 
+                  onChange={(e) => setNewTitle(e.target.value)} 
+                  placeholder="مثال: أهمية التقييم الإلكتروني في تطوير مهارات التفكير" 
+                  style={{ 
+                    width: "100%", 
+                    backgroundColor: "rgba(0, 0, 0, 0.2)", 
+                    border: "1px solid rgba(255, 255, 255, 0.08)", 
+                    borderRadius: 10, 
+                    padding: "12px 14px", 
+                    color: "#ffffff", 
+                    fontSize: 14, 
+                    outline: "none",
+                    textAlign: "right",
+                    fontFamily: "inherit"
+                  }} 
+                  required 
+                />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 13.5, fontWeight: 700, color: "#8E9F9A", marginBottom: 4, textAlign: "right" }}>معرّف الرابط (Slug)</label>
+                <span style={{ display: "block", fontSize: 11.5, color: "#8E9F9A", marginBottom: 8, textAlign: "right" }}>يُكتب بالإنجليزية، ويستخدم كعنوان للرابط (Slug). مثال: online-assessments</span>
+                <input 
+                  type="text" 
+                  value={newSlug} 
+                  onChange={(e) => setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, "-").replace(/-+/g, "-"))} 
+                  placeholder="online-assessments" 
+                  style={{ 
+                    width: "100%", 
+                    backgroundColor: "rgba(0, 0, 0, 0.2)", 
+                    border: "1px solid rgba(255, 255, 255, 0.08)", 
+                    borderRadius: 10, 
+                    padding: "12px 14px", 
+                    color: "#ffffff", 
+                    fontSize: 14, 
+                    outline: "none", 
+                    fontFamily: "monospace",
+                    textAlign: "left"
+                  }} 
+                  required 
+                />
+              </div>
+              <button 
+                type="submit" 
+                disabled={creating} 
+                style={{ 
+                  width: "100%", 
+                  backgroundColor: "#00E08A", 
+                  color: "#07100E", 
+                  border: "none", 
+                  fontWeight: 800, 
+                  fontSize: 14.5, 
+                  padding: "14px 0", 
+                  borderRadius: 12, 
+                  cursor: creating ? "not-allowed" : "pointer", 
+                  opacity: creating ? 0.7 : 1, 
+                  marginTop: 10,
+                  boxShadow: "0 8px 20px rgba(0, 224, 138, 0.2)",
+                  transition: "all 0.2s"
+                }}
+                onMouseEnter={(e) => { if(!creating) e.currentTarget.style.backgroundColor = "#00F79B"; }}
+                onMouseLeave={(e) => { if(!creating) e.currentTarget.style.backgroundColor = "#00E08A"; }}
               >
-                تعديل الأسئلة الشائعة
-              </a>
-            </div>
-          </div>
+                {creating ? "جاري إنشاء المقال..." : "إنشاء مقال جديد والذهاب للمحرر"}
+              </button>
+            </form>
+          </section>
         </div>
 
       </div>
@@ -435,6 +797,19 @@ function AdminEditorContent({ slug }: { slug: string }) {
               }
               if (updatedProps.subtitle === undefined || updatedProps.subtitle === "") {
                 updatedProps.subtitle = "أفكار عملية عن الذكاء الاصطناعي في التعليم، التقويم المتوازن، والمنهج السعودي — من فريق اختباري ونخبة من المعلمين.";
+              }
+              return { ...item, props: updatedProps };
+            }
+            if (item.type === "FAQ") {
+              const updatedProps = { ...item.props };
+              if (!updatedProps.categories || updatedProps.categories.length === 0) {
+                updatedProps.categories = (config.components.FAQ as any).defaultProps?.categories || [];
+              }
+              if (updatedProps.title === undefined || updatedProps.title === "") {
+                updatedProps.title = "كل ما تريد معرفته عن اختباري";
+              }
+              if (updatedProps.subtitle === undefined || updatedProps.subtitle === "") {
+                updatedProps.subtitle = "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات، التصحيح، التخصيص، والأسعار. لم تجد إجابتك؟ فريقنا جاهز لمساعدتك.";
               }
               return { ...item, props: updatedProps };
             }

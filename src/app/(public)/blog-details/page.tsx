@@ -1,5 +1,5 @@
 import React from "react";
-import { getPageData } from "../actions";
+import { getPageData } from "../../actions";
 import { BlogDetailsClientView } from "./BlogDetailsClientView";
 
 const blogDetailsFallbackData = {
@@ -50,6 +50,29 @@ type Args = {
     slug?: string;
   }>;
 };
+
+export async function generateMetadata({ searchParams }: Args) {
+  try {
+    const resolvedSearchParams = await searchParams;
+    const articleSlug = resolvedSearchParams.slug || "default";
+    const dbData = (await getPageData(`blog-details-${articleSlug}`)) || (await getPageData("blog-details"));
+    const puckData = dbData && dbData.puckData 
+      ? (typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData)
+      : null;
+    const blogDetailsBlock = puckData?.content?.find((c: any) => c.type === "BlogDetails");
+    const title = puckData?.root?.props?.title || blogDetailsBlock?.props?.title || dbData?.title || "تفاصيل المقالة - Examy";
+    const description = puckData?.root?.props?.description || blogDetailsBlock?.props?.subtitle || "اقرأ مقالات المدوّنة التعليمية لمنصة اختباري.";
+    return {
+      title,
+      description,
+    };
+  } catch (e) {
+    return {
+      title: "تفاصيل المقالة - Examy",
+      description: "اقرأ مقالات المدوّنة التعليمية لمنصة اختباري.",
+    };
+  }
+}
 
 export default async function BlogDetailsPage({ searchParams }: Args) {
   const resolvedSearchParams = await searchParams;

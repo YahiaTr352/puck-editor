@@ -10,6 +10,7 @@ export default function PayloadLayout({ children }: { children: React.ReactNode 
     <RootLayout
       config={config}
       importMap={importMap}
+      htmlProps={{ suppressHydrationWarning: true }}
       serverFunction={async (args) => {
         'use server'
         return handleServerFunctions({ ...args, config, importMap })

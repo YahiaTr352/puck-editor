@@ -1,8 +1,9 @@
 import React from "react";
-import { getPageData, getDynamicBlogsList } from "../actions";
-import { BlogsClientView } from "./BlogsClientView";
+import { getPageData } from "../../actions";
+import { FAQClientView } from "./FAQClientView";
+import { config } from "../../../puck/config";
 
-const blogsFallbackData = {
+const faqFallbackData = {
   content: [
     {
       type: "Nav",
@@ -10,23 +11,20 @@ const blogsFallbackData = {
         ctaText: "ابدأ مجانًا",
         ctaLink: "/login?start=true",
         links: [
-          { label: "الأسئلة الشائعة", href: "/faq" },
-          { label: "المدوّنة", href: "/blogs" },
-          { label: "نماذج واقعية", href: "/#actual-models" },
+          { label: "المنتج", href: "/#features" },
           { label: "كيف يعمل", href: "/#how_it_works" },
-          { label: "المنتج", href: "/#features" }
+          { label: "نماذج واقعية", href: "/#actual-models" },
+          { label: "المدوّنة", href: "/blogs" },
+          { label: "الأسئلة الشائعة", href: "/faq" }
         ],
         id: "nav-header"
       }
     },
     {
-      type: "BlogList",
+      type: "FAQ",
       props: {
-        id: "blogs-block",
-        eyebrow: "مدوّنة اختباري",
-        title: "رؤى ومقالات لمعلّمي الغد في المملكة",
-        subtitle: "أفكار عملية عن الذكاء الاصطناعي في التعليم، التقويم المتوازن، والمنهج السعودي — من فريق اختباري ونخبة من المعلمين.",
-        posts: []
+        id: "faq-block",
+        categories: (config.components.FAQ as any).defaultProps?.categories || []
       }
     },
     {
@@ -38,25 +36,37 @@ const blogsFallbackData = {
   ],
   root: {
     props: {
-      title: "المدوّنة - Examy"
+      title: "الأسئلة الشائعة - Examy"
     }
   }
 };
 
-export default async function BlogsPage() {
-  let data = blogsFallbackData;
-  let posts: any[] = [];
-
-  // 1. Query all blog details pages dynamically from PostgreSQL
+export async function generateMetadata() {
   try {
-    posts = await getDynamicBlogsList();
+    const dbData = await getPageData("faq");
+    const puckData = dbData && dbData.puckData 
+      ? (typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData)
+      : null;
+    const title = puckData?.root?.props?.title || dbData?.title || "الأسئلة الشائعة - Examy";
+    const faqBlock = puckData?.content?.find((c: any) => c.type === "FAQ");
+    const description = puckData?.root?.props?.description || faqBlock?.props?.subtitle || "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات والأسعار.";
+    return {
+      title,
+      description,
+    };
   } catch (e) {
-    console.error("Error fetching dynamic blogs list:", e);
+    return {
+      title: "الأسئلة الشائعة - Examy",
+      description: "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات والأسعار.",
+    };
   }
+}
 
-  // 2. Load the Blogs Page design from the pages table
+export default async function FAQPage() {
+  let data = faqFallbackData;
+
   try {
-    const dbData = await getPageData("blogs");
+    const dbData = await getPageData("faq");
     if (dbData && dbData.puckData) {
       const parsed = typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData;
       if (parsed.content) {
@@ -64,11 +74,11 @@ export default async function BlogsPage() {
           if (item.type === "Nav") {
             const updatedProps = { ...item.props };
             updatedProps.links = [
-              { label: "الأسئلة الشائعة", href: "/faq" },
-              { label: "المدوّنة", href: "/blogs" },
-              { label: "نماذج واقعية", href: "/#actual-models" },
+              { label: "المنتج", href: "/#features" },
               { label: "كيف يعمل", href: "/#how_it_works" },
-              { label: "المنتج", href: "/#features" }
+              { label: "نماذج واقعية", href: "/#actual-models" },
+              { label: "المدوّنة", href: "/blogs" },
+              { label: "الأسئلة الشائعة", href: "/faq" }
             ];
             if (!updatedProps.actions) {
               updatedProps.actions = [
@@ -78,16 +88,16 @@ export default async function BlogsPage() {
             }
             return { ...item, props: updatedProps };
           }
-          if (item.type === "BlogList") {
+          if (item.type === "FAQ") {
             const updatedProps = { ...item.props };
-            if (updatedProps.eyebrow === undefined || updatedProps.eyebrow === "") {
-              updatedProps.eyebrow = "مدوّنة اختباري";
+            if (!updatedProps.categories || updatedProps.categories.length === 0) {
+              updatedProps.categories = (config.components.FAQ as any).defaultProps?.categories || [];
             }
             if (updatedProps.title === undefined || updatedProps.title === "") {
-              updatedProps.title = "رؤى ومقالات لمعلّمي الغد في المملكة";
+              updatedProps.title = "كل ما تريد معرفته عن اختباري";
             }
             if (updatedProps.subtitle === undefined || updatedProps.subtitle === "") {
-              updatedProps.subtitle = "أفكار عملية عن الذكاء الاصطناعي في التعليم، التقويم المتوازن، والمنهج السعودي — من فريق اختباري ونخبة من المعلمين.";
+              updatedProps.subtitle = "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات، التصحيح، التخصيص، والأسعار. لم تجد إجابتك؟ فريقنا جاهز لمساعدتك.";
             }
             return { ...item, props: updatedProps };
           }
@@ -144,24 +154,8 @@ export default async function BlogsPage() {
       }
     }
   } catch (e) {
-    console.error("Error loading page design from DB:", e);
+    console.error("Error loading page data from DB:", e);
   }
 
-  // 3. Inject the dynamically loaded posts into the page design
-  if (data.content) {
-    data.content = data.content.map((item: any) => {
-      if (item.type === "BlogList") {
-        return {
-          ...item,
-          props: {
-            ...item.props,
-            posts: posts
-          }
-        };
-      }
-      return item;
-    });
-  }
-
-  return <BlogsClientView data={data} />;
+  return <FAQClientView data={data} />;
 }

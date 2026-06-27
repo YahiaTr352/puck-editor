@@ -29,7 +29,7 @@ const initialFaqData = {
         id: "faq-component",
         title: "كل ما تريد معرفته عن اختباري",
         subtitle: "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات، التصحيح، التخصيص، والأسعار. لم تجد إجابتك؟ فريقنا جاهز لمساعدتك.",
-        categories: []
+        categories: (config.components.FAQ as any).defaultProps?.categories || []
       }
     },
     {
@@ -108,7 +108,7 @@ export default function FAQAdminEditor() {
               if (item.type === "FAQ") {
                 const updatedProps = { ...item.props };
                 if (!updatedProps.categories || updatedProps.categories.length === 0) {
-                  updatedProps.categories = [];
+                  updatedProps.categories = (config.components.FAQ as any).defaultProps?.categories || [];
                 }
                 if (updatedProps.title === undefined || updatedProps.title === "") {
                   updatedProps.title = "كل ما تريد معرفته عن اختباري";
