@@ -465,8 +465,7 @@ function AdminDashboard() {
   return (
     <div style={{
       minHeight: "100vh",
-      backgroundColor: "#050b09",
-      backgroundImage: "radial-gradient(circle at 50% -20%, #154536 0%, #050b09 60%)",
+      backgroundColor: "#000000",
       color: "#ffffff",
       fontFamily: "'Cairo', sans-serif",
       direction: "rtl",
@@ -534,197 +533,11 @@ function AdminDashboard() {
           </div>
         )}
 
-        {/* Cards Grid */}
-        <section style={{ marginBottom: 50 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 20, color: "#ffffff" }}>الصفحات الرئيسية</h2>
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: 30
-          }}>
-            {/* Card 1: Homepage */}
-            <div style={cardStyle}>
-              <div style={cardGlowStyle}></div>
-              <div style={{ position: "relative", zIndex: 2 }}>
-                <div style={iconContainerStyle}>🏠</div>
-                <h3 style={cardTitleStyle}>الصفحة الرئيسية (Homepage)</h3>
-                <p style={cardDescStyle}>
-                  تعديل الهيرو، مزايا المنصة، أرقام وإحصائيات اختباري، وقسم الشركاء والأسعار.
-                </p>
-                <a 
-                  href="/admin/home" 
-                  style={primaryBtnStyle}
-                  onMouseEnter={primaryHover}
-                  onMouseLeave={primaryLeave}
-                >
-                  تعديل الصفحة الرئيسية
-                </a>
-              </div>
-            </div>
 
-            {/* Card 2: Blogs */}
-            <div style={cardStyle}>
-              <div style={cardGlowStyle}></div>
-              <div style={{ position: "relative", zIndex: 2 }}>
-                <div style={iconContainerStyle}>📝</div>
-                <h3 style={cardTitleStyle}>صفحة المدوّنة (Blogs Page)</h3>
-                <p style={cardDescStyle}>
-                  تعديل ترويسة صفحة المدوّنة وعناوينها الفرعية التي يعرض فيها المقالات التلقائية.
-                </p>
-                <a 
-                  href="/admin/blogs" 
-                  style={secondaryBtnStyle}
-                  onMouseEnter={secondaryHover}
-                  onMouseLeave={secondaryLeave}
-                >
-                  تعديل صفحة المدوّنة
-                </a>
-              </div>
-            </div>
 
-            {/* Card 3: FAQ */}
-            <div style={cardStyle}>
-              <div style={cardGlowStyle}></div>
-              <div style={{ position: "relative", zIndex: 2 }}>
-                <div style={iconContainerStyle}>🙋‍♂️</div>
-                <h3 style={cardTitleStyle}>الأسئلة الشائعة (FAQ)</h3>
-                <p style={cardDescStyle}>
-                  إضافة أو حذف أو تعديل الأسئلة الشائعة وإجاباتها وتوزيعها في تصنيفات منظمة.
-                </p>
-                <a 
-                  href="/admin/faq" 
-                  style={secondaryBtnStyle}
-                  onMouseEnter={secondaryHover}
-                  onMouseLeave={secondaryLeave}
-                >
-                  تعديل الأسئلة الشائعة
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Create Page Form */}
-        <section style={{ marginBottom: 50 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 20, color: "#ffffff" }}>
-            إنشاء صفحة أو مقال جديد
-          </h2>
-          <form onSubmit={handleCreate} style={{
-            backgroundColor: "rgba(12, 24, 21, 0.45)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid rgba(255, 255, 255, 0.06)",
-            borderRadius: 20,
-            padding: 30,
-            boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: 20,
-            alignItems: "end"
-          }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <label style={{ fontSize: 14, color: "#8E9F9A", fontWeight: 600 }}>عنوان الصفحة/المقالة:</label>
-              <input 
-                type="text" 
-                value={newTitle} 
-                onChange={(e) => setNewTitle(e.target.value)}
-                placeholder="مثال: أهمية التقييم المستمر"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: 10,
-                  padding: "12px 16px",
-                  color: "#ffffff",
-                  fontSize: 14,
-                  outline: "none",
-                  transition: "border-color 0.2s"
-                }}
-                onFocus={(e) => e.target.style.borderColor = "#00E08A"}
-                onBlur={(e) => e.target.style.borderColor = "rgba(255, 255, 255, 0.1)"}
-              />
-            </div>
-            
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <label style={{ fontSize: 14, color: "#8E9F9A", fontWeight: 600 }}>معرّف الرابط (Slug) بالإنجليزية:</label>
-              <input 
-                type="text" 
-                value={newSlug} 
-                onChange={(e) => setNewSlug(e.target.value)}
-                placeholder="مثال: continuous-assessment"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: 10,
-                  padding: "12px 16px",
-                  color: "#ffffff",
-                  fontSize: 14,
-                  outline: "none",
-                  direction: "ltr",
-                  textAlign: "right",
-                  transition: "border-color 0.2s"
-                }}
-                onFocus={(e) => e.target.style.borderColor = "#00E08A"}
-                onBlur={(e) => e.target.style.borderColor = "rgba(255, 255, 255, 0.1)"}
-              />
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <label style={{ fontSize: 14, color: "#8E9F9A", fontWeight: 600 }}>نوع الصفحة:</label>
-              <select 
-                value={pageType} 
-                onChange={(e: any) => setPageType(e.target.value)}
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: 10,
-                  padding: "12px 16px",
-                  color: "#ffffff",
-                  fontSize: 14,
-                  outline: "none",
-                  cursor: "pointer",
-                  transition: "border-color 0.2s"
-                }}
-                onFocus={(e) => e.target.style.borderColor = "#00E08A"}
-                onBlur={(e) => e.target.style.borderColor = "rgba(255, 255, 255, 0.1)"}
-              >
-                <option value="blog" style={{ backgroundColor: "#0C1815", color: "#ffffff" }}>مقال في المدونة (Blog Details)</option>
-                <option value="custom" style={{ backgroundColor: "#0C1815", color: "#ffffff" }}>صفحة مخصصة (Custom Page)</option>
-              </select>
-            </div>
-
-            <button 
-              type="submit" 
-              disabled={creating}
-              style={{
-                backgroundColor: "#00E08A",
-                color: "#07100E",
-                border: "none",
-                borderRadius: 10,
-                padding: "13px 0",
-                fontSize: 14,
-                fontWeight: 800,
-                cursor: "pointer",
-                boxShadow: "0 8px 20px rgba(0, 224, 138, 0.25)",
-                transition: "all 0.2s ease"
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#00F79B";
-                e.currentTarget.style.transform = "translateY(-1px)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#00E08A";
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
-            >
-              {creating ? "جاري الإنشاء..." : "إنشاء الصفحة"}
-            </button>
-          </form>
-        </section>
 
         {/* All Pages Table */}
         <section style={{ marginTop: 50, marginBottom: 50 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 20, color: "#ffffff" }}>
-            جميع الصفحات والمقالات في قاعدة البيانات
-          </h2>
           <div style={{
             backgroundColor: "rgba(12, 24, 21, 0.45)",
             backdropFilter: "blur(12px)",
@@ -835,32 +648,6 @@ function AdminDashboard() {
                             >
                               معاينة
                             </a>
-                            {!["home", "blogs", "faq"].includes(page.slug) && (
-                              <button 
-                                onClick={() => handleDelete(page.slug, page.title)}
-                                style={{
-                                  padding: "6px 12px",
-                                  borderRadius: 8,
-                                  backgroundColor: "rgba(239, 68, 68, 0.15)",
-                                  border: "1px solid rgba(239, 68, 68, 0.3)",
-                                  color: "#f87171",
-                                  fontSize: 13,
-                                  fontWeight: 700,
-                                  cursor: "pointer",
-                                  transition: "all 0.15s ease"
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.backgroundColor = "#ef4444";
-                                  e.currentTarget.style.color = "#ffffff";
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.backgroundColor = "rgba(239, 68, 68, 0.15)";
-                                  e.currentTarget.style.color = "#f87171";
-                                }}
-                              >
-                                حذف
-                              </button>
-                            )}
                           </div>
                         </td>
                       </tr>

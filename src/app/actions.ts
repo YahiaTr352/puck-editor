@@ -27,36 +27,74 @@ export async function getPageData(slug: string, options?: { draft?: boolean }) {
     const pubDoc = resultFalse.docs.length > 0 ? resultFalse.docs[0] : null;
     console.log(`[getPageData] "${slug}" - Published doc found: ${!!pubDoc}`);
 
+    let docToReturn = null;
     if (!draft) {
-      return pubDoc;
-    }
-
-    // Fetch draft version
-    const resultTrue = await payload.find({
-      collection: 'pages',
-      draft: true,
-      overrideAccess: true,
-      where: {
-        slug: {
-          equals: slug,
+      docToReturn = pubDoc;
+    } else {
+      // Fetch draft version
+      const resultTrue = await payload.find({
+        collection: 'pages',
+        draft: true,
+        overrideAccess: true,
+        where: {
+          slug: {
+            equals: slug,
+          },
         },
-      },
-    });
-    const draftDoc = resultTrue.docs.length > 0 ? resultTrue.docs[0] : null;
-    console.log(`[getPageData] "${slug}" - Draft/latest doc found: ${!!draftDoc}`);
+      });
+      const draftDoc = resultTrue.docs.length > 0 ? resultTrue.docs[0] : null;
+      console.log(`[getPageData] "${slug}" - Draft/latest doc found: ${!!draftDoc}`);
 
-    // Compare timestamps to return the most recently updated one
-    if (pubDoc && draftDoc) {
-      const pubTime = new Date(pubDoc.updatedAt).getTime();
-      const draftTime = new Date(draftDoc.updatedAt).getTime();
-      const choice = draftTime >= pubTime ? 'draftDoc' : 'pubDoc';
-      console.log(`[getPageData] "${slug}" - Both found. Choice: ${choice} (pubTime: ${pubDoc.updatedAt}, draftTime: ${draftDoc.updatedAt})`);
-      return draftTime >= pubTime ? draftDoc : pubDoc;
+      // Compare timestamps to return the most recently updated one
+      if (pubDoc && draftDoc) {
+        const pubTime = new Date(pubDoc.updatedAt).getTime();
+        const draftTime = new Date(draftDoc.updatedAt).getTime();
+        const choice = draftTime >= pubTime ? 'draftDoc' : 'pubDoc';
+        console.log(`[getPageData] "${slug}" - Both found. Choice: ${choice} (pubTime: ${pubDoc.updatedAt}, draftTime: ${draftDoc.updatedAt})`);
+        docToReturn = draftTime >= pubTime ? draftDoc : pubDoc;
+      } else {
+        docToReturn = draftDoc || pubDoc;
+      }
     }
 
-    const finalDoc = draftDoc || pubDoc;
-    console.log(`[getPageData] "${slug}" - Returning: ${finalDoc ? (draftDoc ? 'draftDoc' : 'pubDoc') : 'null'}`);
-    return finalDoc;
+    // Dynamic Title Sync to ensure changes from CMS update puckData
+    const finalDoc = docToReturn;
+    if (finalDoc) {
+      const clonedDoc = { ...finalDoc };
+      if (clonedDoc.puckData) {
+        try {
+          const parsed = typeof clonedDoc.puckData === 'string' ? JSON.parse(clonedDoc.puckData) : JSON.parse(JSON.stringify(clonedDoc.puckData));
+          if (parsed) {
+            if (!parsed.root) parsed.root = { props: {} };
+            if (!parsed.root.props) parsed.root.props = {};
+            
+            parsed.root.props.title = clonedDoc.title;
+            
+            if (parsed.content && Array.isArray(parsed.content)) {
+              parsed.content = parsed.content.map((item: any) => {
+                if (item.type === "BlogDetails" && item.props) {
+                  return {
+                    ...item,
+                    props: {
+                      ...item.props,
+                      title: clonedDoc.title
+                    }
+                  };
+                }
+                return item;
+              });
+            }
+            clonedDoc.puckData = parsed;
+          }
+        } catch (e) {
+          console.error(`[getPageData] Failed to sync puckData title for "${slug}":`, e);
+        }
+      }
+      console.log(`[getPageData] "${slug}" - Returning: ${clonedDoc ? (options?.draft ? 'draftDoc' : 'pubDoc') : 'null'}`);
+      return clonedDoc;
+    }
+
+    return null;
   } catch (error) {
     console.error(`[getPageData] Error fetching page data for "${slug}":`, error);
     return null;
@@ -389,7 +427,7 @@ export async function getDynamicBlogsList(options?: { draft?: boolean }) {
 
       const cleanSlug = doc.slug.replace('blog-details-', '');
 
-      const title = props.title || doc.title || "";
+      const title = doc.title || props.title || "";
       const subtitle = props.subtitle || "";
       const combined = `${title} ${subtitle}`.toLowerCase();
       
