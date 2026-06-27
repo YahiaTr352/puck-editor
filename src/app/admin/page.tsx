@@ -174,367 +174,224 @@ const blogsFallbackData = {
 };
 
 // --- dashboard component ---
+// --- dashboard styling & interactive animations ---
+const cardStyle: React.CSSProperties = {
+  position: "relative",
+  backgroundColor: "rgba(12, 24, 21, 0.45)",
+  backdropFilter: "blur(12px)",
+  border: "1px solid rgba(255, 255, 255, 0.06)",
+  borderRadius: 20,
+  padding: 30,
+  overflow: "hidden",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "space-between",
+  boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
+  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+};
+
+const cardGlowStyle: React.CSSProperties = {
+  position: "absolute",
+  top: "-50%",
+  left: "-50%",
+  width: "200%",
+  height: "200%",
+  background: "radial-gradient(circle at center, rgba(0, 224, 138, 0.04) 0%, transparent 60%)",
+  pointerEvents: "none",
+  zIndex: 1
+};
+
+const iconContainerStyle: React.CSSProperties = {
+  fontSize: 32,
+  width: 60,
+  height: 60,
+  borderRadius: 16,
+  backgroundColor: "rgba(0, 224, 138, 0.1)",
+  border: "1px solid rgba(0, 224, 138, 0.2)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  marginBottom: 24,
+  boxShadow: "0 8px 16px rgba(0, 224, 138, 0.05)"
+};
+
+const cardTitleStyle: React.CSSProperties = {
+  fontSize: 18,
+  fontWeight: 800,
+  color: "#ffffff",
+  marginBottom: 12
+};
+
+const cardDescStyle: React.CSSProperties = {
+  fontSize: 14,
+  color: "#8E9F9A",
+  lineHeight: 1.7,
+  marginBottom: 30,
+  minHeight: 68
+};
+
+const primaryBtnStyle: React.CSSProperties = {
+  display: "block",
+  textAlign: "center",
+  backgroundColor: "#00E08A",
+  color: "#07100E",
+  textDecoration: "none",
+  fontWeight: 800,
+  fontSize: 14,
+  padding: "14px 0",
+  borderRadius: 12,
+  transition: "all 0.2s ease",
+  boxShadow: "0 8px 20px rgba(0, 224, 138, 0.25)"
+};
+
+const secondaryBtnStyle: React.CSSProperties = {
+  display: "block",
+  textAlign: "center",
+  backgroundColor: "transparent",
+  border: "1px solid rgba(255, 255, 255, 0.15)",
+  color: "#ffffff",
+  textDecoration: "none",
+  fontWeight: 800,
+  fontSize: 14,
+  padding: "13px 0",
+  borderRadius: 12,
+  transition: "all 0.2s ease"
+};
+
+const primaryHover = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  e.currentTarget.style.backgroundColor = "#00F79B";
+  e.currentTarget.style.transform = "translateY(-2px)";
+  e.currentTarget.style.boxShadow = "0 10px 25px rgba(0, 224, 138, 0.4)";
+};
+
+const primaryLeave = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  e.currentTarget.style.backgroundColor = "#00E08A";
+  e.currentTarget.style.transform = "translateY(0)";
+  e.currentTarget.style.boxShadow = "0 8px 20px rgba(0, 224, 138, 0.25)";
+};
+
+const secondaryHover = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  e.currentTarget.style.backgroundColor = "rgba(0, 224, 138, 0.1)";
+  e.currentTarget.style.borderColor = "#00E08A";
+  e.currentTarget.style.color = "#00E08A";
+  e.currentTarget.style.transform = "translateY(-2px)";
+};
+
+const secondaryLeave = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  e.currentTarget.style.backgroundColor = "transparent";
+  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.15)";
+  e.currentTarget.style.color = "#ffffff";
+  e.currentTarget.style.transform = "translateY(0)";
+};
+
+// --- dashboard component ---
 function AdminDashboard() {
-  const [pages, setPages] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [creating, setCreating] = useState(false);
-  const [newTitle, setNewTitle] = useState("");
-  const [newSlug, setNewSlug] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
-
-  const loadPages = async () => {
-    setLoading(true);
-    const list = await getPagesList();
-    const sorted = [...list].sort((a, b) => {
-      const coreSlugs = ["home", "blogs", "faq"];
-      const aIsCore = coreSlugs.includes(a.slug);
-      const bIsCore = coreSlugs.includes(b.slug);
-      if (aIsCore && !bIsCore) return -1;
-      if (!aIsCore && bIsCore) return 1;
-      return b.id - a.id;
-    });
-    setPages(sorted);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    loadPages();
-  }, []);
-
-  const handleDelete = async (slug: string, title: string) => {
-    if (!confirm(`هل أنت متأكد من رغبتك في حذف المقال "${title || slug}" نهائياً؟`)) {
-      return;
-    }
-    try {
-      const res = await deletePageData(slug);
-      if (res.success) {
-        setSuccessMsg("تم حذف المقال بنجاح.");
-        loadPages();
-      } else {
-        setErrorMsg(`فشل الحذف: ${res.error}`);
-      }
-    } catch (err) {
-      setErrorMsg("حدث خطأ أثناء الاتصال بالخادم لحذف المقال.");
-    }
-  };
-
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg("");
-    setSuccessMsg("");
-
-    if (!newTitle.trim()) {
-      setErrorMsg("الرجاء إدخال عنوان المقال.");
-      return;
-    }
-
-    const cleanSlug = newSlug
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9_-]/g, "-")
-      .replace(/-+/g, "-");
-
-    if (!cleanSlug) {
-      setErrorMsg("الرجاء إدخال معرّف المقال (Slug) باللغة الإنجليزية.");
-      return;
-    }
-
-    const fullSlug = `blog-details-${cleanSlug}`;
-    if (pages.some((p) => p.slug === fullSlug)) {
-      setErrorMsg("معرّف المقال (Slug) مستخدم بالفعل. الرجاء اختيار معرّف آخر.");
-      return;
-    }
-
-    setCreating(true);
-    try {
-      const today = new Date().toLocaleDateString("ar-SA", {
-        day: "numeric",
-        month: "long",
-        year: "numeric"
-      });
-
-      const puckData = {
-        ...newBlogFallbackData,
-        content: newBlogFallbackData.content.map((item) => {
-          if (item.type === "BlogDetails") {
-            return {
-              ...item,
-              props: {
-                ...item.props,
-                title: newTitle,
-                date: today
-              }
-            };
-          }
-          return item;
-        }),
-        root: {
-          props: {
-            title: `${newTitle} - Examy`
-          }
-        }
-      };
-
-      const res = await savePageData(fullSlug, `مقالة: ${newTitle} - Examy`, puckData);
-      if (res.success) {
-        setSuccessMsg("تم إنشاء المقال بنجاح! جاري تحويلك للمحرر البصري...");
-        setTimeout(() => {
-          window.location.href = `/admin/blog-details?slug=${cleanSlug}`;
-        }, 1200);
-      } else {
-        setErrorMsg("حدث خطأ أثناء حفظ المقال في قاعدة البيانات.");
-        setCreating(false);
-      }
-    } catch (err) {
-      setErrorMsg("فشل الاتصال بقاعدة البيانات لإنشاء المقال.");
-      setCreating(false);
-    }
-  };
-
-  const blogPages = pages.filter((p) => p.slug.startsWith("blog-details-"));
-
   return (
     <div style={{
       minHeight: "100vh",
-      backgroundColor: "#07100E",
+      backgroundColor: "#050b09",
+      backgroundImage: "radial-gradient(circle at 50% -20%, #154536 0%, #050b09 60%)",
       color: "#ffffff",
       fontFamily: "'Cairo', sans-serif",
       direction: "rtl",
-      padding: "40px 20px"
+      padding: "80px 20px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center"
     }}>
-      <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1000, width: "100%", margin: "0 auto" }}>
         
+        {/* Header */}
         <header style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          borderBottom: "1px solid #172F29",
-          paddingBottom: 24,
-          marginBottom: 36
+          textAlign: "center",
+          marginBottom: 60
         }}>
-          <div>
-            <h1 style={{ fontSize: 28, fontWeight: 800, color: "#E8F1EE" }}>لوحة تحكم المحتوى (CMS)</h1>
-            <p style={{ fontSize: 14, color: "#8E9F9A", marginTop: 4 }}>إدارة وتعديل صفحات منصة اختباري وتصميم المدوّنة</p>
-          </div>
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            backgroundColor: "#0C1815",
-            padding: "8px 16px",
-            borderRadius: 8,
-            border: "1px solid #172F29"
+          <h1 style={{ 
+            fontSize: "clamp(32px, 4vw, 42px)", 
+            fontWeight: 900, 
+            color: "#ffffff",
+            letterSpacing: "-0.02em",
+            textShadow: "0 0 40px rgba(0, 224, 138, 0.2)"
           }}>
-            <div style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: "#00E08A" }}></div>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#00E08A" }}>قاعدة البيانات متصلة</span>
-          </div>
+            محرر صفحات منصة اختباري
+          </h1>
+          <p style={{ 
+            fontSize: 16, 
+            color: "#8E9F9A", 
+            marginTop: 12,
+            maxWidth: 600,
+            marginInline: "auto",
+            lineHeight: 1.6
+          }}>
+            تعديل وتنسيق محتوى صفحات الموقع والتفاعلات بشكل مرئي وبسيط دون الحاجة لأي برمجة.
+          </p>
         </header>
 
-        {errorMsg && (
-          <div style={{
-            backgroundColor: "rgba(239, 68, 68, 0.15)",
-            border: "1px solid rgba(239, 68, 68, 0.3)",
-            color: "#f87171",
-            padding: "12px 16px",
-            borderRadius: 8,
-            marginBottom: 24,
-            fontSize: 14,
-            fontWeight: 500
-          }}>
-            ⚠️ {errorMsg}
-          </div>
-        )}
-
-        {successMsg && (
-          <div style={{
-            backgroundColor: "rgba(0, 224, 138, 0.12)",
-            border: "1px solid rgba(0, 224, 138, 0.25)",
-            color: "#00E08A",
-            padding: "12px 16px",
-            borderRadius: 8,
-            marginBottom: 24,
-            fontSize: 14,
-            fontWeight: 500
-          }}>
-            ✓ {successMsg}
-          </div>
-        )}
-
-        <section style={{ marginBottom: 40 }}>
-          <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: "#E8F1EE" }}>الصفحات الرئيسية</h2>
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: 20
-          }}>
-            <div style={{
-              backgroundColor: "#0C1815",
-              border: "1px solid #172F29",
-              borderRadius: 12,
-              padding: 20,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between"
-            }}>
-              <div>
-                <h3 style={{ fontSize: 16, fontWeight: 700, color: "#E8F1EE" }}>الصفحة الرئيسية (Homepage)</h3>
-                <p style={{ fontSize: 13, color: "#8E9F9A", marginTop: 6, lineHeight: 1.5 }}>
-                  تعديل الهيرو، مزايا المنصة، أرقام وإحصائيات اختباري، وقسم الشركاء والأسعار.
-                </p>
-              </div>
-              <a href="/admin/home" style={{
-                display: "block",
-                textAlign: "center",
-                backgroundColor: "#00E08A",
-                color: "#07100E",
-                textDecoration: "none",
-                fontWeight: 700,
-                fontSize: 14,
-                padding: "10px 0",
-                borderRadius: 8,
-                marginTop: 20,
-                transition: "opacity 0.2s"
-              }}>
+        {/* Cards Grid */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: 30
+        }}>
+          {/* Card 1: Homepage */}
+          <div style={cardStyle}>
+            <div style={cardGlowStyle}></div>
+            <div style={{ position: "relative", zIndex: 2 }}>
+              <div style={iconContainerStyle}>🏠</div>
+              <h3 style={cardTitleStyle}>الصفحة الرئيسية (Homepage)</h3>
+              <p style={cardDescStyle}>
+                تعديل الهيرو، مزايا المنصة، أرقام وإحصائيات اختباري، وقسم الشركاء والأسعار.
+              </p>
+              <a 
+                href="/admin/home" 
+                style={primaryBtnStyle}
+                onMouseEnter={primaryHover}
+                onMouseLeave={primaryLeave}
+              >
                 تعديل الصفحة الرئيسية
               </a>
             </div>
+          </div>
 
-            <div style={{
-              backgroundColor: "#0C1815",
-              border: "1px solid #172F29",
-              borderRadius: 12,
-              padding: 20,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between"
-            }}>
-              <div>
-                <h3 style={{ fontSize: 16, fontWeight: 700, color: "#E8F1EE" }}>صفحة المدوّنة (Blogs Page)</h3>
-                <p style={{ fontSize: 13, color: "#8E9F9A", marginTop: 6, lineHeight: 1.5 }}>
-                  تعديل ترويسة صفحة المدوّنة وعناوينها الفرعية التي يعرض فيها المقالات التلقائية.
-                </p>
-              </div>
-              <a href="/admin/blogs" style={{
-                display: "block",
-                textAlign: "center",
-                backgroundColor: "transparent",
-                border: "1px solid #00E08A",
-                color: "#00E08A",
-                textDecoration: "none",
-                fontWeight: 700,
-                fontSize: 14,
-                padding: "9px 0",
-                borderRadius: 8,
-                marginTop: 20,
-                transition: "background 0.2s"
-              }}>
+          {/* Card 2: Blogs */}
+          <div style={cardStyle}>
+            <div style={cardGlowStyle}></div>
+            <div style={{ position: "relative", zIndex: 2 }}>
+              <div style={iconContainerStyle}>📝</div>
+              <h3 style={cardTitleStyle}>صفحة المدوّنة (Blogs Page)</h3>
+              <p style={cardDescStyle}>
+                تعديل ترويسة صفحة المدوّنة وعناوينها الفرعية التي يعرض فيها المقالات التلقائية.
+              </p>
+              <a 
+                href="/admin/blogs" 
+                style={secondaryBtnStyle}
+                onMouseEnter={secondaryHover}
+                onMouseLeave={secondaryLeave}
+              >
                 تعديل صفحة المدوّنة
               </a>
             </div>
+          </div>
 
-            <div style={{
-              backgroundColor: "#0C1815",
-              border: "1px solid #172F29",
-              borderRadius: 12,
-              padding: 20,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between"
-            }}>
-              <div>
-                <h3 style={{ fontSize: 16, fontWeight: 700, color: "#E8F1EE" }}>الأسئلة الشائعة (FAQ)</h3>
-                <p style={{ fontSize: 13, color: "#8E9F9A", marginTop: 6, lineHeight: 1.5 }}>
-                  إضافة أو حذف أو تعديل الأسئلة الشائعة وإجاباتها وتوزيعها في تصنيفات منظمة.
-                </p>
-              </div>
-              <a href="/admin/faq" style={{
-                display: "block",
-                textAlign: "center",
-                backgroundColor: "transparent",
-                border: "1px solid #172F29",
-                color: "#E8F1EE",
-                textDecoration: "none",
-                fontWeight: 700,
-                fontSize: 14,
-                padding: "9px 0",
-                borderRadius: 8,
-                marginTop: 20,
-                transition: "background 0.2s"
-              }}>
+          {/* Card 3: FAQ */}
+          <div style={cardStyle}>
+            <div style={cardGlowStyle}></div>
+            <div style={{ position: "relative", zIndex: 2 }}>
+              <div style={iconContainerStyle}>🙋‍♂️</div>
+              <h3 style={cardTitleStyle}>الأسئلة الشائعة (FAQ)</h3>
+              <p style={cardDescStyle}>
+                إضافة أو حذف أو تعديل الأسئلة الشائعة وإجاباتها وتوزيعها في تصنيفات منظمة.
+              </p>
+              <a 
+                href="/admin/faq" 
+                style={secondaryBtnStyle}
+                onMouseEnter={secondaryHover}
+                onMouseLeave={secondaryLeave}
+              >
                 تعديل الأسئلة الشائعة
               </a>
             </div>
           </div>
-        </section>
-
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "1.8fr 1.2fr",
-          gap: 30
-        }}>
-          <section>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h2 style={{ fontSize: 18, fontWeight: 700, color: "#E8F1EE" }}>مقالات المدوّنة المنشورة ({blogPages.length})</h2>
-              <button onClick={loadPages} style={{ background: "none", border: "none", color: "#00E08A", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
-                🔄 تحديث
-              </button>
-            </div>
-
-            {loading ? (
-              <div style={{ backgroundColor: "#0C1815", border: "1px solid #172F29", borderRadius: 12, padding: "40px 0", textAlign: "center", color: "#8E9F9A" }}>
-                جاري تحميل قائمة المقالات...
-              </div>
-            ) : blogPages.length === 0 ? (
-              <div style={{ backgroundColor: "#0C1815", border: "1px solid #172F29", borderRadius: 12, padding: "40px 0", textAlign: "center", color: "#8E9F9A" }}>
-                لا يوجد مقالات منشورة حالياً. استخدم النموذج لإنشاء مقالك الأول!
-              </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {blogPages.map((page) => {
-                  const cleanSlug = page.slug.replace("blog-details-", "");
-                  return (
-                    <div key={page.id} style={{ backgroundColor: "#0C1815", border: "1px solid #172F29", borderRadius: 10, padding: "16px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <div style={{ flex: 1, paddingLeft: 20 }}>
-                        <h4 style={{ fontSize: 15, fontWeight: 700, color: "#E8F1EE" }}>
-                          {page.title ? page.title.replace("مقالة: ", "").replace(" - Examy", "") : "بدون عنوان"}
-                        </h4>
-                        <div style={{ display: "flex", gap: 12, fontSize: 12, color: "#8E9F9A", marginTop: 4 }}>
-                          <span>معرف الرابط (Slug): <strong style={{ color: "#ffffff" }}>{cleanSlug}</strong></span>
-                        </div>
-                      </div>
-                      <div style={{ display: "flex", gap: 8 }}>
-                        <a href={`/admin/blog-details?slug=${cleanSlug}`} style={{ backgroundColor: "rgba(255, 255, 255, 0.05)", border: "1px solid #172F29", color: "#ffffff", textDecoration: "none", fontSize: 13, fontWeight: 600, padding: "6px 12px", borderRadius: 6 }}>
-                          تعديل المحتوى
-                        </a>
-                        <button onClick={() => handleDelete(page.slug, page.title)} style={{ backgroundColor: "rgba(239, 68, 68, 0.08)", border: "1px solid rgba(239, 68, 68, 0.2)", color: "#f87171", fontSize: 13, fontWeight: 600, padding: "6px 12px", borderRadius: 6, cursor: "pointer" }}>
-                          حذف
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </section>
-
-          <section>
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: "#E8F1EE" }}>إضافة مقال جديد</h2>
-            <form onSubmit={handleCreate} style={{ backgroundColor: "#0C1815", border: "1px solid #172F29", borderRadius: 12, padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
-              <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#8E9F9A", marginBottom: 8 }}>عنوان المقال الرئيسي</label>
-                <input type="text" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="مثال: أهمية التقييم الإلكتروني في تطوير مهارات التفكير" style={{ width: "100%", backgroundColor: "#07100E", border: "1px solid #172F29", borderRadius: 8, padding: "10px 12px", color: "#ffffff", fontSize: 14, outline: "none" }} required />
-              </div>
-              <div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#8E9F9A", marginBottom: 4 }}>معرّف الرابط (Slug)</label>
-                <span style={{ display: "block", fontSize: 11, color: "#8E9F9A", marginBottom: 8 }}>يُكتب بالإنجليزية، ويستخدم كعنوان للرابط (Slug). مثال: online-assessments</span>
-                <input type="text" value={newSlug} onChange={(e) => setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, "-"))} placeholder="online-assessments" style={{ width: "100%", backgroundColor: "#07100E", border: "1px solid #172F29", borderRadius: 8, padding: "10px 12px", color: "#ffffff", fontSize: 14, outline: "none", fontFamily: "monospace" }} required />
-              </div>
-              <button type="submit" disabled={creating} style={{ width: "100%", backgroundColor: "#00E08A", color: "#07100E", border: "none", fontWeight: 700, fontSize: 14, padding: "12px 0", borderRadius: 8, cursor: creating ? "not-allowed" : "pointer", opacity: creating ? 0.7 : 1, marginTop: 10 }}>
-                {creating ? "جاري الإنشاء..." : "إنشاء مقال جديد والذهاب للمحرر"}
-              </button>
-            </form>
-          </section>
         </div>
 
       </div>
@@ -606,10 +463,10 @@ function AdminEditorContent({ slug }: { slug: string }) {
       const pageTitle = newData.root?.props?.title || defaultTitle;
       
       await savePageData(slug, pageTitle, newData);
-      alert(`تم حفظ تصميم الصفحة (${slug}) بنجاح في قاعدة البيانات PostgreSQL!`);
+      alert("تم حفظ التعديلات بنجاح!");
     } catch (e) {
       console.error(e);
-      alert("حدث خطأ أثناء حفظ الصفحة في قاعدة البيانات.");
+      alert("حدث خطأ أثناء حفظ التعديلات.");
     }
   };
 

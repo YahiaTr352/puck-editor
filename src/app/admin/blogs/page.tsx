@@ -191,10 +191,10 @@ export default function BlogsAdminEditor() {
     try {
       const pageTitle = newData.root?.props?.title || "المدوّنة - Examy";
       await savePageData("blogs", pageTitle, newData);
-      alert("تم حفظ التعديلات بنجاح في قاعدة البيانات PostgreSQL!");
+      alert("تم حفظ التعديلات بنجاح!");
     } catch (e) {
       console.error(e);
-      alert("حدث خطأ أثناء حفظ التعديلات في قاعدة البيانات.");
+      alert("حدث خطأ أثناء حفظ التعديلات.");
     }
   };
 

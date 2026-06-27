@@ -51,8 +51,8 @@ export async function savePageData(slug: string, title: string, puckData: any) {
   try {
     const payload = await getPayload({ config });
 
-    // Check if the page already exists
-    const result = await payload.find({
+    // Check if the page already exists (first check drafts, then fall back to published main table)
+    let result = await payload.find({
       collection: 'pages',
       where: {
         slug: {
@@ -61,6 +61,18 @@ export async function savePageData(slug: string, title: string, puckData: any) {
       },
       draft: true,
     });
+
+    if (result.docs.length === 0) {
+      result = await payload.find({
+        collection: 'pages',
+        where: {
+          slug: {
+            equals: slug,
+          },
+        },
+        draft: false,
+      });
+    }
 
     if (result.docs.length > 0) {
       // Update existing page and publish it directly to the main pages table
