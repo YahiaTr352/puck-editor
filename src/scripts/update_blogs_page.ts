@@ -1,5 +1,5 @@
 import { getPayload } from 'payload';
-import config from '../../payload.config.ts';
+import config from '../../payload.config';
 
 async function run() {
   const payload = await getPayload({ config });
@@ -27,7 +27,7 @@ async function run() {
 
   // Update title and subtitle inside puckData content
   if (puckData.content && Array.isArray(puckData.content)) {
-    puckData.content = puckData.content.map(item => {
+    puckData.content = puckData.content.map((item: any) => {
       if (item.type === 'BlogList') {
         return {
           ...item,

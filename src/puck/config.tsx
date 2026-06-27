@@ -1241,6 +1241,7 @@ export type PuckConfig = {
       }[];
     };
     BlogList: {
+      eyebrow?: string;
       title?: string;
       subtitle?: string;
       posts?: {
@@ -4505,7 +4506,8 @@ export const config: Config<PuckConfig> = {
     },
     BlogList: {
       fields: {
-        title: { type: "text", label: "عنوان المدوّنة", placeholder: "مثال: مدوّنة اختباري" },
+        eyebrow: { type: "text", label: "الوسم العلوي (Eyebrow)", placeholder: "مثال: مدوّنة اختباري" },
+        title: { type: "text", label: "عنوان المدوّنة", placeholder: "مثال: رؤى ومقالات لمعلّمي الغد في المملكة" },
         subtitle: { type: "textarea", label: "الوصف الفرعي", placeholder: "اكتب الوصف الفرعي هنا..." },
         posts: {
           type: "array",
@@ -4530,11 +4532,12 @@ export const config: Config<PuckConfig> = {
         }
       },
       defaultProps: {
+        eyebrow: "مدوّنة اختباري",
         title: "رؤى ومقالات لمعلّمي الغد في المملكة",
         subtitle: "أفكار عملية عن الذكاء الاصطناعي في التعليم، التقويم المتوازن، والمنهج السعودي — من فريق اختباري ونخبة من المعلمين.",
         posts: []
       },
-      render: ({ title, subtitle, posts = [] }) => {
+      render: ({ eyebrow = "مدوّنة اختباري", title, subtitle, posts = [] }) => {
         const [searchQuery, setSearchQuery] = useState("");
         const [selectedCategory, setSelectedCategory] = useState("الكل");
 
@@ -5004,7 +5007,7 @@ export const config: Config<PuckConfig> = {
               <div className="examy-blog-hero-content">
                 <div className="examy-blog-eyebrow">
                   <div className="examy-blog-eyebrow-dot"></div>
-                  <span className="examy-blog-eyebrow-text">مدوّنة اختباري</span>
+                  <span className="examy-blog-eyebrow-text">{eyebrow}</span>
                 </div>
                 <h1 className="examy-blog-hero-title">
                   {title && title.includes("الغد في المملكة") ? (

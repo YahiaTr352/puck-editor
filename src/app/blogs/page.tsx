@@ -23,6 +23,7 @@ const blogsFallbackData = {
       type: "BlogList",
       props: {
         id: "blogs-block",
+        eyebrow: "مدوّنة اختباري",
         title: "رؤى ومقالات لمعلّمي الغد في المملكة",
         subtitle: "أفكار عملية عن الذكاء الاصطناعي في التعليم، التقويم المتوازن، والمنهج السعودي — من فريق اختباري ونخبة من المعلمين.",
         posts: []
@@ -79,11 +80,14 @@ export default async function BlogsPage() {
           }
           if (item.type === "BlogList") {
             const updatedProps = { ...item.props };
+            if (updatedProps.eyebrow === undefined || updatedProps.eyebrow === "") {
+              updatedProps.eyebrow = "مدوّنة اختباري";
+            }
             if (updatedProps.title === undefined || updatedProps.title === "") {
-              updatedProps.title = "مدوّنة اختباري التعليمية";
+              updatedProps.title = "رؤى ومقالات لمعلّمي الغد في المملكة";
             }
             if (updatedProps.subtitle === undefined || updatedProps.subtitle === "") {
-              updatedProps.subtitle = "نصائح وإرشادات تعليمية، مقالات متخصصة في الذكاء الاصطناعي والتقويم المدرسي لمساعدتك على التفوق.";
+              updatedProps.subtitle = "أفكار عملية عن الذكاء الاصطناعي في التعليم، التقويم المتوازن، والمنهج السعودي — من فريق اختباري ونخبة من المعلمين.";
             }
             return { ...item, props: updatedProps };
           }

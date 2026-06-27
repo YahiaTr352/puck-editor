@@ -153,6 +153,7 @@ const blogsFallbackData = {
       type: "BlogList",
       props: {
         id: "blogs-block",
+        eyebrow: "مدوّنة اختباري",
         title: "رؤى ومقالات لمعلّمي الغد في المملكة",
         subtitle: "أفكار عملية عن الذكاء الاصطناعي في التعليم، التقويم المتوازن، والمنهج السعودي — من فريق اختباري ونخبة من المعلمين.",
         posts: []
@@ -551,18 +552,39 @@ function AdminEditorContent({ slug }: { slug: string }) {
       setLoading(true);
       try {
         const dbData = await getPageData(slug);
-        if (dbData && dbData.puckData) {
-          const parsed = typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData;
-          setData(parsed);
-        } else {
-          setData(
-            slug === "faq"
-              ? faqFallbackData
-              : slug === "blogs"
-              ? blogsFallbackData
-              : initialData
-          );
+        let rawData = dbData && dbData.puckData 
+          ? (typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData)
+          : (slug === "faq" ? faqFallbackData : slug === "blogs" ? blogsFallbackData : initialData);
+
+        if (rawData.content && Array.isArray(rawData.content)) {
+          let posts: any[] = [];
+          if (slug === "blogs") {
+            try {
+              posts = await getDynamicBlogsList();
+            } catch (err) {
+              console.error("Failed to fetch dynamic blogs list for editor:", err);
+            }
+          }
+
+          rawData.content = rawData.content.map((item: any) => {
+            if (item.type === "BlogList") {
+              const updatedProps = { ...item.props };
+              updatedProps.posts = posts;
+              if (updatedProps.eyebrow === undefined || updatedProps.eyebrow === "") {
+                updatedProps.eyebrow = "مدوّنة اختباري";
+              }
+              if (updatedProps.title === undefined || updatedProps.title === "") {
+                updatedProps.title = "رؤى ومقالات لمعلّمي الغد في المملكة";
+              }
+              if (updatedProps.subtitle === undefined || updatedProps.subtitle === "") {
+                updatedProps.subtitle = "أفكار عملية عن الذكاء الاصطناعي في التعليم، التقويم المتوازن، والمنهج السعودي — من فريق اختباري ونخبة من المعلمين.";
+              }
+              return { ...item, props: updatedProps };
+            }
+            return item;
+          });
         }
+        setData(rawData);
       } catch (e) {
         console.error("Failed to load page data:", e);
         setData(initialData);
