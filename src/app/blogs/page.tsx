@@ -1,8 +1,6 @@
 import React from "react";
-import { getPageData } from "../actions";
+import { getPageData, getDynamicBlogsList } from "../actions";
 import { BlogsClientView } from "./BlogsClientView";
-import { getPayload } from "payload";
-import config from "@payload-config";
 
 const blogsFallbackData = {
   content: [
@@ -25,8 +23,8 @@ const blogsFallbackData = {
       type: "BlogList",
       props: {
         id: "blogs-block",
-        title: "مدوّنة اختباري التعليمية",
-        subtitle: "نصائح وإرشادات تعليمية، مقالات متخصصة في الذكاء الاصطناعي والتقويم المدرسي لمساعدتك على التفوق.",
+        title: "رؤى ومقالات لمعلّمي الغد في المملكة",
+        subtitle: "أفكار عملية عن الذكاء الاصطناعي في التعليم، التقويم المتوازن، والمنهج السعودي — من فريق اختباري ونخبة من المعلمين.",
         posts: []
       }
     },
@@ -48,36 +46,9 @@ export default async function BlogsPage() {
   let data = blogsFallbackData;
   let posts: any[] = [];
 
-  // 1. Query all blog details pages dynamically from PostgreSQL via Payload local API
+  // 1. Query all blog details pages dynamically from PostgreSQL
   try {
-    const payload = await getPayload({ config });
-    const result = await payload.find({
-      collection: 'pages',
-      limit: 100,
-      draft: false,
-    });
-
-    const blogDocs = result.docs.filter((doc: any) => doc.slug.startsWith('blog-details-'));
-    
-    // Sort descending by ID to make newer/featured posts appear first
-    blogDocs.sort((a: any, b: any) => b.id - a.id);
-
-    posts = blogDocs.map((doc: any) => {
-      const puckData = typeof doc.puckData === 'string' ? JSON.parse(doc.puckData) : doc.puckData;
-      const blogDetails = puckData?.content?.find((c: any) => c.type === 'BlogDetails') || {};
-      const props = blogDetails.props || {};
-
-      const cleanSlug = doc.slug.replace('blog-details-', '');
-
-      return {
-        title: props.title || doc.title || "",
-        description: props.subtitle || "",
-        image: props.image || "",
-        date: props.date || "",
-        author: props.author || "فريق اختباري",
-        slug: cleanSlug
-      };
-    });
+    posts = await getDynamicBlogsList();
   } catch (e) {
     console.error("Error fetching dynamic blogs list:", e);
   }

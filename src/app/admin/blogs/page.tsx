@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Puck } from "@puckeditor/core";
 import "@puckeditor/core/dist/index.css";
 import { config } from "../../../puck/config";
-import { getPageData, savePageData } from "../../actions";
+import { getPageData, savePageData, getDynamicBlogsList } from "../../actions";
 
 const initialBlogsData = {
   content: [
@@ -26,8 +26,8 @@ const initialBlogsData = {
       type: "BlogList",
       props: {
         id: "blogs-block",
-        title: "مدوّنة اختباري التعليمية",
-        subtitle: "نصائح وإرشادات تعليمية، مقالات متخصصة في الذكاء الاصطناعي والتقويم المدرسي لمساعدتك على التفوق.",
+        title: "رؤى ومقالات لمعلّمي الغد في المملكة",
+        subtitle: "أفكار عملية عن الذكاء الاصطناعي في التعليم، التقويم المتوازن، والمنهج السعودي — من فريق اختباري ونخبة من المعلمين.",
         posts: []
       }
     },
@@ -83,95 +83,95 @@ export default function BlogsAdminEditor() {
     async function loadData() {
       setLoading(true);
       try {
+        const posts = await getDynamicBlogsList();
         const dbData = await getPageData("blogs");
+        
+        let rawData = initialBlogsData;
         if (dbData && dbData.puckData) {
-          const parsed = typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData;
-          if (parsed.content && Array.isArray(parsed.content)) {
-            const migratedContent = parsed.content.map((item: any) => {
-              if (item.type === "Nav") {
-                const updatedProps = { ...item.props };
-                updatedProps.links = [
-                  { label: "الميزات", href: "/#features" },
-                  { label: "الأسعار", href: "/#pricing" },
-                  { label: "كيف يعمل", href: "/#how_it_works" },
-                  { label: "القوالب الجاهزة", href: "/#actual-models" }
+          rawData = typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData;
+        }
+
+        if (rawData.content && Array.isArray(rawData.content)) {
+          const migratedContent = rawData.content.map((item: any) => {
+            if (item.type === "Nav") {
+              const updatedProps = { ...item.props };
+              updatedProps.links = [
+                { label: "الميزات", href: "/#features" },
+                { label: "الأسعار", href: "/#pricing" },
+                { label: "كيف يعمل", href: "/#how_it_works" },
+                { label: "القوالب الجاهزة", href: "/#actual-models" }
+              ];
+              if (!updatedProps.actions) {
+                updatedProps.actions = [
+                  { label: "تسجيل دخول", href: "#login", variant: "link" },
+                  { label: updatedProps.ctaText || "ابدأ مجاناً", href: updatedProps.ctaLink || "#cta", variant: "primary" }
                 ];
-                if (!updatedProps.actions) {
-                  updatedProps.actions = [
-                    { label: "تسجيل دخول", href: "#login", variant: "link" },
-                    { label: updatedProps.ctaText || "ابدأ مجاناً", href: updatedProps.ctaLink || "#cta", variant: "primary" }
-                  ];
-                }
-                return { ...item, props: updatedProps };
               }
-              if (item.type === "BlogList") {
-                const updatedProps = { ...item.props };
-                if (!updatedProps.posts || updatedProps.posts.length === 0) {
-                  updatedProps.posts = [];
-                }
-                if (updatedProps.title === undefined || updatedProps.title === "") {
-                  updatedProps.title = "مدوّنة اختباري التعليمية";
-                }
-                if (updatedProps.subtitle === undefined || updatedProps.subtitle === "") {
-                  updatedProps.subtitle = "نصائح وإرشادات تعليمية، مقالات متخصصة في الذكاء الاصطناعي والتقويم المدرسي لمساعدتك على التفوق.";
-                }
-                return { ...item, props: updatedProps };
+              return { ...item, props: updatedProps };
+            }
+            if (item.type === "BlogList") {
+              const updatedProps = { ...item.props };
+              updatedProps.posts = posts;
+              if (updatedProps.title === undefined || updatedProps.title === "") {
+                updatedProps.title = "مدوّنة اختباري التعليمية";
               }
-              if (item.type === "Footer") {
-                const updatedProps = { ...item.props };
-                const defs = {
-                  description: "منصة سعودية مدعومة بالذكاء الاصطناعي لإنشاء وإدارة الاختبارات، مرتبطة بالمنهج السعودي.",
-                  twitterUrl: "https://x.com/examyai",
-                  instagramUrl: "https://www.instagram.com/examy.ai/",
-                  col1Title: "المنتج",
-                  col1Links: [
-                    { label: "الميزات", href: "#" },
-                    { label: "كيف يعمل", href: "#" },
-                    { label: "القوالب الجاهزة", href: "#" }
-                  ],
-                  col2Title: "لمن",
-                  col2Links: [
-                    { label: "للمعلمين", href: "#" },
-                    { label: "للمدارس", href: "#" },
-                    { label: "للجامعات", href: "#" },
-                    { label: "للجهات التعليمية", href: "#" }
-                  ],
-                  col3Title: "موارد",
-                  col3Links: [
-                    { label: "مركز المساعدة", href: "#" },
-                    { label: "المدوّنة", href: "#" },
-                    { label: "عن اختباري", href: "#" },
-                    { label: "تواصل معنا", href: "#" }
-                  ],
-                  col4Title: "الشركة",
-                  col4Links: [
-                    { label: "سياسة الخصوصية", href: "#" },
-                    { label: "الشروط والأحكام", href: "#" }
-                  ],
-                  copyrightText: "© ٢٠٢٦ اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦",
-                  statusText: "توليد ذكي وموثوق"
-                };
-                Object.keys(defs).forEach(key => {
-                  const val = updatedProps[key];
-                  if (
-                    val === undefined ||
-                    val === null ||
-                    val === "" ||
-                    (Array.isArray(val) && val.length === 0)
-                  ) {
-                    updatedProps[key] = (defs as any)[key];
-                  }
-                });
-                return { ...item, props: updatedProps };
+              if (updatedProps.subtitle === undefined || updatedProps.subtitle === "") {
+                updatedProps.subtitle = "نصائح وإرشادات تعليمية، مقالات متخصصة في الذكاء الاصطناعي والتقويم المدرسي لمساعدتك على التفوق.";
               }
-              return item;
-            });
-            setData({ ...parsed, content: migratedContent });
-          } else {
-            setData(initialBlogsData);
-          }
+              return { ...item, props: updatedProps };
+            }
+            if (item.type === "Footer") {
+              const updatedProps = { ...item.props };
+              const defs = {
+                description: "منصة سعودية مدعومة بالذكاء الاصطناعي لإنشاء وإدارة الاختبارات، مرتبطة بالمنهج السعودي.",
+                twitterUrl: "https://x.com/examyai",
+                instagramUrl: "https://www.instagram.com/examy.ai/",
+                col1Title: "المنتج",
+                col1Links: [
+                  { label: "الميزات", href: "#" },
+                  { label: "كيف يعمل", href: "#" },
+                  { label: "القوالب الجاهزة", href: "#" }
+                ],
+                col2Title: "لمن",
+                col2Links: [
+                  { label: "للمعلمين", href: "#" },
+                  { label: "للمدارس", href: "#" },
+                  { label: "للجامعات", href: "#" },
+                  { label: "للجهات التعليمية", href: "#" }
+                ],
+                col3Title: "موارد",
+                col3Links: [
+                  { label: "مركز المساعدة", href: "#" },
+                  { label: "المدوّنة", href: "#" },
+                  { label: "عن اختباري", href: "#" },
+                  { label: "تواصل معنا", href: "#" }
+                ],
+                col4Title: "الشركة",
+                col4Links: [
+                  { label: "سياسة الخصوصية", href: "#" },
+                  { label: "الشروط والأحكام", href: "#" }
+                ],
+                copyrightText: "© ٢٠٢٦ اختباري · Examy. صُنع بحبٍّ في المملكة العربية السعودية 🇸🇦",
+                statusText: "توليد ذكي وموثوق"
+              };
+              Object.keys(defs).forEach(key => {
+                const val = updatedProps[key];
+                if (
+                  val === undefined ||
+                  val === null ||
+                  val === "" ||
+                  (Array.isArray(val) && val.length === 0)
+                ) {
+                  updatedProps[key] = (defs as any)[key];
+                }
+              });
+              return { ...item, props: updatedProps };
+            }
+            return item;
+          });
+          setData({ ...rawData, content: migratedContent });
         } else {
-          setData(initialBlogsData);
+          setData(rawData);
         }
       } catch (e) {
         console.error("Failed to load page data:", e);

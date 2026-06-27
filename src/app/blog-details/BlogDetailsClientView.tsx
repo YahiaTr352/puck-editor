@@ -6,7 +6,7 @@ import { config } from "../../puck/config";
 
 export function BlogDetailsClientView({ data }: { data: any }) {
   return (
-    <div style={{ minHeight: "100vh", position: "relative", backgroundColor: "#07100E" }}>
+    <div style={{ minHeight: "100vh", position: "relative", backgroundColor: "#000000" }}>
       <Render config={config} data={data} />
     </div>
   );

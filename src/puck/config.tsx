@@ -1479,7 +1479,38 @@ export const config: Config<PuckConfig> = {
                 style={{ display: "flex", gap: 10, alignItems: "center", justifyContent: "flex-end" }}
                 className="nav-actions"
               >
-                {/* Theme Toggle Button (Desktop) */}
+                {/* Actions first (reversed to make primary CTA rightmost, link in middle under RTL) */}
+                {[...activeActions].reverse().map((act, idx) => {
+                  if (act.variant === "primary") {
+                    return (
+                      <a
+                        key={`act-${idx}`}
+                        href={act.href}
+                        className="btn btn-primary"
+                        style={{ padding: "10px 18px", fontSize: 14 }}
+                      >
+                        {act.label}
+                        <Icon.ArrowLeft width="16" height="16" />
+                      </a>
+                    );
+                  }
+                  return (
+                    <a
+                      key={`act-${idx}`}
+                      href={act.href}
+                      style={{
+                        fontSize: 14,
+                        color: "var(--text-muted)",
+                        fontWeight: 500,
+                        padding: "8px 12px",
+                      }}
+                    >
+                      {act.label}
+                    </a>
+                  );
+                })}
+
+                {/* Theme Toggle Button (Desktop) - Leftmost under RTL */}
                 <button
                   type="button"
                   id="theme-toggle-header-btn"
@@ -1528,35 +1559,6 @@ export const config: Config<PuckConfig> = {
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                   )}
                 </button>
-                {activeActions.map((act, idx) => {
-                  if (act.variant === "primary") {
-                    return (
-                      <a
-                        key={`act-${idx}`}
-                        href={act.href}
-                        className="btn btn-primary"
-                        style={{ padding: "10px 18px", fontSize: 14 }}
-                      >
-                        {act.label}
-                        <Icon.ArrowLeft width="16" height="16" />
-                      </a>
-                    );
-                  }
-                  return (
-                    <a
-                      key={`act-${idx}`}
-                      href={act.href}
-                      style={{
-                        fontSize: 14,
-                        color: "var(--text-muted)",
-                        fontWeight: 500,
-                        padding: "8px 12px",
-                      }}
-                    >
-                      {act.label}
-                    </a>
-                  );
-                })}
               </div>
               
               {/* Theme Toggle & Hamburger Button (Mobile Container) */}
@@ -4528,8 +4530,8 @@ export const config: Config<PuckConfig> = {
         }
       },
       defaultProps: {
-        title: "مدوّنة اختباري التعليمية",
-        subtitle: "نصائح وإرشادات تعليمية، مقالات متخصصة في الذكاء الاصطناعي والتقويم المدرسي لمساعدتك على التفوق.",
+        title: "رؤى ومقالات لمعلّمي الغد في المملكة",
+        subtitle: "أفكار عملية عن الذكاء الاصطناعي في التعليم، التقويم المتوازن، والمنهج السعودي — من فريق اختباري ونخبة من المعلمين.",
         posts: []
       },
       render: ({ title, subtitle, posts = [] }) => {
@@ -5005,9 +5007,9 @@ export const config: Config<PuckConfig> = {
                   <span className="examy-blog-eyebrow-text">مدوّنة اختباري</span>
                 </div>
                 <h1 className="examy-blog-hero-title">
-                  {title === "مدوّنة اختباري التعليمية" || title === "المدوّنة - Examy" ? (
+                  {title && title.includes("الغد في المملكة") ? (
                     <>
-                      رؤى ومقالات لمعلّمي
+                      {title.replace("الغد في المملكة", "")}
                       <br />
                       <span>الغد في المملكة</span>
                     </>
@@ -5091,6 +5093,41 @@ export const config: Config<PuckConfig> = {
                 </div>
               )}
             </div>
+
+            {/* Floating edit button for blogs list page layout */}
+            {(typeof window !== "undefined" && !window.location.pathname.includes("/admin")) && (
+              <a
+                href="/admin/blogs"
+                style={{
+                  position: "fixed",
+                  bottom: 24,
+                  left: 24,
+                  backgroundColor: "#00E08A",
+                  color: "#07100E",
+                  padding: "12px 20px",
+                  borderRadius: 30,
+                  boxShadow: "0 10px 25px rgba(0, 224, 138, 0.35)",
+                  fontWeight: 700,
+                  fontSize: 14,
+                  textDecoration: "none",
+                  zIndex: 9999,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontFamily: "'Cairo', sans-serif",
+                  transition: "all 0.2s ease",
+                  cursor: "pointer"
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+                تعديل صفحة المدوّنة
+              </a>
+            )}
           </div>
         );
       }
@@ -5114,74 +5151,104 @@ export const config: Config<PuckConfig> = {
       },
       render: ({ title, subtitle, date, author, image, content = "" }) => {
         return (
-          <article style={{ padding: "120px 24px 80px", direction: "rtl", color: "var(--text)", position: "relative" }}>
-            <div className="grid-bg" />
-            
+          <article style={{ padding: "120px 24px 80px", direction: "rtl", color: "#ffffff", backgroundColor: "#000000", position: "relative" }}>
             <style>{`
+              .blog-rich-content span,
+              .blog-rich-content p,
+              .blog-rich-content div,
+              .blog-rich-content li,
+              .blog-rich-content strong,
+              .blog-rich-content em,
+              .blog-rich-content h1,
+              .blog-rich-content h2,
+              .blog-rich-content h3,
+              .blog-rich-content h4,
+              .blog-rich-content h5,
+              .blog-rich-content h6 {
+                color: #ffffff !important;
+              }
+              .blog-rich-content a {
+                color: var(--brand) !important;
+                text-decoration: underline;
+              }
               .blog-rich-content p {
-                margin-bottom: 20px;
-                font-size: 16px;
-                line-height: 1.8;
-                color: var(--text-muted);
+                margin-bottom: 24px;
+                font-size: 18px;
+                line-height: 1.85;
+                text-align: right;
               }
               .blog-rich-content h2 {
-                margin-top: 36px;
-                margin-bottom: 16px;
-                font-size: 22px;
+                margin-top: 40px;
+                margin-bottom: 20px;
+                font-size: 24px;
                 font-weight: 800;
-                color: var(--text);
+                text-align: right;
               }
               .blog-rich-content h3 {
-                margin-top: 30px;
-                margin-bottom: 12px;
-                font-size: 19px;
+                margin-top: 32px;
+                margin-bottom: 16px;
+                font-size: 20px;
                 font-weight: 700;
-                color: var(--text);
+                text-align: right;
               }
               .blog-rich-content ul, .blog-rich-content ol {
-                margin-bottom: 20px;
+                margin-bottom: 24px;
                 padding-right: 24px;
                 list-style-position: inside;
               }
               .blog-rich-content li {
-                margin-bottom: 8px;
-                font-size: 15.5px;
-                color: var(--text-muted);
+                margin-bottom: 10px;
+                font-size: 17px;
+                color: rgba(255, 255, 255, 0.9) !important;
+                text-align: right;
               }
               .blog-rich-content strong {
-                color: var(--text);
                 font-weight: 700;
-              }
-              .blog-rich-content a {
-                color: var(--brand);
-                text-decoration: underline;
               }
             `}</style>
 
-            <div style={{ maxWidth: 800, margin: "0 auto", position: "relative", zIndex: 2 }}>
-              <a href="/blogs" style={{
+            <div style={{ maxWidth: 760, margin: "0 auto", position: "relative", zIndex: 2, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+              <Link href="/blogs" style={{
                 display: "inline-flex",
+                flexDirection: "row-reverse",
                 alignItems: "center",
-                gap: 8,
-                color: "var(--brand)",
+                gap: 7,
+                padding: "8px 16px",
+                borderRadius: 24,
+                border: "1px solid rgba(255, 255, 255, 0.15)",
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                color: "#ffffff",
                 textDecoration: "none",
-                fontSize: 14,
-                fontWeight: 600,
-                marginBottom: 32,
-                transition: "transform 0.2s ease"
+                fontSize: 13,
+                fontWeight: 500,
+                alignSelf: "flex-start",
+                marginBottom: 18,
+                transition: "all 0.2s ease",
+                cursor: "pointer"
               }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = "translateX(-4px)"}
-                onMouseLeave={(e) => e.currentTarget.style.transform = "translateX(0)"}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+                  e.currentTarget.style.borderColor = "var(--brand)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.05)";
+                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.15)";
+                }}
               >
-                <span>→</span> العودة للمدوّنة
-              </a>
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--brand)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+                <span>رجوع إلى المدوّنة</span>
+              </Link>
 
               <h1 style={{
-                fontSize: "clamp(26px, 4vw, 42px)",
-                fontWeight: "900",
-                lineHeight: 1.3,
-                color: "var(--text)",
-                marginBottom: 20
+                fontSize: 30,
+                fontWeight: "bold",
+                lineHeight: "42px",
+                color: "#ffffff",
+                marginBottom: 16,
+                textAlign: "right",
+                width: "100%"
               }}>
                 {title}
               </h1>
@@ -5189,35 +5256,35 @@ export const config: Config<PuckConfig> = {
               <div style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 16,
-                color: "var(--text-muted)",
-                fontSize: 13,
-                marginBottom: 32,
-                borderBottom: "1px solid var(--border)",
-                paddingBottom: 16
+                gap: 6,
+                color: "rgba(255, 255, 255, 0.6)",
+                fontSize: 12.5,
+                marginBottom: 20,
+                justifyContent: "flex-start",
+                direction: "rtl",
+                width: "100%"
               }}>
-                <span>الكاتب: <strong>{author}</strong></span>
-                <span style={{ color: "var(--border-strong)" }}>|</span>
-                <span>تاريخ النشر: <strong>{date}</strong></span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span style={{ fontWeight: 500 }}>{date}</span>
               </div>
 
               {image && (
                 <div style={{
                   position: "relative",
-                  borderRadius: 20,
-                  overflow: "hidden",
-                  marginBottom: 40,
+                  width: "100%",
+                  aspectRatio: "1.9 / 1",
+                  borderRadius: 16,
                   border: "1px solid var(--border)",
-                  boxShadow: "0 16px 40px rgba(0,0,0,0.3)"
+                  overflow: "hidden",
+                  marginBottom: 20,
+                  backgroundColor: "rgba(0,0,0,0.02)"
                 }}>
-                  <img src={image} alt={title} style={{ width: "100%", height: "auto", display: "block" }} />
-                  <div style={{
-                    position: "absolute",
-                    inset: 0,
-                    backgroundImage: "linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px)",
-                    backgroundSize: "28px 28px",
-                    pointerEvents: "none"
-                  }} />
+                  <img src={image} alt={title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                 </div>
               )}
 
@@ -5233,7 +5300,8 @@ export const config: Config<PuckConfig> = {
                   background: "rgba(0, 224, 138, 0.03)",
                   paddingTop: 12,
                   paddingBottom: 12,
-                  borderRadius: "0 8px 8px 0"
+                  borderRadius: "0 8px 8px 0",
+                  width: "100%"
                 }}>
                   {subtitle}
                 </div>
@@ -5241,16 +5309,59 @@ export const config: Config<PuckConfig> = {
 
               <div 
                 className="blog-rich-content"
-                style={{ fontSize: 16, lineHeight: 1.8, color: "var(--text-muted)" }} 
+                style={{ fontSize: 18, lineHeight: 1.85, color: "#ffffff", width: "100%", display: "flow-root", clear: "both" }} 
                 dangerouslySetInnerHTML={{ __html: content }} 
               />
 
-              <div style={{ marginTop: 50, paddingTop: 30, borderTop: "1px solid var(--border)", display: "flex", justifyContent: "space-between" }}>
+              <div style={{ marginTop: 50, paddingTop: 30, borderTop: "1px solid var(--border)", display: "flex", justifyContent: "space-between", width: "100%" }}>
                 <a href="/blogs" style={{ color: "var(--brand)", textDecoration: "none", fontWeight: 700 }}>
                   ← العودة للمدوّنة
                 </a>
               </div>
             </div>
+
+            {/* Floating edit button for blog details page layout */}
+            {(() => {
+              let slug = "";
+              if (typeof window !== "undefined") {
+                const params = new URLSearchParams(window.location.search);
+                slug = params.get("slug") || "";
+              }
+              const showEditButton = typeof window !== "undefined" && !window.location.pathname.includes("/admin") && slug;
+              return showEditButton ? (
+                <a
+                  href={`/admin/blog-details?slug=${slug}`}
+                  style={{
+                    position: "fixed",
+                    bottom: 24,
+                    left: 24,
+                    backgroundColor: "#00E08A",
+                    color: "#07100E",
+                    padding: "12px 20px",
+                    borderRadius: 30,
+                    boxShadow: "0 10px 25px rgba(0, 224, 138, 0.35)",
+                    fontWeight: 700,
+                    fontSize: 14,
+                    textDecoration: "none",
+                    zIndex: 9999,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    fontFamily: "'Cairo', sans-serif",
+                    transition: "all 0.2s ease",
+                    cursor: "pointer"
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
+                  تعديل هذه المقالة
+                </a>
+              ) : null;
+            })()}
           </article>
         );
       }
@@ -5258,9 +5369,22 @@ export const config: Config<PuckConfig> = {
   },
   root: {
     render: ({ children }) => {
+      let pathname = "";
+      try {
+        pathname = usePathname() || "";
+      } catch (e) {
+        if (typeof window !== "undefined") {
+          pathname = window.location.pathname || "";
+        }
+      }
+
+      const isBlogDetails = pathname.includes("blog-details");
+
       return (
-        <div style={{ direction: "rtl", minHeight: "100vh", position: "relative", width: "100%" }}>
-          <AmbientBackground bgStyle="fluid" intensity={75} blur={60} speed={100} grain={true} mesh={false} />
+        <div style={{ direction: "rtl", minHeight: "100vh", position: "relative", width: "100%", backgroundColor: isBlogDetails ? "#000000" : "transparent" }}>
+          {!isBlogDetails && (
+            <AmbientBackground bgStyle="fluid" intensity={75} blur={60} speed={100} grain={true} mesh={false} />
+          )}
           <div style={{ position: "relative", zIndex: 1 }}>
             {children}
           </div>
