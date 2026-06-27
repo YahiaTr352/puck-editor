@@ -2,6 +2,8 @@ import React from "react";
 import { getPageData } from "../../actions";
 import { BlogDetailsClientView } from "./BlogDetailsClientView";
 
+export const dynamic = "force-dynamic";
+
 const blogDetailsFallbackData = {
   content: [
     {
@@ -60,11 +62,13 @@ export async function generateMetadata({ searchParams }: Args) {
       ? (typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData)
       : null;
     const blogDetailsBlock = puckData?.content?.find((c: any) => c.type === "BlogDetails");
-    const title = puckData?.root?.props?.title || blogDetailsBlock?.props?.title || dbData?.title || "تفاصيل المقالة - Examy";
-    const description = puckData?.root?.props?.description || blogDetailsBlock?.props?.subtitle || "اقرأ مقالات المدوّنة التعليمية لمنصة اختباري.";
+    const title = puckData?.root?.props?.title || (dbData as any)?.meta?.title || blogDetailsBlock?.props?.title || dbData?.title || "تفاصيل المقالة - Examy";
+    const description = puckData?.root?.props?.description || (dbData as any)?.meta?.description || blogDetailsBlock?.props?.subtitle || "اقرأ مقالات المدوّنة التعليمية لمنصة اختباري.";
+    const keywords = (dbData as any)?.meta?.keywords || undefined;
     return {
       title,
       description,
+      keywords,
     };
   } catch (e) {
     return {
@@ -88,13 +92,15 @@ export default async function BlogDetailsPage({ searchParams }: Args) {
         const migratedContent = parsed.content.map((item: any) => {
           if (item.type === "Nav") {
             const updatedProps = { ...item.props };
-            updatedProps.links = [
-              { label: "الأسئلة الشائعة", href: "/faq" },
-              { label: "المدوّنة", href: "/blogs" },
-              { label: "نماذج واقعية", href: "/#actual-models" },
-              { label: "كيف يعمل", href: "/#how_it_works" },
-              { label: "المنتج", href: "/#features" }
-            ];
+            if (!updatedProps.links || updatedProps.links.length === 0) {
+              updatedProps.links = [
+                { label: "الأسئلة الشائعة", href: "/faq" },
+                { label: "المدوّنة", href: "/blogs" },
+                { label: "نماذج واقعية", href: "/#actual-models" },
+                { label: "كيف يعمل", href: "/#how_it_works" },
+                { label: "المنتج", href: "/#features" }
+              ];
+            }
             if (!updatedProps.actions) {
               updatedProps.actions = [
                 { label: "تسجيل دخول", href: "#login", variant: "link" },

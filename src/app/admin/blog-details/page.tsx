@@ -97,12 +97,14 @@ function BlogDetailsAdminContent() {
             const migratedContent = parsed.content.map((item: any) => {
               if (item.type === "Nav") {
                 const updatedProps = { ...item.props };
-                updatedProps.links = [
-                  { label: "الميزات", href: "/#features" },
-                  { label: "الأسعار", href: "/#pricing" },
-                  { label: "كيف يعمل", href: "/#how_it_works" },
-                  { label: "القوالب الجاهزة", href: "/#actual-models" }
-                ];
+                if (!updatedProps.links || updatedProps.links.length === 0) {
+                  updatedProps.links = [
+                    { label: "الميزات", href: "/#features" },
+                    { label: "الأسعار", href: "/#pricing" },
+                    { label: "كيف يعمل", href: "/#how_it_works" },
+                    { label: "القوالب الجاهزة", href: "/#actual-models" }
+                  ];
+                }
                 if (!updatedProps.actions) {
                   updatedProps.actions = [
                     { label: "تسجيل دخول", href: "#login", variant: "link" },

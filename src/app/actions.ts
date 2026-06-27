@@ -2,6 +2,7 @@
 
 import { getPayload } from 'payload';
 import config from '@payload-config';
+import { revalidatePath } from 'next/cache';
 
 /**
  * Get page data from Payload CMS PostgreSQL database by slug
@@ -87,6 +88,7 @@ export async function savePageData(slug: string, title: string, puckData: any) {
         },
         draft: false, // Save as published directly to the main pages table
       });
+      revalidatePath('/', 'layout');
       return { success: true, doc: updated };
     } else {
       // Create and publish new page
@@ -100,6 +102,7 @@ export async function savePageData(slug: string, title: string, puckData: any) {
         },
         draft: false, // Save as published directly to the main pages table
       });
+      revalidatePath('/', 'layout');
       return { success: true, doc: created };
     }
   } catch (error) {
@@ -152,6 +155,7 @@ export async function deletePageData(slug: string) {
         collection: 'pages',
         id: result.docs[0].id,
       });
+      revalidatePath('/', 'layout');
       return { success: true };
     }
     return { success: false, error: 'Page not found' };

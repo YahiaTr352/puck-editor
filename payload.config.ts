@@ -4,9 +4,32 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import sharp from 'sharp';
+import { seoPlugin } from '@payloadcms/plugin-seo';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
+
+const generateTitle = ({ doc }: any) => {
+  return doc?.title ? `${doc.title} - Examy` : 'Examy';
+};
+
+const generateDescription = ({ doc }: any) => {
+  try {
+    const parsed = doc?.puckData 
+      ? (typeof doc.puckData === 'string' ? JSON.parse(doc.puckData) : doc.puckData) 
+      : null;
+    const heroBlock = parsed?.content?.find((c: any) => c.type === 'Hero');
+    return parsed?.root?.props?.description || heroBlock?.props?.subtitle || 'Examy';
+  } catch (e) {
+    return 'Examy';
+  }
+};
+
+const generateURL = ({ doc }: any) => {
+  const base = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  if (!doc?.slug) return base;
+  return `${base}/${doc.slug}`;
+};
 
 export default buildConfig({
   admin: {
@@ -14,6 +37,9 @@ export default buildConfig({
     suppressHydrationWarning: true,
     importMap: {
       baseDir: path.resolve(dirname),
+    },
+    components: {
+      beforeDashboard: ['/src/components/CmsEditorLink#CmsEditorLink'],
     },
   },
   collections: [
@@ -76,4 +102,13 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
+  plugins: [
+    seoPlugin({
+      collections: ['pages'],
+      tabbedUI: true,
+      generateTitle,
+      generateDescription,
+      generateURL,
+    }),
+  ],
 });

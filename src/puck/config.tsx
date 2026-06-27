@@ -5622,10 +5622,6 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
     },
   },
   root: {
-    fields: {
-      title: { type: "text", label: "عنوان الصفحة (SEO Title)" },
-      description: { type: "textarea", label: "وصف الصفحة (SEO Description)" }
-    },
     render: ({ children }) => {
       let pathname = "";
       try {

@@ -163,23 +163,28 @@ export default function HomeAdminEditor() {
   const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    const savedData = localStorage.getItem("puck-page-data");
-    if (savedData) {
+    async function loadData() {
       try {
-        const parsed = JSON.parse(savedData);
-        // التحقق من أن الهيكل متوافق وإلا تحميل الافتراضي
-        if (parsed.content && Array.isArray(parsed.content)) {
+        const dbData = await getPageData("home");
+        const savedData = dbData && dbData.puckData 
+          ? (typeof dbData.puckData === 'string' ? dbData.puckData : JSON.stringify(dbData.puckData))
+          : null;
+        if (savedData) {
+          const parsed = JSON.parse(savedData);
+          if (parsed.content && Array.isArray(parsed.content)) {
           const migratedContent = parsed.content.map((item: any) => {
             if (item.type === "Nav") {
               const updatedProps = { ...item.props };
-              updatedProps.links = [
-                { label: "المنتج", href: "#features" },
-                { label: "كيف يعمل", href: "#how_it_works" },
-                { label: "نماذج واقعية", href: "#actual-models" },
-                { label: "الأسعار", href: "#pricing" },
-                { label: "المدوّنة", href: "/blogs" },
-                { label: "الأسئلة الشائعة", href: "/faq" }
-              ];
+              if (!updatedProps.links || updatedProps.links.length === 0) {
+                updatedProps.links = [
+                  { label: "المنتج", href: "#features" },
+                  { label: "كيف يعمل", href: "#how_it_works" },
+                  { label: "نماذج واقعية", href: "#actual-models" },
+                  { label: "الأسعار", href: "#pricing" },
+                  { label: "المدوّنة", href: "/blogs" },
+                  { label: "الأسئلة الشائعة", href: "/faq" }
+                ];
+              }
               if (!updatedProps.actions) {
                 updatedProps.actions = [
                   { label: "تسجيل دخول", href: "#login", variant: "link" },
@@ -473,17 +478,27 @@ export default function HomeAdminEditor() {
         } else {
           setData(initialData);
         }
-      } catch (e) {
+      } else {
         setData(initialData);
       }
-    } else {
+    } catch (e) {
+      console.error("Failed to load page data:", e);
       setData(initialData);
     }
-  }, []);
+  }
+  loadData();
+}, []);
 
   const handleSave = async (newData: any) => {
-    localStorage.setItem("puck-page-data", JSON.stringify(newData));
-    alert("تم حفظ التعديلات بنجاح");
+    try {
+      const pageTitle = newData.root?.props?.title || "الصفحة الرئيسية - Examy";
+      await savePageData("home", pageTitle, newData);
+      localStorage.setItem("puck-page-data", JSON.stringify(newData));
+      alert("تم حفظ التعديلات بنجاح!");
+    } catch (e) {
+      console.error(e);
+      alert("حدث خطأ أثناء حفظ التعديلات.");
+    }
   };
 
   if (!data) {

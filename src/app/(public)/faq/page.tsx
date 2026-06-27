@@ -3,6 +3,8 @@ import { getPageData } from "../../actions";
 import { FAQClientView } from "./FAQClientView";
 import { config } from "../../../puck/config";
 
+export const dynamic = "force-dynamic";
+
 const faqFallbackData = {
   content: [
     {
@@ -47,12 +49,14 @@ export async function generateMetadata() {
     const puckData = dbData && dbData.puckData 
       ? (typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData)
       : null;
-    const title = puckData?.root?.props?.title || dbData?.title || "الأسئلة الشائعة - Examy";
+    const title = puckData?.root?.props?.title || (dbData as any)?.meta?.title || dbData?.title || "الأسئلة الشائعة - Examy";
     const faqBlock = puckData?.content?.find((c: any) => c.type === "FAQ");
-    const description = puckData?.root?.props?.description || faqBlock?.props?.subtitle || "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات والأسعار.";
+    const description = puckData?.root?.props?.description || (dbData as any)?.meta?.description || faqBlock?.props?.subtitle || "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات والأسعار.";
+    const keywords = (dbData as any)?.meta?.keywords || undefined;
     return {
       title,
       description,
+      keywords,
     };
   } catch (e) {
     return {
@@ -73,13 +77,15 @@ export default async function FAQPage() {
         const migratedContent = parsed.content.map((item: any) => {
           if (item.type === "Nav") {
             const updatedProps = { ...item.props };
-            updatedProps.links = [
-              { label: "المنتج", href: "/#features" },
-              { label: "كيف يعمل", href: "/#how_it_works" },
-              { label: "نماذج واقعية", href: "/#actual-models" },
-              { label: "المدوّنة", href: "/blogs" },
-              { label: "الأسئلة الشائعة", href: "/faq" }
-            ];
+            if (!updatedProps.links || updatedProps.links.length === 0) {
+              updatedProps.links = [
+                { label: "المنتج", href: "/#features" },
+                { label: "كيف يعمل", href: "/#how_it_works" },
+                { label: "نماذج واقعية", href: "/#actual-models" },
+                { label: "المدوّنة", href: "/blogs" },
+                { label: "الأسئلة الشائعة", href: "/faq" }
+              ];
+            }
             if (!updatedProps.actions) {
               updatedProps.actions = [
                 { label: "تسجيل دخول", href: "#login", variant: "link" },

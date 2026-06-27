@@ -90,13 +90,15 @@ export default function FAQAdminEditor() {
             const migratedContent = parsed.content.map((item: any) => {
               if (item.type === "Nav") {
                 const updatedProps = { ...item.props };
-                updatedProps.links = [
-                  { label: "المنتج", href: "/#features" },
-                  { label: "كيف يعمل", href: "/#how_it_works" },
-                  { label: "نماذج واقعية", href: "/#actual-models" },
-                  { label: "المدوّنة", href: "/blogs" },
-                  { label: "الأسئلة الشائعة", href: "/faq" }
-                ];
+                if (!updatedProps.links || updatedProps.links.length === 0) {
+                  updatedProps.links = [
+                    { label: "المنتج", href: "/#features" },
+                    { label: "كيف يعمل", href: "/#how_it_works" },
+                    { label: "نماذج واقعية", href: "/#actual-models" },
+                    { label: "المدوّنة", href: "/blogs" },
+                    { label: "الأسئلة الشائعة", href: "/faq" }
+                  ];
+                }
                 if (!updatedProps.actions) {
                   updatedProps.actions = [
                     { label: "تسجيل دخول", href: "#login", variant: "link" },

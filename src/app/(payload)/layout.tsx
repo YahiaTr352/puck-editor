@@ -1,9 +1,9 @@
 import { RootLayout, handleServerFunctions } from '@payloadcms/next/layouts'
+import '@payloadcms/next/css'
 import config from '@payload-config'
 import React from 'react'
 import { importMap } from './cms/importMap'
-
-import '@payloadcms/next/css'
+import DevOverlaySuppressor from '@/components/DevOverlaySuppressor'
 
 export default function PayloadLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -16,6 +16,8 @@ export default function PayloadLayout({ children }: { children: React.ReactNode 
         return handleServerFunctions({ ...args, config, importMap })
       }}
     >
+      <style dangerouslySetInnerHTML={{ __html: 'nextjs-portal { display: none !important; }' }} />
+      <DevOverlaySuppressor />
       {children}
     </RootLayout>
   )

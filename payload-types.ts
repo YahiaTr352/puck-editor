@@ -160,6 +160,10 @@ export interface Page {
     | boolean
     | null;
   status?: ('draft' | 'published') | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -269,6 +273,12 @@ export interface PagesSelect<T extends boolean = true> {
   slug?: T;
   puckData?: T;
   status?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
