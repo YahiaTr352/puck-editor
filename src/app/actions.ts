@@ -10,29 +10,13 @@ import { revalidatePath } from 'next/cache';
 export async function getPageData(slug: string) {
   try {
     const payload = await getPayload({ config });
-    let result = await payload.find({
+    const result = await payload.find({
       collection: 'pages',
       where: {
         slug: {
           equals: slug,
         },
       },
-      draft: true, // Fetch drafts too if versions drafts are enabled
-    });
-
-    if (result.docs.length > 0) {
-      return result.docs[0];
-    }
-
-    // Fallback to published-only query if no draft is found (e.g., raw SQL inserts)
-    result = await payload.find({
-      collection: 'pages',
-      where: {
-        slug: {
-          equals: slug,
-        },
-      },
-      draft: false,
     });
 
     if (result.docs.length > 0) {
@@ -52,28 +36,15 @@ export async function savePageData(slug: string, title: string, puckData: any) {
   try {
     const payload = await getPayload({ config });
 
-    // Check if the page already exists (first check drafts, then fall back to published main table)
-    let result = await payload.find({
+    // Check if the page already exists
+    const result = await payload.find({
       collection: 'pages',
       where: {
         slug: {
           equals: slug,
         },
       },
-      draft: true,
     });
-
-    if (result.docs.length === 0) {
-      result = await payload.find({
-        collection: 'pages',
-        where: {
-          slug: {
-            equals: slug,
-          },
-        },
-        draft: false,
-      });
-    }
 
     if (result.docs.length > 0) {
       // Update existing page and publish it directly to the main pages table
@@ -83,10 +54,10 @@ export async function savePageData(slug: string, title: string, puckData: any) {
         id: pageId,
         data: {
           title,
+          slug,
           puckData,
           status: 'published',
         },
-        draft: false, // Save as published directly to the main pages table
       });
       revalidatePath('/', 'layout');
       return { success: true, doc: updated };
@@ -100,7 +71,6 @@ export async function savePageData(slug: string, title: string, puckData: any) {
           puckData,
           status: 'published',
         },
-        draft: false, // Save as published directly to the main pages table
       });
       revalidatePath('/', 'layout');
       return { success: true, doc: created };
@@ -120,7 +90,6 @@ export async function getPagesList() {
     const result = await payload.find({
       collection: 'pages',
       limit: 200,
-      draft: true,
     });
     return result.docs.map(doc => ({
       id: doc.id,
@@ -147,7 +116,6 @@ export async function deletePageData(slug: string) {
           equals: slug,
         },
       },
-      draft: true,
     });
 
     if (result.docs.length > 0) {
@@ -174,7 +142,6 @@ export async function getDynamicBlogsList() {
     const result = await payload.find({
       collection: 'pages',
       limit: 100,
-      draft: false,
     });
 
     const blogDocs = result.docs.filter((doc: any) => doc.slug.startsWith('blog-details-'));

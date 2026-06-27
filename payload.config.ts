@@ -56,9 +56,6 @@ export default buildConfig({
         useAsTitle: 'title',
         defaultColumns: ['title', 'slug', 'status', 'updatedAt'],
       },
-      versions: {
-        drafts: true,
-      },
       fields: [
         {
           name: 'title',

@@ -77,7 +77,7 @@ const initialFaqData = {
 };
 
 export default function FAQAdminEditor() {
-  const [data, setData] = useState<any>(initialFaqData);
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -202,6 +202,22 @@ export default function FAQAdminEditor() {
     FAQ: puckComponents.FAQ,
     Footer: puckComponents.Footer
   };
+
+  if (!data) {
+    return (
+      <div style={{
+        display: "flex",
+        height: "100vh",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: "sans-serif",
+        fontSize: "1.2rem",
+        color: "#64748b"
+      }}>
+        جاري تحميل المحرر البصري لـ Examy...
+      </div>
+    );
+  }
 
   return (
     <div style={{ height: "100vh", direction: "ltr" }} className="puck-editor-theme-override">
