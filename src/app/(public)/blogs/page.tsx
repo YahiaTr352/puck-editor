@@ -71,6 +71,22 @@ export async function generateMetadata() {
 export default async function BlogsPage() {
   let data = blogsFallbackData;
   let posts: any[] = [];
+  let homeNav: any = null;
+  let homeFooter: any = null;
+
+  // Fetch home layout first to sync Nav and Footer
+  try {
+    const homeData = await getPageData("home");
+    if (homeData && homeData.puckData) {
+      const parsedHome = typeof homeData.puckData === 'string' ? JSON.parse(homeData.puckData) : homeData.puckData;
+      if (parsedHome.content) {
+        homeNav = parsedHome.content.find((c: any) => c.type === "Nav");
+        homeFooter = parsedHome.content.find((c: any) => c.type === "Footer");
+      }
+    }
+  } catch (e) {
+    console.error("Error loading home page for layout sync:", e);
+  }
 
   // 1. Query all blog details pages dynamically from PostgreSQL
   try {
@@ -174,7 +190,7 @@ export default async function BlogsPage() {
     console.error("Error loading page design from DB:", e);
   }
 
-  // 3. Inject the dynamically loaded posts into the page design
+  // 3. Inject the dynamically loaded posts into the page design & sync Nav/Footer with home
   if (data.content) {
     data.content = data.content.map((item: any) => {
       if (item.type === "BlogList") {
@@ -185,6 +201,12 @@ export default async function BlogsPage() {
             posts: posts
           }
         };
+      }
+      if (item.type === "Nav" && homeNav) {
+        return { ...item, props: { ...homeNav.props } };
+      }
+      if (item.type === "Footer" && homeFooter) {
+        return { ...item, props: { ...homeFooter.props } };
       }
       return item;
     });

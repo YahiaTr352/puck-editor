@@ -68,6 +68,22 @@ export async function generateMetadata() {
 
 export default async function FAQPage() {
   let data = faqFallbackData;
+  let homeNav: any = null;
+  let homeFooter: any = null;
+
+  // Fetch home layout first to sync Nav and Footer
+  try {
+    const homeData = await getPageData("home");
+    if (homeData && homeData.puckData) {
+      const parsedHome = typeof homeData.puckData === 'string' ? JSON.parse(homeData.puckData) : homeData.puckData;
+      if (parsedHome.content) {
+        homeNav = parsedHome.content.find((c: any) => c.type === "Nav");
+        homeFooter = parsedHome.content.find((c: any) => c.type === "Footer");
+      }
+    }
+  } catch (e) {
+    console.error("Error loading home page for layout sync:", e);
+  }
 
   try {
     const dbData = await getPageData("faq");
@@ -103,7 +119,7 @@ export default async function FAQPage() {
               updatedProps.title = "كل ما تريد معرفته عن اختباري";
             }
             if (updatedProps.subtitle === undefined || updatedProps.subtitle === "") {
-              updatedProps.subtitle = "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات، التصحيح، التخصيص، والأسعار. لم تجد إجابتك؟ فريقنا جاهز لمساعدتك.";
+              updatedProps.subtitle = "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات، التصحيح، التخصيص، والأسعار. لم تجد إجابتك? فريقنا جاهز لمساعدتك.";
             }
             return { ...item, props: updatedProps };
           }
@@ -161,6 +177,19 @@ export default async function FAQPage() {
     }
   } catch (e) {
     console.error("Error loading page data from DB:", e);
+  }
+
+  // Sync Nav/Footer with home
+  if (data.content) {
+    data.content = data.content.map((item: any) => {
+      if (item.type === "Nav" && homeNav) {
+        return { ...item, props: { ...homeNav.props } };
+      }
+      if (item.type === "Footer" && homeFooter) {
+        return { ...item, props: { ...homeFooter.props } };
+      }
+      return item;
+    });
   }
 
   return <FAQClientView data={data} />;
