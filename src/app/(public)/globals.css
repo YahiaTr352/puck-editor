@@ -28,12 +28,12 @@ img { display: block; max-width: 100%; }
 ::selection { background: var(--brand); color: var(--brand-on); }
 
 body {
-  --bg: #000000;
+  --bg: #07100E;
   --bg-elev-1: #0C1815;
   --bg-elev-2: #122520;
   --surface: #0F1E1A;
   --border: rgba(255,255,255,0.08);
-  --border-strong: rgba(255,255,255,0.14);
+  --border-strong: rgba(255,255,255,0.16);
   --text: #E8F1EE;
   --text-muted: rgba(232,241,238,0.62);
   --text-subtle: rgba(232,241,238,0.42);
@@ -50,18 +50,26 @@ body {
   --radius-lg: 22px;
   --radius-xl: 32px;
   --max-w: 1240px;
+  --theme-toggle-bg: rgba(255, 255, 255, 0.08);
+  --hero-glow-op: 0.16;
+  --card-shadow: rgba(0, 0, 0, 0.3);
+  --featured-shadow: rgba(0, 0, 0, 0.4);
 }
 
 body[data-theme="light"] {
-  --bg: #F7F9F8;
+  --bg: #F5F8F7;
   --bg-elev-1: #FFFFFF;
   --bg-elev-2: #FFFFFF;
   --surface: #FFFFFF;
   --border: rgba(15,30,26,0.08);
-  --border-strong: rgba(15,30,26,0.14);
+  --border-strong: rgba(15,30,26,0.18);
   --text: #0A1814;
   --text-muted: rgba(10,24,20,0.64);
-  --text-subtle: rgba(10,24,20,0.48);
+  --text-subtle: rgba(10,24,20,0.42);
+  --theme-toggle-bg: rgba(10, 24, 20, 0.05);
+  --hero-glow-op: 0.08;
+  --card-shadow: rgba(0, 0, 0, 0.04);
+  --featured-shadow: rgba(0, 0, 0, 0.05);
 }
 
 
