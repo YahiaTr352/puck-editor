@@ -5301,6 +5301,74 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
         content: ""
       },
       render: ({ title, subtitle, date, author, image, content = "" }) => {
+        const getCategoryDetails = (postTitle: string, postDesc: string) => {
+          const text = `${postTitle} ${postDesc}`.toLowerCase();
+          if (
+            text.includes('ذكاء') ||
+            text.includes('ai') ||
+            text.includes('اصطناعي') ||
+            text.includes('qa') ||
+            text.includes('جودة') ||
+            text.includes('اختبارات') ||
+            text.includes('برمجيات')
+          ) {
+            return {
+              name: 'الذكاء الاصطناعي',
+              color: '#00E08A',
+              bgColor: 'rgba(0, 224, 138, 0.12)',
+            };
+          }
+          if (
+            text.includes('تقويم') ||
+            text.includes('اختبار') ||
+            text.includes('امتحان') ||
+            text.includes('أسئلة') ||
+            text.includes('بلوم') ||
+            text.includes('تصحيح') ||
+            text.includes('رصد') ||
+            text.includes('درجات')
+          ) {
+            return {
+              name: 'التقويم والاختبارات',
+              color: '#3B82F6',
+              bgColor: 'rgba(59, 130, 246, 0.12)',
+            };
+          }
+          if (
+            text.includes('منهج') ||
+            text.includes('سعودي') ||
+            text.includes('مملكة') ||
+            text.includes('وزارة') ||
+            text.includes('تعليم')
+          ) {
+            return {
+              name: 'المنهج السعودي',
+              color: '#1FA89F',
+              bgColor: 'rgba(31, 168, 159, 0.12)',
+            };
+          }
+          if (
+            text.includes('نصائح') ||
+            text.includes('معلم') ||
+            text.includes('إرشادات') ||
+            text.includes('طرق') ||
+            text.includes('أساليب')
+          ) {
+            return {
+              name: 'نصائح للمعلمين',
+              color: '#F59E0B',
+              bgColor: 'rgba(245, 158, 11, 0.12)',
+            };
+          }
+          return {
+            name: 'عام',
+            color: '#8B5CF6',
+            bgColor: 'rgba(139, 92, 246, 0.12)',
+          };
+        };
+
+        const cat = getCategoryDetails(title || "", subtitle || "");
+
         return (
           <article style={{ padding: "120px 24px 80px", direction: "rtl", color: "var(--text)", backgroundColor: "var(--bg)", position: "relative" }}>
             <style>{`
@@ -5323,39 +5391,72 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 text-decoration: underline;
               }
               .blog-rich-content p {
-                margin-bottom: 24px;
-                font-size: 18px;
-                line-height: 1.85;
+                margin-bottom: 16px;
+                font-size: 19px;
+                line-height: 34px;
                 text-align: right;
+              }
+              .blog-rich-content h1 {
+                font-size: 28px;
+                font-weight: 700;
+                text-align: right;
+                margin-top: 24px;
+                margin-bottom: 10px;
               }
               .blog-rich-content h2 {
-                margin-top: 40px;
-                margin-bottom: 20px;
+                margin-top: 20px;
+                margin-bottom: 10px;
                 font-size: 24px;
-                font-weight: 800;
+                font-weight: 700;
                 text-align: right;
+                border-right: 4px solid var(--brand);
+                padding-right: 12px;
               }
               .blog-rich-content h3 {
-                margin-top: 32px;
-                margin-bottom: 16px;
-                font-size: 20px;
+                margin-top: 16px;
+                margin-bottom: 8px;
+                font-size: 21px;
                 font-weight: 700;
                 text-align: right;
               }
               .blog-rich-content ul, .blog-rich-content ol {
-                margin-bottom: 24px;
-                padding-right: 24px;
-                list-style-position: inside;
+                margin-bottom: 14px;
+                padding-right: 20px;
+                text-align: right;
               }
               .blog-rich-content li {
-                margin-bottom: 10px;
-                font-size: 17px;
+                margin-bottom: 6px;
+                font-size: 18px;
+                line-height: 30px;
                 color: var(--text) !important;
-                opacity: 0.9;
                 text-align: right;
               }
               .blog-rich-content strong {
                 font-weight: 700;
+              }
+              .blog-rich-content blockquote {
+                border-right: 4px solid var(--brand);
+                padding-right: 16px;
+                padding-left: 8px;
+                margin: 14px 0;
+                font-size: 18px;
+                line-height: 30px;
+                color: var(--text-muted) !important;
+              }
+              .blog-rich-content code {
+                font-family: monospace;
+                background-color: var(--bg-elev-1);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-size: 16px;
+              }
+              .blog-rich-content pre {
+                font-family: monospace;
+                background-color: var(--bg-elev-1);
+                padding: 12px;
+                border-radius: 8px;
+                margin: 16px 0;
+                overflow-x: auto;
               }
             `}</style>
 
@@ -5392,6 +5493,22 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 </svg>
                 <span>رجوع إلى المدوّنة</span>
               </Link>
+
+              {/* Category Badge */}
+              <div style={{
+                padding: "5px 12px",
+                borderRadius: 20,
+                backgroundColor: cat.bgColor,
+                color: cat.color,
+                fontSize: 12,
+                fontWeight: 700,
+                marginBottom: 16,
+                display: "inline-flex",
+                alignItems: "center",
+                fontFamily: "'Cairo', sans-serif"
+              }}>
+                {cat.name}
+              </div>
 
               <h1 style={{
                 fontSize: 30,
@@ -5441,27 +5558,23 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
               )}
 
               {subtitle && (
-                <div style={{
-                  fontSize: 18,
-                  lineHeight: 1.6,
-                  color: "var(--brand)",
-                  fontWeight: 600,
-                  marginBottom: 36,
-                  paddingRight: 20,
-                  borderRight: "4px solid var(--brand)",
-                  background: "rgba(0, 224, 138, 0.03)",
-                  paddingTop: 12,
-                  paddingBottom: 12,
-                  borderRadius: "0 8px 8px 0",
+                <p style={{
+                  fontSize: 20,
+                  lineHeight: 1.8,
+                  color: "var(--text)",
+                  opacity: 0.85,
+                  marginBottom: 32,
+                  fontWeight: 500,
+                  textAlign: "right",
                   width: "100%"
                 }}>
                   {subtitle}
-                </div>
+                </p>
               )}
 
               <div 
                 className="blog-rich-content"
-                style={{ fontSize: 18, lineHeight: 1.85, color: "var(--text)", width: "100%", display: "flow-root", clear: "both" }} 
+                style={{ fontSize: 19, lineHeight: 1.8, color: "var(--text)", width: "100%", display: "flow-root", clear: "both" }} 
                 dangerouslySetInnerHTML={{ __html: content }} 
               />
 
@@ -5471,49 +5584,6 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 </a>
               </div>
             </div>
-
-            {/* Floating edit button for blog details page layout */}
-            {(() => {
-              let slug = "";
-              if (typeof window !== "undefined") {
-                const params = new URLSearchParams(window.location.search);
-                slug = params.get("slug") || "";
-              }
-              const showEditButton = typeof window !== "undefined" && window.location.pathname.includes("/admin") && slug;
-              return showEditButton ? (
-                <a
-                  href={`/admin/blog-details?slug=${slug}`}
-                  style={{
-                    position: "fixed",
-                    bottom: 24,
-                    left: 24,
-                    backgroundColor: "#00E08A",
-                    color: "#07100E",
-                    padding: "12px 20px",
-                    borderRadius: 30,
-                    boxShadow: "0 10px 25px rgba(0, 224, 138, 0.35)",
-                    fontWeight: 700,
-                    fontSize: 14,
-                    textDecoration: "none",
-                    zIndex: 9999,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    fontFamily: "'Cairo', sans-serif",
-                    transition: "all 0.2s ease",
-                    cursor: "pointer"
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                  </svg>
-                  تعديل هذه المقالة
-                </a>
-              ) : null;
-            })()}
           </article>
         );
       }
