@@ -28,6 +28,20 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" data-theme="dark" data-anims="on">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const savedTheme = localStorage.getItem('theme');
+                  if (savedTheme === 'dark' || savedTheme === 'light') {
+                    document.body.setAttribute('data-theme', savedTheme);
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
         {children}
       </body>
     </html>

@@ -1599,37 +1599,6 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 style={{ display: "flex", gap: 10, alignItems: "center", justifyContent: "flex-end" }}
                 className="nav-actions"
               >
-                {/* Actions first (reversed to make primary CTA rightmost, link in middle under RTL) */}
-                {[...activeActions].reverse().map((act, idx) => {
-                  if (act.variant === "primary") {
-                    return (
-                      <a
-                        key={`act-${idx}`}
-                        href={act.href}
-                        className="btn btn-primary"
-                        style={{ padding: "10px 18px", fontSize: 14 }}
-                      >
-                        {act.label}
-                        <Icon.ArrowLeft width="16" height="16" />
-                      </a>
-                    );
-                  }
-                  return (
-                    <a
-                      key={`act-${idx}`}
-                      href={act.href}
-                      style={{
-                        fontSize: 14,
-                        color: "var(--text-muted)",
-                        fontWeight: 500,
-                        padding: "8px 12px",
-                      }}
-                    >
-                      {act.label}
-                    </a>
-                  );
-                })}
-
                 {/* Theme Toggle Button (Desktop) - Leftmost under RTL */}
                 <button
                   type="button"
@@ -1679,6 +1648,37 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                   )}
                 </button>
+
+                {/* Actions first (reversed to make primary CTA rightmost, link in middle under RTL) */}
+                {[...activeActions].reverse().map((act, idx) => {
+                  if (act.variant === "primary") {
+                    return (
+                      <a
+                        key={`act-${idx}`}
+                        href={act.href}
+                        className="btn btn-primary"
+                        style={{ padding: "10px 18px", fontSize: 14 }}
+                      >
+                        {act.label}
+                        <Icon.ArrowLeft width="16" height="16" />
+                      </a>
+                    );
+                  }
+                  return (
+                    <a
+                      key={`act-${idx}`}
+                      href={act.href}
+                      style={{
+                        fontSize: 14,
+                        color: "var(--text-muted)",
+                        fontWeight: 500,
+                        padding: "8px 12px",
+                      }}
+                    >
+                      {act.label}
+                    </a>
+                  );
+                })}
               </div>
               
               {/* Theme Toggle & Hamburger Button (Mobile Container) */}
