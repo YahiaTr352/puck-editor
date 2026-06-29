@@ -539,6 +539,7 @@ function AdminDashboard() {
             gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
             gap: 30
           }}>
+
             {/* Card 1: Homepage */}
             <div style={cardStyle}>
               <div style={cardGlowStyle}></div>
@@ -548,6 +549,20 @@ function AdminDashboard() {
                 <p style={cardDescStyle}>
                   تعديل الهيرو، مزايا المنصة، أرقام وإحصائيات اختباري، وقسم الشركاء والأسعار.
                 </p>
+                <div style={{
+                  fontSize: 12,
+                  color: "#00E08A",
+                  backgroundColor: "rgba(0, 224, 138, 0.08)",
+                  padding: "8px 12px",
+                  borderRadius: 8,
+                  marginBottom: 20,
+                  display: "inline-block",
+                  fontWeight: 600,
+                  border: "1px solid rgba(0, 224, 138, 0.15)",
+                  lineHeight: "1.4"
+                }}>
+                  💡 تنبيه: الصفحة التي تحمل الـ Slug بـ "home" أو "/" تُعرض تلقائياً على الرابط الرئيسي (/) للموقع.
+                </div>
                 <a 
                   href="/admin/home" 
                   style={primaryBtnStyle}
@@ -601,244 +616,7 @@ function AdminDashboard() {
           </div>
         </section>
 
-        {/* Create Page Form */}
-        <section style={{ marginBottom: 50 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 800, marginBottom: 20, color: "#ffffff" }}>
-            إنشاء صفحة أو مقال جديد
-          </h2>
-          <form onSubmit={handleCreate} style={{
-            backgroundColor: "rgba(12, 24, 21, 0.45)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid rgba(255, 255, 255, 0.06)",
-            borderRadius: 20,
-            padding: 30,
-            boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: 20,
-            alignItems: "end"
-          }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <label style={{ fontSize: 14, color: "#8E9F9A", fontWeight: 600 }}>عنوان الصفحة/المقالة:</label>
-              <input 
-                type="text" 
-                value={newTitle} 
-                onChange={(e) => setNewTitle(e.target.value)}
-                placeholder="مثال: أهمية التقييم المستمر"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: 10,
-                  padding: "12px 16px",
-                  color: "#ffffff",
-                  fontSize: 14,
-                  outline: "none",
-                  transition: "border-color 0.2s"
-                }}
-                onFocus={(e) => e.target.style.borderColor = "#00E08A"}
-                onBlur={(e) => e.target.style.borderColor = "rgba(255, 255, 255, 0.1)"}
-              />
-            </div>
-            
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <label style={{ fontSize: 14, color: "#8E9F9A", fontWeight: 600 }}>معرّف الرابط (Slug) بالإنجليزية:</label>
-              <input 
-                type="text" 
-                value={newSlug} 
-                onChange={(e) => setNewSlug(e.target.value)}
-                placeholder="مثال: continuous-assessment"
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: 10,
-                  padding: "12px 16px",
-                  color: "#ffffff",
-                  fontSize: 14,
-                  outline: "none",
-                  direction: "ltr",
-                  textAlign: "right",
-                  transition: "border-color 0.2s"
-                }}
-                onFocus={(e) => e.target.style.borderColor = "#00E08A"}
-                onBlur={(e) => e.target.style.borderColor = "rgba(255, 255, 255, 0.1)"}
-              />
-            </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <label style={{ fontSize: 14, color: "#8E9F9A", fontWeight: 600 }}>نوع الصفحة:</label>
-              <select 
-                value={pageType} 
-                onChange={(e: any) => setPageType(e.target.value)}
-                style={{
-                  backgroundColor: "rgba(255, 255, 255, 0.05)",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: 10,
-                  padding: "12px 16px",
-                  color: "#ffffff",
-                  fontSize: 14,
-                  outline: "none",
-                  cursor: "pointer",
-                  transition: "border-color 0.2s"
-                }}
-                onFocus={(e) => e.target.style.borderColor = "#00E08A"}
-                onBlur={(e) => e.target.style.borderColor = "rgba(255, 255, 255, 0.1)"}
-              >
-                <option value="blog" style={{ backgroundColor: "#0C1815", color: "#ffffff" }}>مقال في المدونة (Blog Details)</option>
-                <option value="custom" style={{ backgroundColor: "#0C1815", color: "#ffffff" }}>صفحة مخصصة (Custom Page)</option>
-              </select>
-            </div>
-
-            <button 
-              type="submit" 
-              disabled={creating}
-              style={{
-                backgroundColor: "#00E08A",
-                color: "#07100E",
-                border: "none",
-                borderRadius: 10,
-                padding: "13px 0",
-                fontSize: 14,
-                fontWeight: 800,
-                cursor: "pointer",
-                boxShadow: "0 8px 20px rgba(0, 224, 138, 0.25)",
-                transition: "all 0.2s ease"
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#00F79B";
-                e.currentTarget.style.transform = "translateY(-1px)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#00E08A";
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
-            >
-              {creating ? "جاري الإنشاء..." : "إنشاء الصفحة"}
-            </button>
-          </form>
-        </section>
-
-        {/* All Pages Table */}
-        <section style={{ marginTop: 50, marginBottom: 50 }}>
-          <div style={{
-            backgroundColor: "rgba(12, 24, 21, 0.45)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid rgba(255, 255, 255, 0.06)",
-            borderRadius: 20,
-            overflow: "hidden",
-            boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)"
-          }}>
-            {loading ? (
-              <div style={{ padding: 40, textAlign: "center", color: "#8E9F9A" }}>جاري تحميل الصفحات...</div>
-            ) : pages.length === 0 ? (
-              <div style={{ padding: 40, textAlign: "center", color: "#8E9F9A" }}>لا توجد صفحات حالياً.</div>
-            ) : (
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "right" }}>
-                  <thead>
-                    <tr style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.08)", backgroundColor: "rgba(255, 255, 255, 0.02)" }}>
-                      <th style={{ padding: "16px 24px", color: "#8E9F9A", fontWeight: 700, fontSize: 14 }}>العنوان</th>
-                      <th style={{ padding: "16px 24px", color: "#8E9F9A", fontWeight: 700, fontSize: 14 }}>المعرّف (Slug)</th>
-                      <th style={{ padding: "16px 24px", color: "#8E9F9A", fontWeight: 700, fontSize: 14 }}>الحالة</th>
-                      <th style={{ padding: "16px 24px", color: "#8E9F9A", fontWeight: 700, fontSize: 14 }}>تاريخ التحديث</th>
-                      <th style={{ padding: "16px 24px", color: "#8E9F9A", fontWeight: 700, fontSize: 14, textAlign: "center" }}>العمليات</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pages.map((page) => (
-                      <tr 
-                        key={page.slug} 
-                        style={{ 
-                          borderBottom: "1px solid rgba(255, 255, 255, 0.04)",
-                          transition: "background 0.2s ease"
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "rgba(0, 224, 138, 0.02)"}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                      >
-                        <td style={{ padding: "16px 24px", fontWeight: 600, color: "#ffffff" }}>
-                          {page.title}
-                        </td>
-                        <td style={{ padding: "16px 24px", fontFamily: "monospace", color: "#8E9F9A", direction: "ltr", textAlign: "right" }}>
-                          {page.slug}
-                        </td>
-                        <td style={{ padding: "16px 24px" }}>
-                          <span style={{
-                            display: "inline-block",
-                            padding: "4px 8px",
-                            borderRadius: 6,
-                            fontSize: 12,
-                            fontWeight: 700,
-                            backgroundColor: page.status === "draft" ? "rgba(255, 180, 84, 0.15)" : "rgba(0, 224, 138, 0.15)",
-                            color: page.status === "draft" ? "#FFB454" : "#00E08A",
-                            border: page.status === "draft" ? "1px solid rgba(255, 180, 84, 0.25)" : "1px solid rgba(0, 224, 138, 0.25)"
-                          }}>
-                            {page.status === "draft" ? "مسودة" : "منشور"}
-                          </span>
-                        </td>
-                        <td style={{ padding: "16px 24px", color: "#8E9F9A", fontSize: 14 }}>
-                          {new Date(page.updatedAt).toLocaleString("ar-SA", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit"
-                          })}
-                        </td>
-                        <td style={{ padding: "16px 24px", textAlign: "center" }}>
-                          <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-                            <a 
-                              href={getEditUrl(page.slug)} 
-                              style={{
-                                padding: "6px 12px",
-                                borderRadius: 8,
-                                backgroundColor: "rgba(0, 224, 138, 0.1)",
-                                border: "1px solid rgba(0, 224, 138, 0.2)",
-                                color: "#00E08A",
-                                fontSize: 13,
-                                fontWeight: 700,
-                                textDecoration: "none",
-                                transition: "all 0.15s ease"
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = "#00E08A";
-                                e.currentTarget.style.color = "#07100E";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = "rgba(0, 224, 138, 0.1)";
-                                e.currentTarget.style.color = "#00E08A";
-                              }}
-                            >
-                              تعديل مرئي
-                            </a>
-                            <a 
-                              href={getViewUrl(page.slug)}
-                              target="_blank"
-                              rel="noreferrer"
-                              style={{
-                                padding: "6px 12px",
-                                borderRadius: 8,
-                                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                                border: "1px solid rgba(255, 255, 255, 0.1)",
-                                color: "#ffffff",
-                                fontSize: 13,
-                                fontWeight: 700,
-                                textDecoration: "none",
-                                transition: "all 0.15s ease"
-                              }}
-                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.15)"}
-                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.05)"}
-                            >
-                              معاينة
-                            </a>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </section>
 
       </div>
     </div>

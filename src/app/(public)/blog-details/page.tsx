@@ -83,6 +83,22 @@ export default async function BlogDetailsPage({ searchParams }: Args) {
   const articleSlug = decodeURIComponent(resolvedSearchParams.slug || "default");
   
   let data = blogDetailsFallbackData;
+  let homeNav: any = null;
+  let homeFooter: any = null;
+
+  // Fetch home layout first to sync Nav and Footer
+  try {
+    const homeData = await getPageData("home");
+    if (homeData && homeData.puckData) {
+      const parsedHome = typeof homeData.puckData === 'string' ? JSON.parse(homeData.puckData) : homeData.puckData;
+      if (parsedHome.content) {
+        homeNav = parsedHome.content.find((c: any) => c.type === "Nav");
+        homeFooter = parsedHome.content.find((c: any) => c.type === "Footer");
+      }
+    }
+  } catch (e) {
+    console.error("Error loading home page for layout sync:", e);
+  }
 
   try {
     const dbData = (await getPageData(`blog-details-${articleSlug}`)) || (await getPageData("blog-details"));
@@ -231,6 +247,19 @@ export default async function BlogDetailsPage({ searchParams }: Args) {
     }
   } catch (e) {
     console.error("Error loading page data from DB:", e);
+  }
+
+  // Sync Nav/Footer with home
+  if (data.content) {
+    data.content = data.content.map((item: any) => {
+      if (item.type === "Nav" && homeNav) {
+        return { ...item, props: { ...homeNav.props } };
+      }
+      if (item.type === "Footer" && homeFooter) {
+        return { ...item, props: { ...homeFooter.props } };
+      }
+      return item;
+    });
   }
 
   return <BlogDetailsClientView data={data} />;

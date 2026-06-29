@@ -11,21 +11,37 @@ export async function getPageData(slug: string, options?: { draft?: boolean }) {
   console.log(`[getPageData] Called with slug: "${slug}", draft: ${options?.draft}`);
   try {
     const payload = await getPayload({ config });
+
     const draft = options?.draft ?? false;
+    const isHome = slug === 'home' || slug === '/' || slug === '' || slug === 'landing-page';
+    const targetCollection = isHome 
+      ? 'pages' 
+      : (slug === 'faq' || slug === 'faqi') 
+      ? 'faq' 
+      : (slug === 'blogs' || slug.startsWith('blog-details-')) 
+      ? 'blog' 
+      : 'pages';
 
     // Fetch published version
     const resultFalse = await payload.find({
-      collection: 'pages',
+      collection: targetCollection as any,
       draft: false,
       overrideAccess: true,
-      where: {
+      where: isHome ? {
+        or: [
+          { slug: { equals: 'home' } },
+          { slug: { equals: '/' } },
+          { slug: { equals: '' } },
+          { slug: { equals: 'landing-page' } }
+        ]
+      } : {
         slug: {
           equals: slug,
         },
       },
     });
     const pubDoc = resultFalse.docs.length > 0 ? resultFalse.docs[0] : null;
-    console.log(`[getPageData] "${slug}" - Published doc found: ${!!pubDoc}`);
+    console.log(`[getPageData] "${slug}" - Published doc found in ${targetCollection}: ${!!pubDoc}`);
 
     let docToReturn = null;
     if (!draft) {
@@ -33,19 +49,25 @@ export async function getPageData(slug: string, options?: { draft?: boolean }) {
     } else {
       // Fetch draft version
       const resultTrue = await payload.find({
-        collection: 'pages',
+        collection: targetCollection as any,
         draft: true,
         overrideAccess: true,
-        where: {
+        where: isHome ? {
+          or: [
+            { slug: { equals: 'home' } },
+            { slug: { equals: '/' } },
+            { slug: { equals: '' } },
+            { slug: { equals: 'landing-page' } }
+          ]
+        } : {
           slug: {
             equals: slug,
           },
         },
       });
       const draftDoc = resultTrue.docs.length > 0 ? resultTrue.docs[0] : null;
-      console.log(`[getPageData] "${slug}" - Draft/latest doc found: ${!!draftDoc}`);
+      console.log(`[getPageData] "${slug}" - Draft/latest doc found in ${targetCollection}: ${!!draftDoc}`);
 
-      // Compare timestamps to return the most recently updated one
       if (pubDoc && draftDoc) {
         const pubTime = new Date(pubDoc.updatedAt).getTime();
         const draftTime = new Date(draftDoc.updatedAt).getTime();
@@ -109,6 +131,15 @@ export async function savePageData(slug: string, title: string, puckData: any) {
   try {
     const payload = await getPayload({ config });
 
+    const isHome = slug === 'home' || slug === '/' || slug === '' || slug === 'landing-page';
+    const targetCollection = isHome 
+      ? 'pages' 
+      : (slug === 'faq' || slug === 'faqi') 
+      ? 'faq' 
+      : (slug === 'blogs' || slug.startsWith('blog-details-')) 
+      ? 'blog' 
+      : 'pages';
+
     // If saving the blogs list page, propagate any changes made to blog items back to their individual pages
     if (slug === "blogs" && puckData && puckData.content) {
       const blogListBlock = puckData.content.find((c: any) => c.type === "BlogList");
@@ -120,7 +151,7 @@ export async function savePageData(slug: string, title: string, puckData: any) {
           
           // Find the existing blog details page (check drafts first)
           let blogRes = await payload.find({
-            collection: 'pages',
+            collection: 'blog',
             draft: true,
             overrideAccess: true,
             where: {
@@ -132,7 +163,7 @@ export async function savePageData(slug: string, title: string, puckData: any) {
           
           if (blogRes.docs.length === 0) {
             blogRes = await payload.find({
-              collection: 'pages',
+              collection: 'blog',
               draft: false,
               overrideAccess: true,
               where: {
@@ -175,7 +206,7 @@ export async function savePageData(slug: string, title: string, puckData: any) {
                 if (changed) {
                   console.log(`[savePageData] Propagating changes to individual blog details page: "${blogSlug}"`);
                   await payload.update({
-                    collection: 'pages',
+                    collection: 'blog',
                     id: blogDoc.id,
                     draft: false,
                     overrideAccess: true,
@@ -195,49 +226,64 @@ export async function savePageData(slug: string, title: string, puckData: any) {
 
     // Check if the page already exists (include drafts)
     let result = await payload.find({
-      collection: 'pages',
+      collection: targetCollection as any,
       draft: true,
       overrideAccess: true,
-      where: {
+      where: isHome ? {
+        or: [
+          { slug: { equals: 'home' } },
+          { slug: { equals: '/' } },
+          { slug: { equals: '' } },
+          { slug: { equals: 'landing-page' } }
+        ]
+      } : {
         slug: {
           equals: slug,
         },
       },
     });
-    console.log(`[savePageData] "${slug}" - Querying draft: true, found count: ${result.docs.length}`);
+    console.log(`[savePageData] "${slug}" - Querying draft: true inside ${targetCollection}, found count: ${result.docs.length}`);
 
     // Fallback to published table if drafts query returns nothing (empty _pages_v)
     if (result.docs.length === 0) {
       result = await payload.find({
-        collection: 'pages',
+        collection: targetCollection as any,
         draft: false,
         overrideAccess: true,
-        where: {
+        where: isHome ? {
+          or: [
+            { slug: { equals: 'home' } },
+            { slug: { equals: '/' } },
+            { slug: { equals: '' } },
+            { slug: { equals: 'landing-page' } }
+          ]
+        } : {
           slug: {
             equals: slug,
           },
         },
       });
-      console.log(`[savePageData] "${slug}" - Fallback query draft: false, found count: ${result.docs.length}`);
+      console.log(`[savePageData] "${slug}" - Fallback query draft: false inside ${targetCollection}, found count: ${result.docs.length}`);
     }
 
     if (result.docs.length > 0) {
       // Update existing page and publish it directly
       const pageId = result.docs[0].id;
-      console.log(`[savePageData] "${slug}" - Updating existing page. ID: ${pageId}`);
+      const existingSlug = result.docs[0].slug;
+      console.log(`[savePageData] "${slug}" - Updating existing page in ${targetCollection}. ID: ${pageId}`);
       const updated = await payload.update({
-        collection: 'pages',
+        collection: targetCollection as any,
         id: pageId,
-        draft: false, // Publish and update main pages table
+        draft: false, // Publish and update main table
         overrideAccess: true,
         data: {
           title,
-          slug,
+          slug: existingSlug || slug, // preserve existing slug format (home or /)
           puckData,
           status: 'published',
         },
       });
-      console.log(`[savePageData] "${slug}" - Successfully updated page ID: ${pageId}`);
+      console.log(`[savePageData] "${slug}" - Successfully updated page ID: ${pageId} in ${targetCollection}`);
       try {
         revalidatePath('/', 'layout');
         console.log(`[savePageData] "${slug}" - Revalidated path '/' layout`);
@@ -247,10 +293,10 @@ export async function savePageData(slug: string, title: string, puckData: any) {
       return { success: true, doc: updated };
     } else {
       // Create and publish new page
-      console.log(`[savePageData] "${slug}" - Creating new page.`);
+      console.log(`[savePageData] "${slug}" - Creating new page in ${targetCollection}.`);
       const created = await payload.create({
-        collection: 'pages',
-        draft: false, // Publish and create in main pages table
+        collection: targetCollection as any,
+        draft: false, // Publish and create in main table
         overrideAccess: true,
         data: {
           title,
@@ -259,7 +305,7 @@ export async function savePageData(slug: string, title: string, puckData: any) {
           status: 'published',
         },
       });
-      console.log(`[savePageData] "${slug}" - Successfully created page ID: ${created.id}`);
+      console.log(`[savePageData] "${slug}" - Successfully created page ID: ${created.id} in ${targetCollection}`);
       try {
         revalidatePath('/', 'layout');
         console.log(`[savePageData] "${slug}" - Revalidated path '/' layout`);
@@ -280,43 +326,47 @@ export async function savePageData(slug: string, title: string, puckData: any) {
 export async function getPagesList() {
   try {
     const payload = await getPayload({ config });
-    
-    // Fetch published pages
-    const resultFalse = await payload.find({
-      collection: 'pages',
-      draft: false,
-      overrideAccess: true,
-      limit: 200,
-    });
+    const collections = ['pages', 'faq', 'blog'] as const;
+    const allDocs: any[] = [];
 
-    // Fetch draft / latest version pages
-    const resultTrue = await payload.find({
-      collection: 'pages',
-      draft: true,
-      overrideAccess: true,
-      limit: 200,
-    });
+    for (const col of collections) {
+      // Fetch published pages
+      const resultFalse = await payload.find({
+        collection: col,
+        draft: false,
+        overrideAccess: true,
+        limit: 200,
+      });
 
-    // Merge them: keep the newer version based on updatedAt timestamp
-    const docsMap = new Map<string, any>();
-    resultFalse.docs.forEach(doc => docsMap.set(doc.slug, doc));
-    
-    resultTrue.docs.forEach(draftDoc => {
-      const existing = docsMap.get(draftDoc.slug);
-      if (existing) {
-        const pubTime = new Date(existing.updatedAt).getTime();
-        const draftTime = new Date(draftDoc.updatedAt).getTime();
-        if (draftTime >= pubTime) {
+      // Fetch draft / latest version pages
+      const resultTrue = await payload.find({
+        collection: col,
+        draft: true,
+        overrideAccess: true,
+        limit: 200,
+      });
+
+      // Merge them: keep the newer version based on updatedAt timestamp
+      const docsMap = new Map<string, any>();
+      resultFalse.docs.forEach(doc => docsMap.set(doc.slug, doc));
+      
+      resultTrue.docs.forEach(draftDoc => {
+        const existing = docsMap.get(draftDoc.slug);
+        if (existing) {
+          const pubTime = new Date(existing.updatedAt).getTime();
+          const draftTime = new Date(draftDoc.updatedAt).getTime();
+          if (draftTime >= pubTime) {
+            docsMap.set(draftDoc.slug, draftDoc);
+          }
+        } else {
           docsMap.set(draftDoc.slug, draftDoc);
         }
-      } else {
-        docsMap.set(draftDoc.slug, draftDoc);
-      }
-    });
+      });
 
-    const docs = Array.from(docsMap.values());
+      allDocs.push(...Array.from(docsMap.values()));
+    }
 
-    return docs.map(doc => ({
+    return allDocs.map(doc => ({
       id: doc.id,
       slug: doc.slug,
       title: doc.title,
@@ -335,10 +385,26 @@ export async function getPagesList() {
 export async function deletePageData(slug: string) {
   try {
     const payload = await getPayload({ config });
+    const isHome = slug === 'home' || slug === '/' || slug === '' || slug === 'landing-page';
+    const targetCollection = isHome 
+      ? 'pages' 
+      : (slug === 'faq' || slug === 'faqi') 
+      ? 'faq' 
+      : (slug === 'blogs' || slug.startsWith('blog-details-')) 
+      ? 'blog' 
+      : 'pages';
+
     const result = await payload.find({
-      collection: 'pages',
+      collection: targetCollection as any,
       overrideAccess: true,
-      where: {
+      where: isHome ? {
+        or: [
+          { slug: { equals: 'home' } },
+          { slug: { equals: '/' } },
+          { slug: { equals: '' } },
+          { slug: { equals: 'landing-page' } }
+        ]
+      } : {
         slug: {
           equals: slug,
         },
@@ -347,7 +413,7 @@ export async function deletePageData(slug: string) {
 
     if (result.docs.length > 0) {
       await payload.delete({
-        collection: 'pages',
+        collection: targetCollection as any,
         id: result.docs[0].id,
         overrideAccess: true,
       });
@@ -374,14 +440,14 @@ export async function getDynamicBlogsList(options?: { draft?: boolean }) {
     if (draft) {
       // Fetch both published and latest versions to perform union merge
       const resultFalse = await payload.find({
-        collection: 'pages',
+        collection: 'blog',
         draft: false,
         overrideAccess: true,
         limit: 100,
       });
 
       const resultTrue = await payload.find({
-        collection: 'pages',
+        collection: 'blog',
         draft: true,
         overrideAccess: true,
         limit: 100,
@@ -407,7 +473,7 @@ export async function getDynamicBlogsList(options?: { draft?: boolean }) {
       docs = Array.from(docsMap.values());
     } else {
       const resultFalse = await payload.find({
-        collection: 'pages',
+        collection: 'blog',
         draft: false,
         overrideAccess: true,
         limit: 100,

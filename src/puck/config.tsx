@@ -1599,37 +1599,6 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 style={{ display: "flex", gap: 10, alignItems: "center", justifyContent: "flex-end" }}
                 className="nav-actions"
               >
-                {/* Actions first (reversed to make primary CTA rightmost, link in middle under RTL) */}
-                {[...activeActions].reverse().map((act, idx) => {
-                  if (act.variant === "primary") {
-                    return (
-                      <a
-                        key={`act-${idx}`}
-                        href={act.href}
-                        className="btn btn-primary"
-                        style={{ padding: "10px 18px", fontSize: 14 }}
-                      >
-                        {act.label}
-                        <Icon.ArrowLeft width="16" height="16" />
-                      </a>
-                    );
-                  }
-                  return (
-                    <a
-                      key={`act-${idx}`}
-                      href={act.href}
-                      style={{
-                        fontSize: 14,
-                        color: "var(--text-muted)",
-                        fontWeight: 500,
-                        padding: "8px 12px",
-                      }}
-                    >
-                      {act.label}
-                    </a>
-                  );
-                })}
-
                 {/* Theme Toggle Button (Desktop) - Leftmost under RTL */}
                 <button
                   type="button"
@@ -1679,6 +1648,37 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                   )}
                 </button>
+
+                {/* Actions first (reversed to make primary CTA rightmost, link in middle under RTL) */}
+                {[...activeActions].reverse().map((act, idx) => {
+                  if (act.variant === "primary") {
+                    return (
+                      <a
+                        key={`act-${idx}`}
+                        href={act.href}
+                        className="btn btn-primary"
+                        style={{ padding: "10px 18px", fontSize: 14 }}
+                      >
+                        {act.label}
+                        <Icon.ArrowLeft width="16" height="16" />
+                      </a>
+                    );
+                  }
+                  return (
+                    <a
+                      key={`act-${idx}`}
+                      href={act.href}
+                      style={{
+                        fontSize: 14,
+                        color: "var(--text-muted)",
+                        fontWeight: 500,
+                        padding: "8px 12px",
+                      }}
+                    >
+                      {act.label}
+                    </a>
+                  );
+                })}
               </div>
               
               {/* Theme Toggle & Hamburger Button (Mobile Container) */}
@@ -4866,7 +4866,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 font-weight: 800;
                 line-height: 1.2;
                 margin-bottom: 16px;
-                color: #E8F1EE;
+                color: var(--text);
                 font-family: 'Cairo', sans-serif;
               }
 
@@ -4876,7 +4876,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
 
               .examy-blog-hero-desc {
                 font-size: 18px;
-                color: rgba(232, 241, 238, 0.62);
+                color: var(--text-muted);
                 line-height: 1.55;
                 font-family: 'Cairo', sans-serif;
                 margin: 0;
@@ -4895,12 +4895,12 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
               /* FEATURED CARD */
               .examy-blog-featured-card {
                 display: flex;
-                background-color: #0C1815;
-                border: 1px solid rgba(255, 255, 255, 0.08);
+                background-color: var(--bg-elev-1);
+                border: 1px solid var(--border);
                 border-radius: 16px;
                 overflow: hidden;
                 width: 100%;
-                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
                 text-align: right;
                 cursor: pointer;
                 transition: transform 0.2s, box-shadow 0.2s;
@@ -4910,13 +4910,13 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
 
               .examy-blog-featured-card:hover {
                 transform: translateY(-4px);
-                box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+                box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
               }
 
               .examy-blog-featured-image-wrapper {
                 width: 53.5%;
                 position: relative;
-                background-color: #07100E;
+                background-color: var(--bg-elev-2);
                 overflow: hidden;
                 display: flex;
                 align-items: center;
@@ -4940,7 +4940,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background-color: #07100E;
+                background-color: var(--bg-elev-2);
               }
 
               .examy-blog-featured-text-wrapper {
@@ -4971,7 +4971,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 font-size: 26px;
                 font-weight: 800;
                 line-height: 1.3;
-                color: #E8F1EE;
+                color: var(--text);
                 font-family: 'Cairo', sans-serif;
                 margin: 0;
                 text-align: right;
@@ -4979,7 +4979,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
 
               .examy-blog-featured-desc {
                 font-size: 15px;
-                color: rgba(232, 241, 238, 0.62);
+                color: var(--text-muted);
                 line-height: 1.6;
                 font-family: 'Cairo', sans-serif;
                 margin: 0;
@@ -4988,7 +4988,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
 
               .examy-blog-meta-date {
                 font-size: 12px;
-                color: rgba(232, 241, 238, 0.62);
+                color: var(--text-muted);
                 font-family: 'Cairo', sans-serif;
               }
 
@@ -5038,11 +5038,11 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
               }
 
               .examy-blog-card {
-                background-color: #0C1815;
-                border: 1px solid rgba(255, 255, 255, 0.08);
+                background-color: var(--bg-elev-1);
+                border: 1px solid var(--border);
                 border-radius: 14px;
                 overflow: hidden;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
                 display: flex;
                 flex-direction: column;
                 cursor: pointer;
@@ -5054,15 +5054,15 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
 
               .examy-blog-card:hover {
                 transform: translateY(-4px);
-                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
               }
 
               .examy-blog-card-image {
                 position: relative;
                 width: 100%;
                 padding-bottom: 50%; /* 2:1 aspect ratio */
-                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-                background-color: #07100E;
+                border-bottom: 1px solid var(--border);
+                background-color: var(--bg-elev-2);
                 overflow: hidden;
                 display: flex;
                 align-items: center;
@@ -5083,7 +5083,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background-color: #07100E;
+                background-color: var(--bg-elev-2);
               }
 
               .examy-blog-card-body {
@@ -5100,7 +5100,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 font-size: 17px;
                 font-weight: 700;
                 line-height: 1.4;
-                color: #E8F1EE;
+                color: var(--text);
                 font-family: 'Cairo', sans-serif;
                 margin: 0;
                 text-align: right;
@@ -5112,7 +5112,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
 
               .examy-blog-card-desc {
                 font-size: 13.5px;
-                color: rgba(232, 241, 238, 0.62);
+                color: var(--text-muted);
                 line-height: 1.5;
                 font-family: 'Cairo', sans-serif;
                 margin: 0;
@@ -5135,7 +5135,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
               .examy-blog-footer-author-name {
                 font-size: 11.5px;
                 font-weight: 700;
-                color: rgba(232, 241, 238, 0.62);
+                color: var(--text-muted);
                 font-family: 'Cairo', sans-serif;
                 margin-left: auto;
               }
@@ -5228,40 +5228,6 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                       </div>
                     </div>
                   </Link>
-                  {isMounted && (
-                    <a 
-                      href={`/admin/blog-details?slug=${featuredPost.slug}`} 
-                      target={window.parent !== window ? "_parent" : "_self"}
-                      style={{
-                        position: "absolute",
-                        top: 16,
-                        left: 16,
-                        backgroundColor: "#00E08A",
-                        color: "#07100E",
-                        padding: "8px 16px",
-                        borderRadius: 8,
-                        fontWeight: 700,
-                        fontSize: 13,
-                        textDecoration: "none",
-                        zIndex: 9999,
-                        boxShadow: "0 4px 12px rgba(0, 224, 138, 0.4)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 4,
-                        fontFamily: "'Cairo', sans-serif",
-                        transition: "transform 0.2s ease",
-                        pointerEvents: "auto",
-                        cursor: "pointer"
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-                      onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
-                    >
-                      <span>تعديل المقالة ✏️</span>
-                    </a>
-                  )}
                 </div>
               )}
 
@@ -5301,81 +5267,12 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                             </div>
                           </div>
                         </Link>
-                        {isMounted && (
-                          <a 
-                            href={`/admin/blog-details?slug=${post.slug}`} 
-                            target={window.parent !== window ? "_parent" : "_self"}
-                            style={{
-                              position: "absolute",
-                              top: 12,
-                              left: 12,
-                              backgroundColor: "#00E08A",
-                              color: "#07100E",
-                              padding: "5px 11px",
-                              borderRadius: 6,
-                              fontWeight: 700,
-                              fontSize: 11.5,
-                              textDecoration: "none",
-                              zIndex: 9999,
-                              boxShadow: "0 4px 10px rgba(0, 224, 138, 0.4)",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 4,
-                              fontFamily: "'Cairo', sans-serif",
-                              transition: "transform 0.2s ease",
-                              pointerEvents: "auto",
-                              cursor: "pointer"
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-                            onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                            }}
-                          >
-                            <span>تعديل ✏️</span>
-                          </a>
-                        )}
                       </div>
                     );
                   })}
                 </div>
               )}
             </div>
-
-            {/* Floating edit button for blogs list page layout */}
-            {(typeof window !== "undefined" && !window.location.pathname.includes("/admin")) && (
-              <a
-                href="/admin/blogs"
-                style={{
-                  position: "fixed",
-                  bottom: 24,
-                  left: 24,
-                  backgroundColor: "#00E08A",
-                  color: "#07100E",
-                  padding: "12px 20px",
-                  borderRadius: 30,
-                  boxShadow: "0 10px 25px rgba(0, 224, 138, 0.35)",
-                  fontWeight: 700,
-                  fontSize: 14,
-                  textDecoration: "none",
-                  zIndex: 9999,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  fontFamily: "'Cairo', sans-serif",
-                  transition: "all 0.2s ease",
-                  cursor: "pointer"
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-                onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                </svg>
-                تعديل صفحة المدوّنة
-              </a>
-            )}
           </div>
         );
       }
@@ -5404,8 +5301,76 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
         content: ""
       },
       render: ({ title, subtitle, date, author, image, content = "" }) => {
+        const getCategoryDetails = (postTitle: string, postDesc: string) => {
+          const text = `${postTitle} ${postDesc}`.toLowerCase();
+          if (
+            text.includes('ذكاء') ||
+            text.includes('ai') ||
+            text.includes('اصطناعي') ||
+            text.includes('qa') ||
+            text.includes('جودة') ||
+            text.includes('اختبارات') ||
+            text.includes('برمجيات')
+          ) {
+            return {
+              name: 'الذكاء الاصطناعي',
+              color: '#00E08A',
+              bgColor: 'rgba(0, 224, 138, 0.12)',
+            };
+          }
+          if (
+            text.includes('تقويم') ||
+            text.includes('اختبار') ||
+            text.includes('امتحان') ||
+            text.includes('أسئلة') ||
+            text.includes('بلوم') ||
+            text.includes('تصحيح') ||
+            text.includes('رصد') ||
+            text.includes('درجات')
+          ) {
+            return {
+              name: 'التقويم والاختبارات',
+              color: '#3B82F6',
+              bgColor: 'rgba(59, 130, 246, 0.12)',
+            };
+          }
+          if (
+            text.includes('منهج') ||
+            text.includes('سعودي') ||
+            text.includes('مملكة') ||
+            text.includes('وزارة') ||
+            text.includes('تعليم')
+          ) {
+            return {
+              name: 'المنهج السعودي',
+              color: '#1FA89F',
+              bgColor: 'rgba(31, 168, 159, 0.12)',
+            };
+          }
+          if (
+            text.includes('نصائح') ||
+            text.includes('معلم') ||
+            text.includes('إرشادات') ||
+            text.includes('طرق') ||
+            text.includes('أساليب')
+          ) {
+            return {
+              name: 'نصائح للمعلمين',
+              color: '#F59E0B',
+              bgColor: 'rgba(245, 158, 11, 0.12)',
+            };
+          }
+          return {
+            name: 'عام',
+            color: '#8B5CF6',
+            bgColor: 'rgba(139, 92, 246, 0.12)',
+          };
+        };
+
+        const cat = getCategoryDetails(title || "", subtitle || "");
+
         return (
-          <article style={{ padding: "120px 24px 80px", direction: "rtl", color: "#ffffff", backgroundColor: "#000000", position: "relative" }}>
+          <article style={{ padding: "120px 24px 80px", direction: "rtl", color: "var(--text)", backgroundColor: "var(--bg)", position: "relative" }}>
             <style>{`
               .blog-rich-content span,
               .blog-rich-content p,
@@ -5419,45 +5384,79 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
               .blog-rich-content h4,
               .blog-rich-content h5,
               .blog-rich-content h6 {
-                color: #ffffff !important;
+                color: var(--text) !important;
               }
               .blog-rich-content a {
                 color: var(--brand) !important;
                 text-decoration: underline;
               }
               .blog-rich-content p {
-                margin-bottom: 24px;
-                font-size: 18px;
-                line-height: 1.85;
+                margin-bottom: 16px;
+                font-size: 19px;
+                line-height: 34px;
                 text-align: right;
+              }
+              .blog-rich-content h1 {
+                font-size: 28px;
+                font-weight: 700;
+                text-align: right;
+                margin-top: 24px;
+                margin-bottom: 10px;
               }
               .blog-rich-content h2 {
-                margin-top: 40px;
-                margin-bottom: 20px;
+                margin-top: 20px;
+                margin-bottom: 10px;
                 font-size: 24px;
-                font-weight: 800;
+                font-weight: 700;
                 text-align: right;
+                border-right: 4px solid var(--brand);
+                padding-right: 12px;
               }
               .blog-rich-content h3 {
-                margin-top: 32px;
-                margin-bottom: 16px;
-                font-size: 20px;
+                margin-top: 16px;
+                margin-bottom: 8px;
+                font-size: 21px;
                 font-weight: 700;
                 text-align: right;
               }
               .blog-rich-content ul, .blog-rich-content ol {
-                margin-bottom: 24px;
-                padding-right: 24px;
-                list-style-position: inside;
+                margin-bottom: 14px;
+                padding-right: 20px;
+                text-align: right;
               }
               .blog-rich-content li {
-                margin-bottom: 10px;
-                font-size: 17px;
-                color: rgba(255, 255, 255, 0.9) !important;
+                margin-bottom: 6px;
+                font-size: 18px;
+                line-height: 30px;
+                color: var(--text) !important;
                 text-align: right;
               }
               .blog-rich-content strong {
                 font-weight: 700;
+              }
+              .blog-rich-content blockquote {
+                border-right: 4px solid var(--brand);
+                padding-right: 16px;
+                padding-left: 8px;
+                margin: 14px 0;
+                font-size: 18px;
+                line-height: 30px;
+                color: var(--text-muted) !important;
+              }
+              .blog-rich-content code {
+                font-family: monospace;
+                background-color: var(--bg-elev-1);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-size: 16px;
+              }
+              .blog-rich-content pre {
+                font-family: monospace;
+                background-color: var(--bg-elev-1);
+                padding: 12px;
+                border-radius: 8px;
+                margin: 16px 0;
+                overflow-x: auto;
               }
             `}</style>
 
@@ -5469,9 +5468,9 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 gap: 7,
                 padding: "8px 16px",
                 borderRadius: 24,
-                border: "1px solid rgba(255, 255, 255, 0.15)",
-                backgroundColor: "rgba(255, 255, 255, 0.05)",
-                color: "#ffffff",
+                border: "1px solid var(--border)",
+                backgroundColor: "var(--bg-elev-2)",
+                color: "var(--text)",
                 textDecoration: "none",
                 fontSize: 13,
                 fontWeight: 500,
@@ -5481,12 +5480,12 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 cursor: "pointer"
               }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.1)";
+                  e.currentTarget.style.backgroundColor = "var(--bg-elev-1)";
                   e.currentTarget.style.borderColor = "var(--brand)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.05)";
-                  e.currentTarget.style.borderColor = "rgba(255, 255, 255, 0.15)";
+                  e.currentTarget.style.backgroundColor = "var(--bg-elev-2)";
+                  e.currentTarget.style.borderColor = "var(--border)";
                 }}
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="var(--brand)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
@@ -5495,11 +5494,27 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 <span>رجوع إلى المدوّنة</span>
               </Link>
 
+              {/* Category Badge */}
+              <div style={{
+                padding: "5px 12px",
+                borderRadius: 20,
+                backgroundColor: cat.bgColor,
+                color: cat.color,
+                fontSize: 12,
+                fontWeight: 700,
+                marginBottom: 16,
+                display: "inline-flex",
+                alignItems: "center",
+                fontFamily: "'Cairo', sans-serif"
+              }}>
+                {cat.name}
+              </div>
+
               <h1 style={{
                 fontSize: 30,
                 fontWeight: "bold",
                 lineHeight: "42px",
-                color: "#ffffff",
+                color: "var(--text)",
                 marginBottom: 16,
                 textAlign: "right",
                 width: "100%"
@@ -5511,7 +5526,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
-                color: "rgba(255, 255, 255, 0.6)",
+                color: "var(--text-muted)",
                 fontSize: 12.5,
                 marginBottom: 20,
                 justifyContent: "flex-start",
@@ -5543,27 +5558,23 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
               )}
 
               {subtitle && (
-                <div style={{
-                  fontSize: 18,
-                  lineHeight: 1.6,
-                  color: "var(--brand)",
-                  fontWeight: 600,
-                  marginBottom: 36,
-                  paddingRight: 20,
-                  borderRight: "4px solid var(--brand)",
-                  background: "rgba(0, 224, 138, 0.03)",
-                  paddingTop: 12,
-                  paddingBottom: 12,
-                  borderRadius: "0 8px 8px 0",
+                <p style={{
+                  fontSize: 20,
+                  lineHeight: 1.8,
+                  color: "var(--text)",
+                  opacity: 0.85,
+                  marginBottom: 32,
+                  fontWeight: 500,
+                  textAlign: "right",
                   width: "100%"
                 }}>
                   {subtitle}
-                </div>
+                </p>
               )}
 
               <div 
                 className="blog-rich-content"
-                style={{ fontSize: 18, lineHeight: 1.85, color: "#ffffff", width: "100%", display: "flow-root", clear: "both" }} 
+                style={{ fontSize: 19, lineHeight: 1.8, color: "var(--text)", width: "100%", display: "flow-root", clear: "both" }} 
                 dangerouslySetInnerHTML={{ __html: content }} 
               />
 
@@ -5573,49 +5584,6 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 </a>
               </div>
             </div>
-
-            {/* Floating edit button for blog details page layout */}
-            {(() => {
-              let slug = "";
-              if (typeof window !== "undefined") {
-                const params = new URLSearchParams(window.location.search);
-                slug = params.get("slug") || "";
-              }
-              const showEditButton = typeof window !== "undefined" && !window.location.pathname.includes("/admin") && slug;
-              return showEditButton ? (
-                <a
-                  href={`/admin/blog-details?slug=${slug}`}
-                  style={{
-                    position: "fixed",
-                    bottom: 24,
-                    left: 24,
-                    backgroundColor: "#00E08A",
-                    color: "#07100E",
-                    padding: "12px 20px",
-                    borderRadius: 30,
-                    boxShadow: "0 10px 25px rgba(0, 224, 138, 0.35)",
-                    fontWeight: 700,
-                    fontSize: 14,
-                    textDecoration: "none",
-                    zIndex: 9999,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    fontFamily: "'Cairo', sans-serif",
-                    transition: "all 0.2s ease",
-                    cursor: "pointer"
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                  </svg>
-                  تعديل هذه المقالة
-                </a>
-              ) : null;
-            })()}
           </article>
         );
       }
@@ -5635,7 +5603,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
       const isBlogDetails = pathname.includes("blog-details");
 
       return (
-        <div style={{ direction: "rtl", minHeight: "100vh", position: "relative", width: "100%", backgroundColor: isBlogDetails ? "#000000" : "transparent" }}>
+        <div style={{ direction: "rtl", minHeight: "100vh", position: "relative", width: "100%", backgroundColor: isBlogDetails ? "var(--bg)" : "transparent" }}>
           {!isBlogDetails && (
             <AmbientBackground bgStyle="fluid" intensity={75} blur={60} speed={100} grain={true} mesh={false} />
           )}
