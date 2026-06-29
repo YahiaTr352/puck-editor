@@ -11,9 +11,10 @@ export async function getPageData(slug: string, options?: { draft?: boolean }) {
   console.log(`[getPageData] Called with slug: "${slug}", draft: ${options?.draft}`);
   try {
     const payload = await getPayload({ config });
-    const draft = options?.draft ?? false;
 
-    const targetCollection = slug === 'home' 
+    const draft = options?.draft ?? false;
+    const isHome = slug === 'home' || slug === '/' || slug === '';
+    const targetCollection = isHome 
       ? 'pages' 
       : (slug === 'faq' || slug === 'faqi') 
       ? 'faq' 
@@ -26,7 +27,13 @@ export async function getPageData(slug: string, options?: { draft?: boolean }) {
       collection: targetCollection as any,
       draft: false,
       overrideAccess: true,
-      where: {
+      where: isHome ? {
+        or: [
+          { slug: { equals: 'home' } },
+          { slug: { equals: '/' } },
+          { slug: { equals: '' } }
+        ]
+      } : {
         slug: {
           equals: slug,
         },
@@ -44,7 +51,13 @@ export async function getPageData(slug: string, options?: { draft?: boolean }) {
         collection: targetCollection as any,
         draft: true,
         overrideAccess: true,
-        where: {
+        where: isHome ? {
+          or: [
+            { slug: { equals: 'home' } },
+            { slug: { equals: '/' } },
+            { slug: { equals: '' } }
+          ]
+        } : {
           slug: {
             equals: slug,
           },
@@ -53,7 +66,6 @@ export async function getPageData(slug: string, options?: { draft?: boolean }) {
       const draftDoc = resultTrue.docs.length > 0 ? resultTrue.docs[0] : null;
       console.log(`[getPageData] "${slug}" - Draft/latest doc found in ${targetCollection}: ${!!draftDoc}`);
 
-      // Compare timestamps to return the most recently updated one
       if (pubDoc && draftDoc) {
         const pubTime = new Date(pubDoc.updatedAt).getTime();
         const draftTime = new Date(draftDoc.updatedAt).getTime();
@@ -214,7 +226,13 @@ export async function savePageData(slug: string, title: string, puckData: any) {
       collection: targetCollection as any,
       draft: true,
       overrideAccess: true,
-      where: {
+      where: isHome ? {
+        or: [
+          { slug: { equals: 'home' } },
+          { slug: { equals: '/' } },
+          { slug: { equals: '' } }
+        ]
+      } : {
         slug: {
           equals: slug,
         },
@@ -228,7 +246,13 @@ export async function savePageData(slug: string, title: string, puckData: any) {
         collection: targetCollection as any,
         draft: false,
         overrideAccess: true,
-        where: {
+        where: isHome ? {
+          or: [
+            { slug: { equals: 'home' } },
+            { slug: { equals: '/' } },
+            { slug: { equals: '' } }
+          ]
+        } : {
           slug: {
             equals: slug,
           },
@@ -240,6 +264,7 @@ export async function savePageData(slug: string, title: string, puckData: any) {
     if (result.docs.length > 0) {
       // Update existing page and publish it directly
       const pageId = result.docs[0].id;
+      const existingSlug = result.docs[0].slug;
       console.log(`[savePageData] "${slug}" - Updating existing page in ${targetCollection}. ID: ${pageId}`);
       const updated = await payload.update({
         collection: targetCollection as any,
@@ -248,7 +273,7 @@ export async function savePageData(slug: string, title: string, puckData: any) {
         overrideAccess: true,
         data: {
           title,
-          slug,
+          slug: existingSlug || slug, // preserve existing slug format (home or /)
           puckData,
           status: 'published',
         },
