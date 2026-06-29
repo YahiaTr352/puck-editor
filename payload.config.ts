@@ -38,9 +38,6 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
-    components: {
-      afterDashboard: ['/src/components/CmsEditorLink#CmsEditorLink'],
-    },
   },
   collections: [
     {
