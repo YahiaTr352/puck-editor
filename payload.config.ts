@@ -70,6 +70,9 @@ export default buildConfig({
           type: 'text',
           required: true,
           unique: true,
+          admin: {
+            description: "Notice: The page with slug 'home', '/', or 'landing-page' is automatically served on the root path (/) of the website.",
+          }
         },
         {
           name: 'puckData',

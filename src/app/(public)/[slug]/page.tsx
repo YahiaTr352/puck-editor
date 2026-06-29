@@ -1,7 +1,7 @@
 import React from "react";
 import { getPageData } from "../../actions";
 import { HomeClientView } from "../HomeClientView";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -16,8 +16,8 @@ export async function generateMetadata({ params }: Props) {
     const resolvedParams = await params;
     const slug = decodeURIComponent(resolvedParams.slug);
     
-    // Ignore core pages or folders
-    if (["home", "faq", "blogs", "blog-details", "login", "admin", "cms", "api"].includes(slug)) {
+    // Ignore core pages or folders (landing-page redirects to root)
+    if (["home", "landing-page", "faq", "blogs", "blog-details", "login", "admin", "cms", "api"].includes(slug)) {
       return {};
     }
     
@@ -43,8 +43,13 @@ export default async function CustomDynamicPage({ params }: Props) {
   const resolvedParams = await params;
   const slug = decodeURIComponent(resolvedParams.slug);
 
+  // If request is for home slug, redirect to root path
+  if (slug === "home" || slug === "landing-page" || slug === "") {
+    redirect("/");
+  }
+
   // If someone requests core folders or files, skip it
-  if (["home", "faq", "blogs", "blog-details", "login", "admin", "cms", "api"].includes(slug)) {
+  if (["faq", "blogs", "blog-details", "login", "admin", "cms", "api"].includes(slug)) {
     return notFound();
   }
 

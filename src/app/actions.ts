@@ -13,7 +13,7 @@ export async function getPageData(slug: string, options?: { draft?: boolean }) {
     const payload = await getPayload({ config });
 
     const draft = options?.draft ?? false;
-    const isHome = slug === 'home' || slug === '/' || slug === '';
+    const isHome = slug === 'home' || slug === '/' || slug === '' || slug === 'landing-page';
     const targetCollection = isHome 
       ? 'pages' 
       : (slug === 'faq' || slug === 'faqi') 
@@ -31,7 +31,8 @@ export async function getPageData(slug: string, options?: { draft?: boolean }) {
         or: [
           { slug: { equals: 'home' } },
           { slug: { equals: '/' } },
-          { slug: { equals: '' } }
+          { slug: { equals: '' } },
+          { slug: { equals: 'landing-page' } }
         ]
       } : {
         slug: {
@@ -55,7 +56,8 @@ export async function getPageData(slug: string, options?: { draft?: boolean }) {
           or: [
             { slug: { equals: 'home' } },
             { slug: { equals: '/' } },
-            { slug: { equals: '' } }
+            { slug: { equals: '' } },
+            { slug: { equals: 'landing-page' } }
           ]
         } : {
           slug: {
@@ -129,7 +131,8 @@ export async function savePageData(slug: string, title: string, puckData: any) {
   try {
     const payload = await getPayload({ config });
 
-    const targetCollection = slug === 'home' 
+    const isHome = slug === 'home' || slug === '/' || slug === '' || slug === 'landing-page';
+    const targetCollection = isHome 
       ? 'pages' 
       : (slug === 'faq' || slug === 'faqi') 
       ? 'faq' 
@@ -230,7 +233,8 @@ export async function savePageData(slug: string, title: string, puckData: any) {
         or: [
           { slug: { equals: 'home' } },
           { slug: { equals: '/' } },
-          { slug: { equals: '' } }
+          { slug: { equals: '' } },
+          { slug: { equals: 'landing-page' } }
         ]
       } : {
         slug: {
@@ -250,7 +254,8 @@ export async function savePageData(slug: string, title: string, puckData: any) {
           or: [
             { slug: { equals: 'home' } },
             { slug: { equals: '/' } },
-            { slug: { equals: '' } }
+            { slug: { equals: '' } },
+            { slug: { equals: 'landing-page' } }
           ]
         } : {
           slug: {
@@ -380,7 +385,8 @@ export async function getPagesList() {
 export async function deletePageData(slug: string) {
   try {
     const payload = await getPayload({ config });
-    const targetCollection = slug === 'home' 
+    const isHome = slug === 'home' || slug === '/' || slug === '' || slug === 'landing-page';
+    const targetCollection = isHome 
       ? 'pages' 
       : (slug === 'faq' || slug === 'faqi') 
       ? 'faq' 
@@ -391,7 +397,14 @@ export async function deletePageData(slug: string) {
     const result = await payload.find({
       collection: targetCollection as any,
       overrideAccess: true,
-      where: {
+      where: isHome ? {
+        or: [
+          { slug: { equals: 'home' } },
+          { slug: { equals: '/' } },
+          { slug: { equals: '' } },
+          { slug: { equals: 'landing-page' } }
+        ]
+      } : {
         slug: {
           equals: slug,
         },

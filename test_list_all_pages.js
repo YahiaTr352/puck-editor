@@ -13,6 +13,10 @@ async function run() {
   try {
     await client.connect();
     
+    const pagesRes = await client.query('SELECT id, slug, title, status FROM pages');
+    console.log(`Pages count in 'pages' table: ${pagesRes.rows.length}`);
+    for (const r of pagesRes.rows) console.log(`  - ${r.slug} (Status: ${r.status}): ${r.title}`);
+
     const res = await client.query('SELECT id, slug, title, puck_data FROM pages WHERE slug = \'blogs\'');
     if (res.rows.length > 0) {
       console.log("Blogs page puck_data:", JSON.stringify(res.rows[0].puck_data, null, 2));

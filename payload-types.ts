@@ -153,6 +153,9 @@ export interface User {
 export interface Page {
   id: number;
   title: string;
+  /**
+   * Notice: The page with slug 'home', '/', or 'landing-page' is automatically served on the root path (/) of the website.
+   */
   slug: string;
   puckData:
     | {

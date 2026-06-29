@@ -539,6 +539,7 @@ function AdminDashboard() {
             gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
             gap: 30
           }}>
+
             {/* Card 1: Homepage */}
             <div style={cardStyle}>
               <div style={cardGlowStyle}></div>
@@ -548,6 +549,20 @@ function AdminDashboard() {
                 <p style={cardDescStyle}>
                   تعديل الهيرو، مزايا المنصة، أرقام وإحصائيات اختباري، وقسم الشركاء والأسعار.
                 </p>
+                <div style={{
+                  fontSize: 12,
+                  color: "#00E08A",
+                  backgroundColor: "rgba(0, 224, 138, 0.08)",
+                  padding: "8px 12px",
+                  borderRadius: 8,
+                  marginBottom: 20,
+                  display: "inline-block",
+                  fontWeight: 600,
+                  border: "1px solid rgba(0, 224, 138, 0.15)",
+                  lineHeight: "1.4"
+                }}>
+                  💡 تنبيه: الصفحة التي تحمل الـ Slug بـ "home" أو "/" تُعرض تلقائياً على الرابط الرئيسي (/) للموقع.
+                </div>
                 <a 
                   href="/admin/home" 
                   style={primaryBtnStyle}
