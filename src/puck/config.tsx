@@ -8,7 +8,7 @@ import { Icon } from "./icons";
 import { AmbientBackground } from "../components/AmbientBackground";
 import { LiveActivity } from "../components/LiveActivity";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 
 /* ────────────────────────────────────────────────────────────────────────
@@ -1442,6 +1442,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
         ],
       },
       render: ({ ctaText, ctaLink, links, actions, logoImageUrl = "", logoText = "اختباري Examy", logoLink = "#", logoSize = 36 }) => {
+        const router = useRouter();
         const [scrolled, setScrolled] = useState(false);
         const [menuOpen, setMenuOpen] = useState(false);
         const [theme, setTheme] = useState("light");
@@ -1575,6 +1576,38 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                     <Link
                       key={`${l.href}-${i}`}
                       href={l.href}
+                      onClick={(e) => {
+                        const href = l.href;
+                        if (href === "#faq" || href === "/#faq" || href === "faq" || href === "/faq") {
+                          if (pathname.includes("/faq")) {
+                            e.preventDefault();
+                            const target = document.querySelector("#faq") || document.querySelector(".faq-section");
+                            if (target) {
+                              target.scrollIntoView({ behavior: "smooth" });
+                            } else {
+                              window.scrollTo({ top: 0, behavior: "smooth" });
+                            }
+                          } else {
+                            if (href.startsWith("#") || href.startsWith("/#")) {
+                              e.preventDefault();
+                              router.push("/faq");
+                            }
+                          }
+                          return;
+                        }
+
+                        if (href.startsWith("#") || href.startsWith("/#")) {
+                          const hash = href.substring(href.indexOf("#"));
+                          if (pathname === "/" || pathname === "") {
+                            const target = document.querySelector(hash);
+                            if (target) {
+                              e.preventDefault();
+                              target.scrollIntoView({ behavior: "smooth" });
+                              window.history.pushState(null, "", hash);
+                            }
+                          }
+                        }
+                      }}
                       style={{
                         padding: "8px 14px",
                         fontSize: 14,
@@ -1769,7 +1802,39 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 <Link
                   key={`${l.href}-${i}`}
                   href={l.href}
-                  onClick={() => setMenuOpen(false)}
+                  onClick={(e) => {
+                    setMenuOpen(false);
+                    const href = l.href;
+                    if (href === "#faq" || href === "/#faq" || href === "faq" || href === "/faq") {
+                      if (pathname.includes("/faq")) {
+                        e.preventDefault();
+                        const target = document.querySelector("#faq") || document.querySelector(".faq-section");
+                        if (target) {
+                          target.scrollIntoView({ behavior: "smooth" });
+                        } else {
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }
+                      } else {
+                        if (href.startsWith("#") || href.startsWith("/#")) {
+                          e.preventDefault();
+                          router.push("/faq");
+                        }
+                      }
+                      return;
+                    }
+
+                    if (href.startsWith("#") || href.startsWith("/#")) {
+                      const hash = href.substring(href.indexOf("#"));
+                      if (pathname === "/" || pathname === "") {
+                        const target = document.querySelector(hash);
+                        if (target) {
+                           e.preventDefault();
+                           target.scrollIntoView({ behavior: "smooth" });
+                           window.history.pushState(null, "", hash);
+                        }
+                      }
+                    }
+                  }}
                   style={{
                     fontSize: 15,
                     color: "var(--text-muted)",
@@ -1981,16 +2046,28 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
               }}
             >
               {ctas.map((cta, idx) => {
+                const isHash = cta.href.startsWith("#") || cta.href.startsWith("/#");
+                const onClickHandler = (e: React.MouseEvent) => {
+                  if (isHash) {
+                    const hash = cta.href.substring(cta.href.indexOf("#"));
+                    const target = document.querySelector(hash);
+                    if (target) {
+                      e.preventDefault();
+                      target.scrollIntoView({ behavior: "smooth" });
+                      window.history.pushState(null, "", hash);
+                    }
+                  }
+                };
                 if (cta.variant === "secondary") {
                   return (
-                    <a key={idx} href={cta.href} className="btn btn-ghost btn-lg">
+                    <a key={idx} href={cta.href} className="btn btn-ghost btn-lg" onClick={onClickHandler}>
                       <Icon.Play width="14" height="14" />
                       {cta.label}
                     </a>
                   );
                 }
                 return (
-                  <a key={idx} href={cta.href} className="btn btn-primary btn-lg">
+                  <a key={idx} href={cta.href} className="btn btn-primary btn-lg" onClick={onClickHandler}>
                     {cta.label}
                     <Icon.ArrowLeft width="18" height="18" />
                   </a>
@@ -2374,7 +2451,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
               <HeroSocialProof center />
 
               {/* Showcase: build your test by picking fields */}
-              <div className="reveal" style={{ marginTop: 72, animationDelay: "0.4s" }}>
+              <div id="actual-models" className="reveal" style={{ marginTop: 72, animationDelay: "0.4s" }}>
                 <div
                   style={{
                     display: "flex",
@@ -2562,6 +2639,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
 
         return (
           <section id="how" className="section" style={{ position: "relative" }}>
+            <div id="how_it_works" style={{ position: "absolute", top: -80 }} />
             <div className="container">
               <div className="section-head">
                 <div className="eyebrow">
@@ -3754,8 +3832,24 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
                 {displayCtas.map((cta, i) => {
                   const isPrimary = cta.variant === "primary";
                   const btnClass = isPrimary ? "btn btn-primary btn-lg" : "btn btn-ghost btn-lg";
+                  const isHash = cta.href.startsWith("#") || cta.href.startsWith("/#");
                   return (
-                    <a key={i} href={cta.href} className={btnClass}>
+                    <a
+                      key={i}
+                      href={cta.href}
+                      className={btnClass}
+                      onClick={(e) => {
+                        if (isHash) {
+                          const hash = cta.href.substring(cta.href.indexOf("#"));
+                          const target = document.querySelector(hash);
+                          if (target) {
+                            e.preventDefault();
+                            target.scrollIntoView({ behavior: "smooth" });
+                            window.history.pushState(null, "", hash);
+                          }
+                        }
+                      }}
+                    >
                       {cta.label}
                       {isPrimary && <Icon.ArrowLeft width="18" height="18" />}
                     </a>
