@@ -87,6 +87,80 @@ export default buildConfig({
         },
       ],
     },
+    {
+      slug: 'faq',
+      admin: {
+        useAsTitle: 'title',
+        defaultColumns: ['title', 'slug', 'status', 'updatedAt'],
+      },
+      versions: {
+        drafts: true,
+      },
+      fields: [
+        {
+          name: 'title',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'slug',
+          type: 'text',
+          required: true,
+          unique: true,
+        },
+        {
+          name: 'puckData',
+          type: 'json',
+          required: true,
+        },
+        {
+          name: 'status',
+          type: 'select',
+          defaultValue: 'draft',
+          options: [
+            { label: 'Draft', value: 'draft' },
+            { label: 'Published', value: 'published' },
+          ],
+        },
+      ],
+    },
+    {
+      slug: 'blog',
+      admin: {
+        useAsTitle: 'title',
+        defaultColumns: ['title', 'slug', 'status', 'updatedAt'],
+      },
+      versions: {
+        drafts: true,
+      },
+      fields: [
+        {
+          name: 'title',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'slug',
+          type: 'text',
+          required: true,
+          unique: true,
+        },
+        {
+          name: 'puckData',
+          type: 'json',
+          required: true,
+        },
+        {
+          name: 'status',
+          type: 'select',
+          defaultValue: 'draft',
+          options: [
+            { label: 'Draft', value: 'draft' },
+            { label: 'Published', value: 'published' },
+          ],
+        },
+      ],
+    },
   ],
   routes: {
     admin: '/cms', // Routed to /cms to avoid conflicts with Puck Editor's /admin path
@@ -104,7 +178,7 @@ export default buildConfig({
   },
   plugins: [
     seoPlugin({
-      collections: ['pages'],
+      collections: ['pages', 'faq', 'blog'],
       tabbedUI: true,
       generateTitle,
       generateDescription,
