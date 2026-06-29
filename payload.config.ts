@@ -126,6 +126,9 @@ export default buildConfig({
         useAsTitle: 'title',
         defaultColumns: ['title', 'slug', 'status', 'updatedAt'],
       },
+      access: {
+        create: () => false,
+      },
       versions: {
         drafts: true,
       },

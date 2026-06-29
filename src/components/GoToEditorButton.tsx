@@ -41,10 +41,10 @@ export default function GoToEditorButton() {
           backgroundColor: '#000000',
           color: '#ffffff',
           textDecoration: 'none',
-          fontWeight: 800,
-          fontSize: '14px',
-          padding: '12px 24px',
-          borderRadius: '10px',
+          fontWeight: 500,
+          fontSize: '13.5px',
+          padding: '10px 20px',
+          borderRadius: '8px',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
           border: '1px solid rgba(255, 255, 255, 0.15)',
           transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -62,7 +62,7 @@ export default function GoToEditorButton() {
           e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)'
         }}
       >
-        <span>الذهاب إلى المحرر البصري</span>
+        <span>edit with puck editor</span>
       </a>
     </div>
   )
