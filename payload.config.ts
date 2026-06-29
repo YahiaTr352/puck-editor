@@ -39,7 +39,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
-      beforeDashboard: ['/src/components/CmsEditorLink#CmsEditorLink'],
+      afterDashboard: ['/src/components/CmsEditorLink#CmsEditorLink'],
     },
   },
   collections: [
@@ -58,6 +58,29 @@ export default buildConfig({
       },
       versions: {
         drafts: true,
+      },
+      access: {
+        read: ({ req, id }) => {
+          if (id) return true;
+          const url = req?.url || '';
+          const queryStr = req?.query ? JSON.stringify(req.query) : '';
+          if (
+            url.includes('blog-details') ||
+            url.includes('blogs') ||
+            url.includes('faq') ||
+            queryStr.includes('blog-details') ||
+            queryStr.includes('blogs') ||
+            queryStr.includes('faq') ||
+            queryStr.includes('blog')
+          ) {
+            return true;
+          }
+          return {
+            slug: {
+              equals: 'home',
+            },
+          };
+        },
       },
       fields: [
         {
