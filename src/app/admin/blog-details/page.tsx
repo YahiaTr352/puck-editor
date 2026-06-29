@@ -92,12 +92,28 @@ function BlogDetailsAdminContent() {
       setLoading(true);
       try {
         const dbData = await getPageData(dbSlug, { draft: true });
+        
+        // Fetch homepage Nav and Footer props to keep header/footer unified
+        const homeDbData = await getPageData("home", { draft: true });
+        const homeData = homeDbData && homeDbData.puckData 
+          ? (typeof homeDbData.puckData === 'string' ? JSON.parse(homeDbData.puckData) : homeDbData.puckData)
+          : null;
+        
+        let homeNavProps: any = null;
+        let homeFooterProps: any = null;
+        if (homeData && homeData.content && Array.isArray(homeData.content)) {
+          const navItem = homeData.content.find((item: any) => item.type === "Nav");
+          if (navItem) homeNavProps = navItem.props;
+          const footerItem = homeData.content.find((item: any) => item.type === "Footer");
+          if (footerItem) homeFooterProps = footerItem.props;
+        }
+
         if (dbData && dbData.puckData) {
           const parsed = typeof dbData.puckData === 'string' ? JSON.parse(dbData.puckData) : dbData.puckData;
           if (parsed.content && Array.isArray(parsed.content)) {
             const migratedContent = parsed.content.map((item: any) => {
               if (item.type === "Nav") {
-                const updatedProps = { ...item.props };
+                const updatedProps = homeNavProps ? { ...homeNavProps, id: item.props.id || "nav-header" } : { ...item.props };
                 if (!updatedProps.links || updatedProps.links.length === 0) {
                   updatedProps.links = [
                     { label: "الميزات", href: "/#features" },
@@ -133,7 +149,7 @@ function BlogDetailsAdminContent() {
                 return { ...item, props: updatedProps };
               }
               if (item.type === "Footer") {
-                const updatedProps = { ...item.props };
+                const updatedProps = homeFooterProps ? { ...homeFooterProps, id: item.props.id || "footer-block" } : { ...item.props };
                 const defs = {
                   description: "منصة سعودية مدعومة بالذكاء الاصطناعي لإنشاء وإدارة الاختبارات، مرتبطة بالمنهج السعودي.",
                   twitterUrl: "https://x.com/examyai",
