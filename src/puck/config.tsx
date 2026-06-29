@@ -4379,7 +4379,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
         const displaySubtitle = subtitle !== undefined ? subtitle : "جمعنا أكثر أسئلة المعلمين والمعلمات تكرارًا حول إنشاء الاختبارات، التصحيح، التخصيص، والأسعار. لم تجد إجابتك؟ فريقنا جاهز لمساعدتك.";
 
         return (
-          <div style={{ position: "relative", direction: "rtl", textAlign: "right", background: "#000000", color: "var(--text)" }}>
+          <div style={{ position: "relative", direction: "rtl", textAlign: "right", background: "var(--bg)", color: "var(--text)" }}>
             {/* Hero Section */}
             <section style={{ position: "relative", paddingTop: 150, paddingBottom: 20 }}>
               <div
@@ -4888,7 +4888,7 @@ export const config: Config<PuckConfig, { title?: string; description?: string }
         const regularPosts = featuredPost ? filteredPosts.slice(1) : filteredPosts;
 
         return (
-          <div style={{ width: "100%", backgroundColor: "#07100E", minHeight: "100vh", position: "relative", paddingBottom: 64 }}>
+          <div style={{ width: "100%", backgroundColor: "var(--bg)", minHeight: "100vh", position: "relative", paddingBottom: 64 }}>
             <style>{`
               .examy-blog-hero {
                 position: relative;
