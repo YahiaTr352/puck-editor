@@ -58,6 +58,7 @@ export default buildConfig({
       },
       access: {
         read: ({ req, id }) => {
+          if (req?.user) return true;
           if (id) return true;
           const url = req?.url || '';
           const queryStr = req?.query ? JSON.stringify(req.query) : '';
@@ -80,6 +81,15 @@ export default buildConfig({
         },
       },
       fields: [
+        {
+          name: 'goToEditor',
+          type: 'ui',
+          admin: {
+            components: {
+              Field: '/src/components/GoToEditorButton.tsx',
+            },
+          },
+        },
         {
           name: 'title',
           type: 'text',
