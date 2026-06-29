@@ -194,6 +194,70 @@ export default buildConfig({
         },
       ],
     },
+    {
+      slug: 'reviews',
+      admin: {
+        useAsTitle: 'name',
+        defaultColumns: ['name', 'type', 'role', 'updatedAt'],
+      },
+      fields: [
+        {
+          name: 'name',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'type',
+          type: 'select',
+          required: true,
+          defaultValue: 'review',
+          options: [
+            { label: 'Review (رأي معلم)', value: 'review' },
+            { label: 'Subscribe (اشتراك جديد)', value: 'subscribe' },
+            { label: 'Create (تم إنشاء اختبار)', value: 'create' },
+          ],
+        },
+        {
+          name: 'role',
+          type: 'text',
+        },
+        {
+          name: 'avatar',
+          type: 'text',
+          admin: {
+            description: 'Optional letter or emoji for the avatar. Defaults to the first letter of the name.',
+          },
+        },
+        {
+          name: 'body',
+          type: 'textarea',
+          admin: {
+            condition: (data) => data?.type === 'review',
+          },
+        },
+        {
+          name: 'plan',
+          type: 'text',
+          admin: {
+            condition: (data) => data?.type === 'subscribe',
+          },
+        },
+        {
+          name: 'subject',
+          type: 'text',
+          admin: {
+            condition: (data) => data?.type === 'create',
+          },
+        },
+        {
+          name: 'count',
+          type: 'number',
+          admin: {
+            condition: (data) => data?.type === 'create',
+          },
+        },
+      ],
+    },
   ],
   routes: {
     admin: '/cms', // Routed to /cms to avoid conflicts with Puck Editor's /admin path

@@ -533,3 +533,23 @@ export async function getDynamicBlogsList(options?: { draft?: boolean }) {
     return [];
   }
 }
+
+/**
+ * Fetch reviews list from the database
+ */
+export async function getReviews() {
+  console.log(`[getReviews] Fetching all reviews from database...`);
+  try {
+    const payload = await getPayload({ config });
+    const result = await payload.find({
+      collection: 'reviews',
+      overrideAccess: true,
+      limit: 100,
+    });
+    console.log(`[getReviews] Found ${result.docs.length} reviews.`);
+    return result.docs;
+  } catch (error) {
+    console.error('[getReviews] Error fetching reviews:', error);
+    return [];
+  }
+}

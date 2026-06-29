@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Icon } from "../puck/icons";
+import { getReviews } from "../app/actions";
 
 const LA_EVENTS = [
   { type: 'review', name: 'أ. منيرة العتيبي', role: 'معلمة رياضيات', avatar: 'م',
@@ -109,9 +110,34 @@ const LiveActivityCard = ({ ev, idx = 0, onClose }: LiveActivityCardProps) => {
 };
 
 export const LiveActivity = () => {
+  const [events, setEvents] = useState<any[]>(LA_EVENTS);
   const [idx, setIdx] = useState(0);
   const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(true); // default to true, load client-side
+
+  useEffect(() => {
+    async function loadDbReviews() {
+      try {
+        const dbReviews = await getReviews();
+        if (dbReviews && dbReviews.length > 0) {
+          const formatted = dbReviews.map((rev: any) => ({
+            type: rev.type || 'review',
+            name: rev.name,
+            role: rev.role || '',
+            avatar: rev.avatar || (rev.name ? rev.name.charAt(0) : 'م'),
+            body: rev.body || '',
+            plan: rev.plan || '',
+            subject: rev.subject || '',
+            count: rev.count || 0
+          }));
+          setEvents(formatted);
+        }
+      } catch (err) {
+        console.warn("Failed to load reviews from database:", err);
+      }
+    }
+    loadDbReviews();
+  }, []);
 
   useEffect(() => {
     // If inside an iframe (like Puck preview canvas) or in admin route, disable live activity
@@ -150,9 +176,9 @@ export const LiveActivity = () => {
     const lead = idx === 0 ? FIRST_DELAY_MS : GAP_MS;
     t.push(setTimeout(() => setVisible(true), lead));
     t.push(setTimeout(() => setVisible(false), lead + VISIBLE_MS));
-    t.push(setTimeout(() => setIdx(i => (i + 1) % LA_EVENTS.length), lead + VISIBLE_MS + 650));
+    t.push(setTimeout(() => setIdx(i => (i + 1) % events.length), lead + VISIBLE_MS + 650));
     return () => t.forEach(clearTimeout);
-  }, [idx, dismissed]);
+  }, [idx, dismissed, events.length]);
 
   if (dismissed) return null;
 
@@ -162,7 +188,7 @@ export const LiveActivity = () => {
     try { sessionStorage.setItem('examy_la_dismissed', '1'); } catch {}
   };
 
-  const ev = LA_EVENTS[idx];
+  const ev = events[idx] || events[0];
 
   return (
     <div
